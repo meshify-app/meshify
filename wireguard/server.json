@@ -1,0 +1,23 @@
+{
+  "address": [
+    "100.0.0.1/24"
+  ],
+  "listenPort": 51820,
+  "mtu": 0,
+  "privateKey": "GIc1T6LVqFcZz8Bhtck4SbeOZZUSgiOVwxqt1y1F4n8=",
+  "publicKey": "xI2ymVGaoLvOhB36Zb74GIEB8zXD8c0Jc4PuVdu8wWU=",
+  "endpoint": "wireguard.example.com:123",
+  "persistentKeepalive": 16,
+  "dns": [],
+  "allowedips": [
+    "0.0.0.0/0",
+    "::/0"
+  ],
+  "preUp": "echo WireGuard PreUp",
+  "postUp": "echo WireGuard PostUp",
+  "preDown": "echo WireGuard PreDown",
+  "postDown": "echo WireGuard PostDown",
+  "updatedBy": "alan@grapid.net",
+  "created": "2020-09-29T22:39:34.647493451Z",
+  "updated": "2020-09-29T22:41:49.790637895Z"
+}
