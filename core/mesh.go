@@ -2,26 +2,20 @@ package core
 
 import (
 	"errors"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"sort"
-	"strconv"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
-	"github.com/skip2/go-qrcode"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/mongo"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/template"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
-	"gopkg.in/gomail.v2"
 )
 
-// CreateClient client with all necessary data
-func CreateClient(client *model.Client) (*model.Client, error) {
+// CreateMesh mesh with all necessary data
+func CreateMesh(client *model.Client) (*model.Client, error) {
 
 	u := uuid.NewV4()
 	client.Id = u.String()
@@ -73,12 +67,12 @@ func CreateClient(client *model.Client) (*model.Client, error) {
 		return nil, errors.New("failed to validate client")
 	}
 
-	err = mongo.Serialize(client.Id, "hosts", client)
+	err = mongo.Serialize(client.Id, "mesh", client)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err := mongo.Deserialize(client.Id, "hosts")
+	v, err := mongo.Deserialize(client.Id, "mesh")
 	if err != nil {
 		return nil, err
 	}
@@ -88,9 +82,9 @@ func CreateClient(client *model.Client) (*model.Client, error) {
 	return client, UpdateServerConfigWg()
 }
 
-// ReadClient client by id
-func ReadClient(id string) (*model.Client, error) {
-	v, err := mongo.Deserialize(id, "hosts")
+// ReadMesh client by id
+func ReadMesh(id string) (*model.Client, error) {
+	v, err := mongo.Deserialize(id, "mesh")
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +93,9 @@ func ReadClient(id string) (*model.Client, error) {
 	return client, nil
 }
 
-// UpdateClient preserve keys
-func UpdateClient(Id string, client *model.Client) (*model.Client, error) {
-	v, err := mongo.Deserialize(Id, "hosts")
+// UpdateMesh preserve keys
+func UpdateMesh(Id string, client *model.Client) (*model.Client, error) {
+	v, err := mongo.Deserialize(Id, "mesh")
 	if err != nil {
 		return nil, err
 	}
@@ -127,12 +121,12 @@ func UpdateClient(Id string, client *model.Client) (*model.Client, error) {
 	client.PublicKey = current.PublicKey
 	client.Updated = time.Now().UTC()
 
-	err = mongo.Serialize(client.Id, "hosts", client)
+	err = mongo.Serialize(client.Id, "mesh", client)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err = mongo.Deserialize(Id, "hosts")
+	v, err = mongo.Deserialize(Id, "mesh")
 	if err != nil {
 		return nil, err
 	}
@@ -142,10 +136,10 @@ func UpdateClient(Id string, client *model.Client) (*model.Client, error) {
 	return client, UpdateServerConfigWg()
 }
 
-// DeleteClient from disk
-func DeleteClient(id string) error {
+// DeleteMesh from disk
+func DeleteMesh(id string) error {
 
-	err := mongo.DeleteClient(id, "hosts")
+	err := mongo.DeleteClient(id, "mesh")
 	//	path := filepath.Join(os.Getenv("WG_CONF_DIR"), id)
 	//	err := os.Remove(path)
 	if err != nil {
@@ -156,8 +150,8 @@ func DeleteClient(id string) error {
 	return UpdateServerConfigWg()
 }
 
-// ReadClients all clients
-func ReadClients() ([]*model.Client, error) {
+// ReadMeshes all clients
+func ReadMeshes() ([]*model.Client, error) {
 	clients := make([]*model.Client, 0)
 	/*
 		files, err := ioutil.ReadDir(filepath.Join(os.Getenv("WG_CONF_DIR")))
@@ -181,7 +175,7 @@ func ReadClients() ([]*model.Client, error) {
 			}
 		}
 	*/
-	clients = mongo.ReadAllClients()
+	clients = mongo.ReadAllMeshes()
 
 	sort.Slice(clients, func(i, j int) bool {
 		return clients[i].Created.After(clients[j].Created)
@@ -190,8 +184,8 @@ func ReadClients() ([]*model.Client, error) {
 	return clients, nil
 }
 
-// ReadClientConfig in wg format
-func ReadClientConfig(id string) ([]byte, error) {
+// ReadMeshConfig in wg format
+func ReadMeshConfig(id string) ([]byte, error) {
 	client, err := ReadClient(id)
 	if err != nil {
 		return nil, err
@@ -208,80 +202,4 @@ func ReadClientConfig(id string) ([]byte, error) {
 	}
 
 	return configDataWg, nil
-}
-
-// EmailClient send email to client
-func EmailClient(id string) error {
-	client, err := ReadClient(id)
-	if err != nil {
-		return err
-	}
-
-	configData, err := ReadClientConfig(id)
-	if err != nil {
-		return err
-	}
-
-	// conf as .conf file
-	tmpfileCfg, err := ioutil.TempFile("", "wireguard-vpn-*.conf")
-	if err != nil {
-		return err
-	}
-	if _, err := tmpfileCfg.Write(configData); err != nil {
-		return err
-	}
-	if err := tmpfileCfg.Close(); err != nil {
-		return err
-	}
-	defer os.Remove(tmpfileCfg.Name()) // clean up
-
-	// conf as png image
-	png, err := qrcode.Encode(string(configData), qrcode.Medium, 280)
-	if err != nil {
-		return err
-	}
-	tmpfilePng, err := ioutil.TempFile("", "qrcode-*.png")
-	if err != nil {
-		return err
-	}
-	if _, err := tmpfilePng.Write(png); err != nil {
-		return err
-	}
-	if err := tmpfilePng.Close(); err != nil {
-		return err
-	}
-	defer os.Remove(tmpfilePng.Name()) // clean up
-
-	// get email body
-	emailBody, err := template.DumpEmail(client, filepath.Base(tmpfilePng.Name()))
-	if err != nil {
-		return err
-	}
-
-	// port to int
-	port, err := strconv.Atoi(os.Getenv("SMTP_PORT"))
-	if err != nil {
-		return err
-	}
-
-	d := gomail.NewDialer(os.Getenv("SMTP_HOST"), port, os.Getenv("SMTP_USERNAME"), os.Getenv("SMTP_PASSWORD"))
-	s, err := d.Dial()
-	if err != nil {
-		return err
-	}
-	m := gomail.NewMessage()
-
-	m.SetHeader("From", os.Getenv("SMTP_FROM"))
-	m.SetAddressHeader("To", client.Email, client.Name)
-	m.SetHeader("Subject", "WireGuard VPN Configuration")
-	m.SetBody("text/html", string(emailBody))
-	m.Attach(tmpfileCfg.Name())
-	m.Embed(tmpfilePng.Name())
-
-	err = gomail.Send(s, m)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

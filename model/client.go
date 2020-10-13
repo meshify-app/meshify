@@ -10,6 +10,10 @@ import (
 // Client structure
 type Client struct {
 	Id                        string    `json:"id"`
+	MeshID                    string    `json:"meshid"`
+	MeshName                  string    `json:"meshName"`
+	PrivateKey                string    `json:"privateKey"`
+	PublicKey                 string    `json:"publicKey"`
 	Name                      string    `json:"name"`
 	Email                     string    `json:"email"`
 	Enable                    bool      `json:"enable"`
@@ -18,22 +22,19 @@ type Client struct {
 	AllowedIPs                []string  `json:"allowedIPs"`
 	Address                   []string  `json:"address"`
 	Tags                      []string  `json:"tags"`
-	PrivateKey                string    `json:"privateKey"`
-	PublicKey                 string    `json:"publicKey"`
+	Dns                       []string  `json:"dns"`
+	PersistentKeepalive       int       `json:"persistentKeepalive"`
+	ListenPort                int       `json:"listenPort"`
+	Endpoint                  string    `json:"endpoint"`
+	Mtu                       int       `json:"mtu"`
+	PreUp                     string    `json:"preUp"`
+	PostUp                    string    `json:"postUp"`
+	PreDown                   string    `json:"preDown"`
+	PostDown                  string    `json:"postDown"`
 	CreatedBy                 string    `json:"createdBy"`
 	UpdatedBy                 string    `json:"updatedBy"`
 	Created                   time.Time `json:"created"`
 	Updated                   time.Time `json:"updated"`
-
-	ListenPort          int      `json:"listenPort"`
-	Mtu                 int      `json:"mtu"`
-	Endpoint            string   `json:"endpoint"`
-	PersistentKeepalive int      `json:"persistentKeepalive"`
-	Dns                 []string `json:"dns"`
-	PreUp               string   `json:"preUp"`
-	PostUp              string   `json:"postUp"`
-	PreDown             string   `json:"preDown"`
-	PostDown            string   `json:"postDown"`
 }
 
 // IsValid check if model is valid
@@ -54,17 +55,17 @@ func (a Client) IsValid() []error {
 			errs = append(errs, fmt.Errorf("email %s is invalid", a.Email))
 		}
 	}
-	// check if the allowedIPs empty
-	if len(a.AllowedIPs) == 0 {
-		errs = append(errs, fmt.Errorf("allowedIPs field is required"))
-	}
-	// check if the allowedIPs are valid
-	for _, allowedIP := range a.AllowedIPs {
-		if !util.IsValidCidr(allowedIP) {
-			errs = append(errs, fmt.Errorf("allowedIP %s is invalid", allowedIP))
+	/*	// check if the allowedIPs empty
+		if len(a.AllowedIPs) == 0 {
+			errs = append(errs, fmt.Errorf("allowedIPs field is required"))
 		}
-	}
-	// check if the address empty
+		// check if the allowedIPs are valid
+		for _, allowedIP := range a.AllowedIPs {
+			if !util.IsValidCidr(allowedIP) {
+				errs = append(errs, fmt.Errorf("allowedIP %s is invalid", allowedIP))
+			}
+		}
+	*/ // check if the address empty
 	if len(a.Address) == 0 {
 		errs = append(errs, fmt.Errorf("address field is required"))
 	}

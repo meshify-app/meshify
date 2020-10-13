@@ -15,9 +15,10 @@ const getters = {
     return state.clients;
   },
   getClientQrcode: (state) => (id) => {
-    let item = state.clientQrcodes.find(item => item.id === id)
+//    let item = state.clientQrcodes.find(item => item.id === id)
     // initial load fails, must wait promise and stuff...
-    return item ? item.qrcode : "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+//    return item ? item.qrcode : "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    return "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
   },
   getClientConfig: (state) => (id) => {
     let item = state.clientConfigs.find(item => item.id === id)
@@ -34,7 +35,7 @@ const actions = {
     ApiService.get("/client")
       .then(resp => {
         commit('clients', resp)
-        dispatch('readQrcodes')
+//        dispatch('readQrcodes')
         dispatch('readConfigs')
       })
       .catch(err => {
@@ -45,7 +46,7 @@ const actions = {
   create({ commit, dispatch }, client){
     ApiService.post("/client", client)
       .then(resp => {
-        dispatch('readQrcode', resp)
+//        dispatch('readQrcode', resp)
         dispatch('readConfig', resp)
         commit('create', resp)
       })
@@ -57,7 +58,7 @@ const actions = {
   update({ commit, dispatch }, client){
     ApiService.patch(`/client/${client.id}`, client)
       .then(resp => {
-        dispatch('readQrcode', resp)
+//        dispatch('readQrcode', resp)
         dispatch('readConfig', resp)
         commit('update', resp)
       })
@@ -86,14 +87,14 @@ const actions = {
   },
 
   readQrcode({ state, commit }, client){
-    ApiService.getWithConfig(`/client/${client.id}/config?qrcode=true`, {responseType: 'arraybuffer'})
+/*    ApiService.getWithConfig(`/client/${client.id}/config?qrcode=true&alan=false`, {responseType: 'arraybuffer'})
       .then(resp => {
         let image = Buffer.from(resp, 'binary').toString('base64')
         commit('clientQrcodes', { client, image })
       })
       .catch(err => {
         commit('error', err)
-      })
+      })*/
   },
 
   readConfig({ state, commit }, client){
@@ -108,7 +109,7 @@ const actions = {
 
   readQrcodes({ state, dispatch }){
     state.clients.forEach(client => {
-      dispatch('readQrcode', client)
+//      dispatch('readQrcode', client)
     })
   },
 

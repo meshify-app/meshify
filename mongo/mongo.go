@@ -15,7 +15,7 @@ import (
 )
 
 // Serialize write interface to disk
-func Serialize(id string, c interface{}) error {
+func Serialize(id string, col string, c interface{}) error {
 	//b, err := json.MarshalIndent(c, "", "  ")
 	//if err != nil {
 	//	return err
@@ -36,7 +36,7 @@ func Serialize(id string, c interface{}) error {
 	var b interface{}
 	err = bson.UnmarshalExtJSON([]byte(data), true, &b)
 
-	collection := client.Database("meshify").Collection("hosts")
+	collection := client.Database("meshify").Collection(col)
 
 	findstr := fmt.Sprintf("{\"id\":\"%s\"}", id)
 	var filter interface{}
@@ -58,7 +58,7 @@ func Serialize(id string, c interface{}) error {
 }
 
 // Deserialize read interface from disk
-func Deserialize(id string) (interface{}, error) {
+func Deserialize(id string, col string) (interface{}, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -70,7 +70,7 @@ func Deserialize(id string) (interface{}, error) {
 		}
 	}()
 
-	collection := client.Database("meshify").Collection("hosts")
+	collection := client.Database("meshify").Collection(col)
 
 	findstr := fmt.Sprintf("{\"id\":\"%s\"}", id)
 	var filter interface{}
@@ -83,7 +83,7 @@ func Deserialize(id string) (interface{}, error) {
 }
 
 // DeleteClient removes the given client id
-func DeleteClient(id string) error {
+func DeleteClient(id string, col string) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -95,7 +95,7 @@ func DeleteClient(id string) error {
 		}
 	}()
 
-	collection := client.Database("meshify").Collection("hosts")
+	collection := client.Database("meshify").Collection(col)
 
 	findstr := fmt.Sprintf("{\"id\":\"%s\"}", id)
 	var filter interface{}
@@ -121,6 +121,41 @@ func ReadAllClients() []*model.Client {
 	}()
 
 	collection := client.Database("meshify").Collection("hosts")
+
+	cursor, err := collection.Find(ctx, bson.D{})
+
+	if err == nil {
+
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var client *model.Client
+			err = cursor.Decode(&client)
+			if err == nil {
+				clients = append(clients, client)
+			}
+		}
+
+	}
+
+	return clients
+
+}
+
+// ReadAllMeshes from MongoDB
+func ReadAllMeshes() []*model.Client {
+	clients := make([]*model.Client, 0)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			log.Error(err)
+		}
+	}()
+
+	collection := client.Database("meshify").Collection("mesh")
 
 	cursor, err := collection.Find(ctx, bson.D{})
 

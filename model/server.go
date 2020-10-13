@@ -2,12 +2,15 @@ package model
 
 import (
 	"fmt"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 	"time"
+
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 )
 
 // Server structure
 type Server struct {
+	MeshID              string    `json:"meshid"`
+	MeshName            string    `json:"meshName"`
 	Address             []string  `json:"address"`
 	ListenPort          int       `json:"listenPort"`
 	Mtu                 int       `json:"mtu"`

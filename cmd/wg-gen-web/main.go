@@ -34,7 +34,7 @@ func init() {
 }
 
 func main() {
-	log.Infof("Starting Wg Gen Web version: %s", version.Version)
+	log.Infof("Starting Meshify version: %s", version.Version)
 
 	// load .env environment variables
 	err := godotenv.Load()
@@ -55,13 +55,13 @@ func main() {
 		}
 	}
 
-	// check if server.json exists otherwise create it with default values
-	if !util.FileExists(filepath.Join(os.Getenv("WG_CONF_DIR"), "server.json")) {
+	// check if mesh.json exists otherwise create it with default values
+	if !util.FileExists(filepath.Join(os.Getenv("WG_CONF_DIR"), "mesh.json")) {
 		_, err = core.ReadServer()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"err": err,
-			}).Fatal("server.json doesnt not exists and can not read it")
+			}).Fatal("mesh.json does not exist or can not read it")
 		}
 	}
 

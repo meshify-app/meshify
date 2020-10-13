@@ -16,6 +16,16 @@ const routes = [
     }
   },
   {
+    path: '/mesh',
+    name: 'mesh',
+    component: function () {
+      return import(/* webpackChunkName: "Mesh" */ '../views/Mesh.vue')
+    },
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/server',
     name: 'server',
     component: function () {

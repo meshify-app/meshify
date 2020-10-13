@@ -6,7 +6,9 @@ import (
 	"path/filepath"
 	"time"
 
+	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
+
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/storage"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/template"
@@ -16,7 +18,7 @@ import (
 
 // ReadServer object, create default one
 func ReadServer() (*model.Server, error) {
-	if !util.FileExists(filepath.Join(os.Getenv("WG_CONF_DIR"), "server.json")) {
+	if !util.FileExists(filepath.Join(os.Getenv("WG_CONF_DIR"), "mesh.json")) {
 		server := &model.Server{}
 
 		key, err := wgtypes.GeneratePrivateKey()
@@ -26,22 +28,26 @@ func ReadServer() (*model.Server, error) {
 		server.PrivateKey = key.String()
 		server.PublicKey = key.PublicKey().String()
 
-		server.Endpoint = "wireguard.example.com:123"
+		server.Endpoint = ""
 		server.ListenPort = 51820
+
+		u := uuid.NewV4()
+		server.MeshID = u.String()
+		server.MeshName = "Meshify"
 
 		server.Address = make([]string, 0)
 		//		server.Address = append(server.Address, "fd9f:6666::10:6:6:1/64")
-		server.Address = append(server.Address, "100.0.0.1/24")
+		server.Address = append(server.Address, "100.0.0.0/24")
 
 		server.Dns = make([]string, 0)
 		//		server.Dns = append(server.Dns, "fd9f::10:0:0:2")
 		//		server.Dns = append(server.Dns, "10.0.0.2")
 
 		server.AllowedIPs = make([]string, 0)
-		server.AllowedIPs = append(server.AllowedIPs, "0.0.0.0/0")
-		server.AllowedIPs = append(server.AllowedIPs, "::/0")
+		//server.AllowedIPs = append(server.AllowedIPs, "0.0.0.0/0")
+		//server.AllowedIPs = append(server.AllowedIPs, "::/0")
 
-		server.PersistentKeepalive = 16
+		server.PersistentKeepalive = 29
 		server.Mtu = 0
 		server.PreUp = "echo WireGuard PreUp"
 		server.PostUp = "echo WireGuard PostUp"
@@ -50,19 +56,19 @@ func ReadServer() (*model.Server, error) {
 		server.Created = time.Now().UTC()
 		server.Updated = server.Created
 
-		err = storage.Serialize("server.json", server)
+		err = storage.Serialize("mesh.json", server)
 		if err != nil {
 			return nil, err
 		}
 
-		// server.json was missing, dump wg config after creation
+		// mesh.json was missing, dump wg config after creation
 		err = UpdateServerConfigWg()
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	c, err := storage.Deserialize("server.json")
+	c, err := storage.Deserialize("mesh.json")
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +78,7 @@ func ReadServer() (*model.Server, error) {
 
 // UpdateServer keep private values from existing one
 func UpdateServer(server *model.Server) (*model.Server, error) {
-	current, err := storage.Deserialize("server.json")
+	current, err := storage.Deserialize("mesh.json")
 	if err != nil {
 		return nil, err
 	}
@@ -93,12 +99,12 @@ func UpdateServer(server *model.Server) (*model.Server, error) {
 	//server.PresharedKey = current.(*model.Server).PresharedKey
 	server.Updated = time.Now().UTC()
 
-	err = storage.Serialize("server.json", server)
+	err = storage.Serialize("mesh.json", server)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err := storage.Deserialize("server.json")
+	v, err := storage.Deserialize("mesh.json")
 	if err != nil {
 		return nil, err
 	}

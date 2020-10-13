@@ -1,30 +1,28 @@
 <template>
     <v-container v-if="server">
-        <v-expansion-panels multiple="true" dark accordian>
-        <v-expansion-panel>
-            <v-expansion-panel-header dark>Host interface configuration</v-expansion-panel-header>
-                <v-expansion-panel-content>
+        <v-row>
+            <v-col cols="12">
+                <v-card dark>
+                    <v-card-title>
+                        Mesh Configuration
+                    </v-card-title>
                     <div class="d-flex flex-no-wrap justify-space-between">
                         <v-col cols="12">
                             <v-text-field
-                                    v-model="server.publicKey"
-                                    label="Public key"
+                                    v-model="server.meshid"
+                                    label="Mesh ID"
                                     disabled
                             />
                             <v-text-field
-                                    v-model="server.listenPort"
-                                    type="number"
-                                    :rules="[
-                          v => !!v || 'Listen port is required',
-                        ]"
-                                    label="Listen port"
-                                    required
+                                    v-model="server.meshName"
+                                    label="Mesh Name"
+                                    disabled
                             />
                             <v-combobox
                                     v-model="server.address"
                                     chips
-                                    hint="Write IPv4 or IPv6 CIDR and hit enter"
-                                    label="Server interface addresses"
+                                    hint="Write IPv4 or IPv6 CIDR and hit enter.  A 100.x.x.0/24 address is recommended."
+                                    label="Host interface address pool"
                                     multiple
                                     dark
                             >
@@ -42,27 +40,15 @@
                             </v-combobox>
                         </v-col>
                     </div>
-                </v-expansion-panel-content>
-            </v-expansion-panel>
-        <v-expansion-panel>
-            <v-expansion-panel-header dark>Client global configuration</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                        <v-spacer></v-spacer>
-                        <v-btn
-                                color="warning"
-                                @click="applyGlobals"
-                        >
-                            Apply globals to all clients
-                            <v-icon right dark>mdi-update</v-icon>
-                        </v-btn>
                     <div class="d-flex flex-no-wrap justify-space-between">
                         <v-col cols="12">
                             <v-text-field
-                                    v-model="server.endpoint"
-                                    label="Public endpoint for clients to connect to"
+                                    v-model="server.listenPort"
+                                    type="number"
                                     :rules="[
-                          v => !!v || 'Public endpoint for clients to connect to is required',
+                          v => !!v || 'Listen port is required',
                         ]"
+                                    label="Default Listen port"
                                     required
                             />
                             <v-combobox
@@ -119,34 +105,9 @@
                             />
                         </v-col>
                     </div>
-            </v-expansion-panel-content>
-        </v-expansion-panel>
-        <v-expansion-panel>
-            <v-expansion-panel-header dark>Interface configuration hooks</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                    <div class="d-flex flex-no-wrap justify-space-between">
-                        <v-col cols="12">
-                            <v-text-field
-                                    v-model="server.preUp"
-                                    label="PreUp: script snippets which will be executed by bash before setting up the interface"
-                            />
-                            <v-text-field
-                                    v-model="server.postUp"
-                                    label="PostUp: script snippets which will be executed by bash after setting up the interface"
-                            />
-                            <v-text-field
-                                    v-model="server.preDown"
-                                    label="PreDown: script snippets which will be executed by bash before setting down the interface"
-                            />
-                            <v-text-field
-                                    v-model="server.postDown "
-                                    label="PostDown : script snippets which will be executed by bash after setting down the interface"
-                            />
-                        </v-col>
-                    </div>
-            </v-expansion-panel-content>
-        </v-expansion-panel>
-        </v-expansion-panels>
+                </v-card>
+            </v-col>
+        </v-row>
             <v-divider dark/>
             <v-btn
                     class="ma-2"
@@ -165,6 +126,15 @@
                 Update server configuration
                 <v-icon right dark>mdi-update</v-icon>
             </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn
+                    color="warning"
+                    @click="applyGlobals"
+            >
+                Apply globals to all clients
+                <v-icon right dark>mdi-update</v-icon>
+            </v-btn>
+
             <v-divider dark/>
     </v-container>
 </template>
@@ -237,7 +207,7 @@
         }
 
         // check client AllowedIPs
-        if (this.server.allowedips.length < 1) {
+        if (this.server.allowedips.length < 0) {
           this.errorServer('Please provide at least one valid CIDR address for client allowed IPs');
           return;
         }

@@ -4,7 +4,7 @@ const state = {
   error: null,
   server: null,
   config: '',
-  version: '_ci_build_not_run_properly_',
+  version: '1.0',
 }
 
 const getters = {

@@ -2,7 +2,7 @@
     <v-container>
         <v-card>
             <v-card-title>
-                Hosts
+                Meshes
                 <v-spacer></v-spacer>
                 <v-text-field
                         v-if="listView"
@@ -17,14 +17,14 @@
                         color="success"
                         @click="startCreate"
                 >
-                    Add host manually
-                    <v-icon right dark>mdi-account-network-outline</v-icon>
+                    Create new mesh
+                    <v-icon right dark>mdi-vpn</v-icon>
                 </v-btn>
             </v-card-title>
             <v-data-table
                     v-if="listView"
                     :headers="headers"
-                    :items="clients"
+                    :items="meshes"
                     :search="search"
             >
                 <template v-slot:item.address="{ item }">
@@ -93,35 +93,34 @@
             <v-card-text v-else>
                 <v-row>
                     <v-col
-                            v-for="(client, i) in clients"
+                            v-for="(mesh, i) in meshes "
                             :key="i"
                             sm12 lg6
                     >
                         <v-card
-                                :color="client.enable ? '#1F7087' : 'warning'"
+                                :color="mesh.enable ? '#1F7087' : 'warning'"
                                 class="mx-auto"
                                 raised
                                 shaped
                         >
                             <v-list-item>
                                 <v-list-item-content>
-                                    <v-list-item-title class="headline">{{ client.name }}</v-list-item-title>
-                                    <v-list-item-subtitle>{{ client.email }}</v-list-item-subtitle>
-                                    <v-list-item-subtitle>Created: {{ client.created | formatDate }} by {{ client.createdBy }}</v-list-item-subtitle>
-                                    <v-list-item-subtitle>Updated: {{ client.updated | formatDate }} by {{ client.updatedBy }}</v-list-item-subtitle>
+                                    <v-list-item-title class="headline">{{ mesh.name }}</v-list-item-title>
+                                    <v-list-item-subtitle>{{ mesh.email }}</v-list-item-subtitle>
+                                    <v-list-item-subtitle>Created: {{ mesh.created | formatDate }} by {{ mesh.createdBy }}</v-list-item-subtitle>
+                                    <v-list-item-subtitle>Updated: {{ mesh.updated | formatDate }} by {{ mesh.updatedBy }}</v-list-item-subtitle>
                                 </v-list-item-content>
 
                                 <v-list-item-avatar
                                         tile
                                         size="150"
                                 >
-<!--                                    <v-img :src="'data:image/png;base64, ' + getClientQrcode(client.id)"/> -->
                                 </v-list-item-avatar>
                             </v-list-item>
 
                             <v-card-text class="text--primary">
                                 <v-chip
-                                        v-for="(ip, i) in client.address"
+                                        v-for="(ip, i) in mesh.address"
                                         :key="i"
                                         color="indigo"
                                         text-color="white"
@@ -132,7 +131,7 @@
                             </v-card-text>
                             <v-card-text class="text--primary">
                                 <v-chip
-                                        v-for="(tag, i) in client.tags"
+                                        v-for="(tag, i) in mesh.tags"
                                         :key="i"
                                         color="blue-grey"
                                         text-color="white"
@@ -146,7 +145,7 @@
                                     <template v-slot:activator="{ on }">
                                         <v-btn
                                                 text
-                                                v-on:click="forceFileDownload(client)"
+                                                v-on:click="forceFileDownload(mesh)"
                                                 v-on="on"
                                         >
                                             <span class="d-none d-lg-flex">Download</span>
@@ -160,7 +159,7 @@
                                     <template v-slot:activator="{ on }">
                                         <v-btn
                                                 text
-                                                @click.stop="startUpdate(client)"
+                                                @click.stop="startUpdate(mesh)"
                                                 v-on="on"
                                         >
                                             <span class="d-none d-lg-flex">Edit</span>
@@ -174,7 +173,7 @@
                                     <template v-slot:activator="{ on }">
                                         <v-btn
                                                 text
-                                                @click="remove(client)"
+                                                @click="remove(mesh)"
                                                 v-on="on"
                                         >
                                             <span class="d-none d-lg-flex">Delete</span>
@@ -188,7 +187,7 @@
                                     <template v-slot:activator="{ on }">
                                         <v-btn
                                                 text
-                                                @click="email(client)"
+                                                @click="email(mesh)"
                                                 v-on="on"
                                         >
                                             <span class="d-none d-lg-flex">Send Email</span>
@@ -204,11 +203,11 @@
                                                 dark
                                                 v-on="on"
                                                 color="success"
-                                                v-model="client.enable"
-                                                v-on:change="update(client)"
+                                                v-model="mesh.enable"
+                                                v-on:change="update(mesh)"
                                         />
                                     </template>
-                                    <span> {{client.enable ? 'Disable' : 'Enable'}} this client</span>
+                                    <span> {{mesh.enable ? 'Disable' : 'Enable'}} this mesh</span>
                                 </v-tooltip>
 
                             </v-card-actions>
@@ -218,12 +217,12 @@
             </v-card-text>
         </v-card>
         <v-dialog
-                v-if="client"
+                v-if="mesh"
                 v-model="dialogCreate"
                 max-width="550"
         >
             <v-card>
-                <v-card-title class="headline">Add new client</v-card-title>
+                <v-card-title class="headline">Create new mesh</v-card-title>
                 <v-card-text>
                     <v-row>
                         <v-col
@@ -234,15 +233,20 @@
                                     v-model="valid"
                             >
                                 <v-text-field
-                                        v-model="client.name"
-                                        label="Client friendly name"
-                                        :rules="[ v => !!v || 'Client name is required', ]"
+                                        v-model="mesh.name"
+                                        label="Mesh friendly name"
+                                        :rules="[ v => !!v || 'Mesh name is required', ]"
                                         required
                                 />
+                                <v-text-field
+                                        v-model="mesh.email"
+                                        label="Mesh email"
+                                        :rules="[ v => (/.+@.+\..+/.test(v) || v === '') || 'E-mail must be valid',]"
+                                />
                                 <v-select
-                                        v-model="client.address"
+                                        v-model="mesh.address"
                                         :items="server.address"
-                                        label="Client IP will be chosen from these networks"
+                                        label="Mesh IP will be chosen from these networks"
                                         :rules="[ v => !!v || 'Network is required', ]"
                                         multiple
                                         chips
@@ -250,7 +254,7 @@
                                         required
                                 />
                                 <v-combobox
-                                        v-model="client.allowedIPs"
+                                        v-model="mesh.allowedIPs"
                                         chips
                                         hint="Write IPv4 or IPv6 CIDR and hit enter"
                                         label="Allowed IPs"
@@ -263,14 +267,14 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="client.allowedIPs.splice(client.allowedIPs.indexOf(item), 1)"
+                                                @click:close="mesh.allowedIPs.splice(mesh.allowedIPs.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
                                     </template>
                                 </v-combobox>
                                 <v-combobox
-                                        v-model="client.tags"
+                                        v-model="mesh.tags"
                                         chips
                                         hint="Enter a tag, hit tab, hit enter."
                                         label="Tags"
@@ -283,23 +287,23 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="client.tags.splice(client.tags.indexOf(item), 1)"
+                                                @click:close="mesh.tags.splice(mesh.tags.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
                                     </template>
                                 </v-combobox>
                                 <v-switch
-                                        v-model="client.enable"
+                                        v-model="mesh.enable"
                                         color="success"
                                         inset
-                                        :label="client.enable ? 'Enable client after creation': 'Disable client after creation'"
+                                        :label="mesh.enable ? 'Enable mesh after creation': 'Disable mesh after creation'"
                                 />
                                 <v-switch
-                                        v-model="client.ignorePersistentKeepalive"
+                                        v-model="mesh.ignorePersistentKeepalive"
                                         color="red"
                                         inset
-                                        :label="'Ignore global persistent keepalive: ' + (client.ignorePersistentKeepalive ? 'Yes': 'NO')"
+                                        :label="'Ignore global persistent keepalive: ' + (mesh.ignorePersistentKeepalive ? 'Yes': 'NO')"
                                 />
                             </v-form>
                         </v-col>
@@ -310,7 +314,7 @@
                     <v-btn
                             :disabled="!valid"
                             color="success"
-                            @click="create(client)"
+                            @click="create(mesh)"
                     >
                         Submit
                         <v-icon right dark>mdi-check-outline</v-icon>
@@ -326,7 +330,7 @@
             </v-card>
         </v-dialog>
         <v-dialog
-                v-if="client"
+                v-if="mesh"
                 v-model="dialogUpdate"
                 max-width="550"
         >
@@ -343,13 +347,13 @@
                                     v-model="valid"
                             >
                                 <v-text-field
-                                        v-model="client.name"
+                                        v-model="mesh.name"
                                         label="Friendly name"
-                                        :rules="[ v => !!v || 'Client name is required',]"
+                                        :rules="[ v => !!v || 'Mesh name is required',]"
                                         required
                                 />
                                 <v-combobox
-                                        v-model="client.address"
+                                        v-model="mesh.address"
                                         chips
                                         hint="Write IPv4 or IPv6 CIDR and hit enter"
                                         label="Addresses"
@@ -362,17 +366,17 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="client.address.splice(client.address.indexOf(item), 1)"
+                                                @click:close="mesh.address.splice(mesh.address.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
                                     </template>
                                 </v-combobox>
                                 <v-combobox
-                                    v-model="client.dns"
+                                    v-model="mesh.dns"
                                     chips
                                     hint="Write IP address(es) and hit enter or leave empty.  If not empty, be sure to include your local resolver."
-                                    label="DNS servers for this client"
+                                    label="DNS servers for this mesh"
                                     multiple
                                     dark
                                 >
@@ -390,7 +394,7 @@
                                 </v-combobox>
 
                                 <v-combobox
-                                        v-model="client.allowedIPs"
+                                        v-model="mesh.allowedIPs"
                                         chips
                                         hint="Write IPv4 or IPv6 CIDR and hit enter"
                                         label="Allowed IPs"
@@ -403,7 +407,7 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="client.allowedIPs.splice(client.allowedIPs.indexOf(item), 1)"
+                                                @click:close="mesh.allowedIPs.splice(mesh.allowedIPs.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
@@ -411,18 +415,18 @@
                                 </v-combobox>
                                 <v-text-field
                                         type="number"
-                                        v-model="client.mtu"
+                                        v-model="mesh.mtu"
                                         label="Define global MTU"
                                         hint="Leave at 0 and let us take care of MTU"
                                 />
                                 <v-text-field
                                         type="number"
-                                        v-model="client.persistentKeepalive"
+                                        v-model="mesh.persistentKeepalive"
                                         label="Persistent keepalive"
                                         hint="To disable, set to 0.  Recommended value 29 (seconds)"
                                 />
                                 <v-combobox
-                                        v-model="client.tags"
+                                        v-model="mesh.tags"
                                         chips
                                         hint="Write tag name and hit enter"
                                         label="Tags"
@@ -435,7 +439,7 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="client.tags.splice(client.tags.indexOf(item), 1)"
+                                                @click:close="mesh.tags.splice(mesh.tags.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
@@ -453,12 +457,12 @@
                         <div class="d-flex flex-no-wrap justify-space-between">
                             <v-col cols="12">
                                 <v-text-field
-                                        v-model="client.publicKey"
+                                        v-model="mesh.publicKey"
                                         label="Public key"
                                         disabled
                                 />
                                 <v-text-field
-                                        v-model="client.endpoint"
+                                        v-model="mesh.endpoint"
                                         label="Public endpoint for clients to connect to"
                                         :rules="[
                             v => !!v || 'Public endpoint for clients to connect to is required',
@@ -466,7 +470,7 @@
                                         required
                                 />
                                 <v-text-field
-                                        v-model="client.listenPort"
+                                        v-model="mesh.listenPort"
                                         type="number"
                                         :rules="[
                             v => !!v || 'Listen port is required',
@@ -486,7 +490,7 @@
                     <v-btn
                             :disabled="!valid"
                             color="success"
-                            @click="update(client)"
+                            @click="update(mesh)"
                     >
                         Submit
                         <v-icon right dark>mdi-check-outline</v-icon>
@@ -509,21 +513,21 @@
   import { mapActions, mapGetters } from 'vuex'
 
   export default {
-    name: 'Clients',
+    name: 'Meshes',
 
     data: () => ({
       listView: true,
       dialogCreate: false,
       dialogUpdate: false,
-      client: null,
+      mesh: null,
       panel: 1,
       valid: false,
       search: '',
       headers: [
         { text: 'Name', value: 'name', },
 //        { text: 'Email', value: 'email', },
-        { text: "Endpoint", value: 'endpoint', },
-        { text: 'IP addresses', value: 'address', },
+//        { text: "Endpoint", value: 'endpoint', },
+        { text: 'IP address pool', value: 'address', },
         { text: 'Created by', value: 'created', sortable: false, },
         { text: 'Tags', value: 'tags', },
         { text: 'Actions', value: 'action', sortable: false, },
@@ -533,39 +537,36 @@
 
     computed:{
       ...mapGetters({
-        getClientQrcode: 'client/getClientQrcode',
-        getClientConfig: 'client/getClientConfig',
         user: 'auth/user',
         server: 'server/server',
-        clients: 'client/clients',
-        clientQrcodes: 'client/clientQrcodes',
+        meshes: 'mesh/mesh',
       }),
     },
 
     mounted () {
-      this.readAllClients()
+      this.readAllMeshes()
       this.readServer()
     },
 
     methods: {
-      ...mapActions('client', {
-        errorClient: 'error',
-        readAllClients: 'readAll',
-        creatClient: 'create',
-        updateClient: 'update',
-        deleteClient: 'delete',
-        emailClient: 'email',
+      ...mapActions('mesh', {
+        errorMesh: 'error',
+        readAllMeshes: 'readAll',
+        createMesh: 'create',
+        updateMesh: 'update',
+        deleteMesh: 'delete',
+        emailMesh: 'email',
       }),
       ...mapActions('server', {
         readServer: 'read',
       }),
 
       startCreate() {
-        this.client = {
+        this.mesh = {
           name: "",
           email: this.user.email,
           enable: true,
-          allowedIPs: this.server.allowedIPs,
+          allowedIPs: this.server.address,
           address: this.server.address,
           meshName: this.server.meshName,
           meshid: this.server.meshid,
@@ -574,89 +575,89 @@
         this.dialogCreate = true;
       },
 
-      create(client) {
-/*        if (client.allowedIPs.length < 0) {
-          this.errorClient('Please provide at least one valid CIDR address for client allowed IPs')
+      create(mesh) {
+        if (mesh.allowedIPs.length < 0) {
+          this.errorMesh('Please provide at least one valid CIDR address for mesh allowed IPs')
           return;
         }
-        for (let i = 0; i < client.allowedIPs.length; i++){
-          if (this.$isCidr(client.allowedIPs[i]) === 0) {
-            this.errorClient('Invalid CIDR detected, please correct before submitting')
+        for (let i = 0; i < mesh.allowedIPs.length; i++){
+          if (this.$isCidr(mesh.allowedIPs[i]) === 0) {
+            this.errorMesh('Invalid CIDR detected, please correct before submitting')
             return
           }
-        }*/
+        }
         this.dialogCreate = false;
-        this.creatClient(client)
+        this.createMesh(mesh)
       },
 
-      remove(client) {
-        if(confirm(`Do you really want to delete ${client.name} ?`)){
-          this.deleteClient(client)
+      remove(mesh) {
+        if(confirm(`Do you really want to delete ${mesh.name} ?`)){
+          this.deleteMesh(mesh)
         }
       },
 
-      email(client) {
-        if (!client.email){
-          this.errorClient('Client email is not defined')
+      email(mesh) {
+        if (!mesh.email){
+          this.errorMesh('Mesh email is not defined')
           return
         }
 
-        if(confirm(`Do you really want to send email to ${client.email} with all configurations ?`)){
-          this.emailClient(client)
+        if(confirm(`Do you really want to send email to ${mesh.email} with all configurations ?`)){
+          this.emailMesh(mesh)
         }
       },
 
-      startUpdate(client) {
-        this.client = client;
+      startUpdate(mesh) {
+        this.mesh = mesh;
         this.dialogUpdate = true;
       },
 
-      update(client) {
+      update(mesh) {
 
-        this.client.listenPort = parseInt(this.client.listenPort, 10);
-        this.client.persistentKeepalive = parseInt(this.client.persistentKeepalive, 10);
-        this.client.mtu = parseInt(this.client.mtu, 10);
-//        this.client.meshid = this.server.meshid
-//        this.client.meshName = this.server.meshName
+        this.mesh.listenPort = parseInt(this.mesh.listenPort, 10);
+        this.mesh.persistentKeepalive = parseInt(this.mesh.persistentKeepalive, 10);
+        this.mesh.mtu = parseInt(this.mesh.mtu, 10);
+//        this.mesh.meshid = this.server.meshid
+//        this.mesh.meshName = this.server.meshName
 
 
         // check allowed IPs
-        if (client.allowedIPs.length < 1) {
-          this.errorClient('Please provide at least one valid CIDR address for client allowed IPs');
+        if (mesh.allowedIPs.length < 1) {
+          this.errorMesh('Please provide at least one valid CIDR address for mesh allowed IPs');
           return;
         }
-        for (let i = 0; i < client.allowedIPs.length; i++){
-          if (this.$isCidr(client.allowedIPs[i]) === 0) {
-            this.errorClient('Invalid CIDR detected, please correct before submitting');
+        for (let i = 0; i < mesh.allowedIPs.length; i++){
+          if (this.$isCidr(mesh.allowedIPs[i]) === 0) {
+            this.errorMesh('Invalid CIDR detected, please correct before submitting');
             return
           }
         }
         // check address
-        if (client.address.length < 1) {
-          this.errorClient('Please provide at least one valid CIDR address for client');
+        if (mesh.address.length < 1) {
+          this.errorMesh('Please provide at least one valid CIDR address for mesh');
           return;
         }
-        for (let i = 0; i < client.address.length; i++){
-          if (this.$isCidr(client.address[i]) === 0) {
-            this.errorClient('Invalid CIDR detected, please correct before submitting');
+        for (let i = 0; i < mesh.address.length; i++){
+          if (this.$isCidr(mesh.address[i]) === 0) {
+            this.errorMesh('Invalid CIDR detected, please correct before submitting');
             return
           }
         }
         // all good, submit
         this.dialogUpdate = false;
-        this.updateClient(client)
+        this.updateMesh(mesh)
       },
 
-      forceFileDownload(client){
-        let config = this.getClientConfig(client.id)
+      forceFileDownload(mesh){
+        let config = this.getMeshConfig(mesh.meshid)
         if (!config) {
-          this.errorClient('Failed to download client config');
+          this.errorMesh('Failed to download mesh config');
           return
         }
         const url = window.URL.createObjectURL(new Blob([config]))
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', client.name.split(' ').join('-') + '.conf') //or any other extension
+        link.setAttribute('download', mesh.name.split(' ').join('-') + '.conf') //or any other extension
         document.body.appendChild(link)
         link.click()
       },

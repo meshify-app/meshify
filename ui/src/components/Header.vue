@@ -11,8 +11,12 @@
                     Hosts
                     <v-icon right dark>mdi-account-network-outline</v-icon>
                 </v-btn>
-                <v-btn to="/server">
+                <v-btn to="/mesh">
                     Mesh
+                    <v-icon right dark>mdi-vpn</v-icon>
+                </v-btn>
+                <v-btn to="/server">
+                    Server
                     <v-icon right dark>mdi-vpn</v-icon>
                 </v-btn>
             </v-toolbar-items>
