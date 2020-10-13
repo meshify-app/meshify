@@ -6,10 +6,10 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/clients',
-    name: 'clients',
+    path: '/hosts',
+    name: 'hosts',
     component: function () {
-      return import(/* webpackChunkName: "Clients" */ '../views/Clients.vue')
+      return import(/* webpackChunkName: "Hosts" */ '../views/Hosts.vue')
     },
     meta: {
       requiresAuth: true

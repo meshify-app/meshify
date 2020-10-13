@@ -2,12 +2,13 @@ package template
 
 import (
 	"bytes"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 )
 
 var (
@@ -117,7 +118,7 @@ var (
                                                                     <td class="h4 pb20" style="color:#ffffff; font-family:'Muli', Arial,sans-serif; font-size:20px; line-height:28px; text-align:left; padding-bottom:20px;">Hello</td>
                                                                 </tr>
                                                                 <tr>
-                                                                    <td class="text pb20" style="color:#ffffff; font-family:Arial,sans-serif; font-size:14px; line-height:26px; text-align:left; padding-bottom:20px;">You probably requested VPN configuration. Here is <strong>{{.Client.Name}}</strong> configuration created <strong>{{.Client.Created.Format "Monday, 02 January 06 15:04:05 MST"}}</strong>. Scan the Qrcode or open attached configuration file in VPN client.</td>
+                                                                    <td class="text pb20" style="color:#ffffff; font-family:Arial,sans-serif; font-size:14px; line-height:26px; text-align:left; padding-bottom:20px;">You probably requested VPN configuration. Here is <strong>{{.Host.Name}}</strong> configuration created <strong>{{.Host.Created.Format "Monday, 02 January 06 15:04:05 MST"}}</strong>. Scan the Qrcode or open attached configuration file in VPN client.</td>
                                                                 </tr>
                                                             </table>
                                                         </th>
@@ -198,8 +199,8 @@ var (
 `
 
 	clientTpl = `[Interface]
-Address = {{ StringsJoin .Client.Address ", " }}
-PrivateKey = {{ .Client.PrivateKey }}
+Address = {{ StringsJoin .Host.Address ", " }}
+PrivateKey = {{ .Host.PrivateKey }}
 {{ if ne (len .Server.Dns) 0 -}}
 DNS = {{ StringsJoin .Server.Dns ", " }}
 {{- end }}
@@ -208,10 +209,10 @@ MTU = {{.Server.Mtu}}
 {{- end}}
 [Peer]
 PublicKey = {{ .Server.PublicKey }}
-PresharedKey = {{ .Client.PresharedKey }}
-AllowedIPs = {{ StringsJoin .Client.AllowedIPs ", " }}
+PresharedKey = {{ .Host.PresharedKey }}
+AllowedIPs = {{ StringsJoin .Host.AllowedIPs ", " }}
 Endpoint = {{ .Server.Endpoint }}
-{{ if and (ne .Server.PersistentKeepalive 0) (not .Client.IgnorePersistentKeepalive) -}}
+{{ if and (ne .Server.PersistentKeepalive 0) (not .Host.IgnorePersistentKeepalive) -}}
 PersistentKeepalive = {{.Server.PersistentKeepalive}}
 {{- end}}
 `
@@ -230,7 +231,7 @@ PreUp = {{ .Server.PreUp }}
 PostUp = {{ .Server.PostUp }}
 PreDown = {{ .Server.PreDown }}
 PostDown = {{ .Server.PostDown }}
-{{- range .Clients }}
+{{- range .Hosts }}
 {{ if .Enable -}}
 # {{.Name}} / {{.Email}} / Updated: {{.Updated}} / Created: {{.Created}}
 [Peer]
@@ -242,34 +243,34 @@ AllowedIPs = {{ StringsJoin .Address ", " }}
 )
 
 // DumpClientWg dump client wg config with go template
-func DumpClientWg(client *model.Client, server *model.Server) ([]byte, error) {
+func DumpClientWg(host *model.Host, server *model.Server) ([]byte, error) {
 	t, err := template.New("client").Funcs(template.FuncMap{"StringsJoin": strings.Join}).Parse(clientTpl)
 	if err != nil {
 		return nil, err
 	}
 
 	return dump(t, struct {
-		Client *model.Client
+		Host   *model.Host
 		Server *model.Server
 	}{
-		Client: client,
+		Host:   host,
 		Server: server,
 	})
 }
 
 // DumpServerWg dump server wg config with go template, write it to file and return bytes
-func DumpServerWg(clients []*model.Client, server *model.Server) ([]byte, error) {
+func DumpServerWg(hosts []*model.Host, server *model.Server) ([]byte, error) {
 	t, err := template.New("server").Funcs(template.FuncMap{"StringsJoin": strings.Join}).Parse(wgTpl)
 	if err != nil {
 		return nil, err
 	}
 
 	configDataWg, err := dump(t, struct {
-		Clients []*model.Client
-		Server  *model.Server
+		Hosts  []*model.Host
+		Server *model.Server
 	}{
-		Clients: clients,
-		Server:  server,
+		Hosts:  hosts,
+		Server: server,
 	})
 	if err != nil {
 		return nil, err
@@ -284,17 +285,17 @@ func DumpServerWg(clients []*model.Client, server *model.Server) ([]byte, error)
 }
 
 // DumpEmail dump server wg config with go template
-func DumpEmail(client *model.Client, qrcodePngName string) ([]byte, error) {
+func DumpEmail(host *model.Host, qrcodePngName string) ([]byte, error) {
 	t, err := template.New("email").Parse(emailTpl)
 	if err != nil {
 		return nil, err
 	}
 
 	return dump(t, struct {
-		Client        *model.Client
+		Host          *model.Host
 		QrcodePngName string
 	}{
-		Client:        client,
+		Host:          host,
 		QrcodePngName: qrcodePngName,
 	})
 }

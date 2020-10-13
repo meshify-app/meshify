@@ -14,7 +14,7 @@ import (
 
 // ApplyRoutes applies router to gin Router
 func ApplyRoutes(r *gin.RouterGroup) {
-	g := r.Group("/client")
+	g := r.Group("/host")
 	{
 
 		g.POST("", createClient)
@@ -28,7 +28,7 @@ func ApplyRoutes(r *gin.RouterGroup) {
 }
 
 func createClient(c *gin.Context) {
-	var data model.Client
+	var data model.Host
 
 	if err := c.ShouldBindJSON(&data); err != nil {
 		log.WithFields(log.Fields{
@@ -80,7 +80,7 @@ func readClient(c *gin.Context) {
 }
 
 func updateClient(c *gin.Context) {
-	var data model.Client
+	var data model.Host
 	id := c.Param("id")
 
 	if err := c.ShouldBindJSON(&data); err != nil {

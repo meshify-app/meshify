@@ -14,7 +14,7 @@ import (
 
 // ApplyRoutes applies router to gin Router
 func ApplyRoutes(r *gin.RouterGroup) {
-	g := r.Group("/client")
+	g := r.Group("/mesh")
 	{
 
 		g.POST("", createMesh)

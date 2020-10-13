@@ -7,7 +7,7 @@
             <v-spacer />
 
             <v-toolbar-items>
-                <v-btn to="/clients">
+                <v-btn to="/hosts">
                     Hosts
                     <v-icon right dark>mdi-account-network-outline</v-icon>
                 </v-btn>

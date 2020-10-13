@@ -15,7 +15,7 @@ import (
 )
 
 // CreateMesh mesh with all necessary data
-func CreateMesh(client *model.Client) (*model.Client, error) {
+func CreateMesh(client *model.Host) (*model.Host, error) {
 
 	u := uuid.NewV4()
 	client.Id = u.String()
@@ -76,30 +76,30 @@ func CreateMesh(client *model.Client) (*model.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	client = v.(*model.Client)
+	client = v.(*model.Host)
 
 	// data modified, dump new config
 	return client, UpdateServerConfigWg()
 }
 
 // ReadMesh client by id
-func ReadMesh(id string) (*model.Client, error) {
+func ReadMesh(id string) (*model.Host, error) {
 	v, err := mongo.Deserialize(id, "mesh")
 	if err != nil {
 		return nil, err
 	}
-	client := v.(*model.Client)
+	client := v.(*model.Host)
 
 	return client, nil
 }
 
 // UpdateMesh preserve keys
-func UpdateMesh(Id string, client *model.Client) (*model.Client, error) {
+func UpdateMesh(Id string, client *model.Host) (*model.Host, error) {
 	v, err := mongo.Deserialize(Id, "mesh")
 	if err != nil {
 		return nil, err
 	}
-	current := v.(*model.Client)
+	current := v.(*model.Host)
 
 	if current.Id != client.Id {
 		return nil, errors.New("records Id mismatch")
@@ -130,7 +130,7 @@ func UpdateMesh(Id string, client *model.Client) (*model.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	client = v.(*model.Client)
+	client = v.(*model.Host)
 
 	// data modified, dump new config
 	return client, UpdateServerConfigWg()
@@ -151,8 +151,8 @@ func DeleteMesh(id string) error {
 }
 
 // ReadMeshes all clients
-func ReadMeshes() ([]*model.Client, error) {
-	clients := make([]*model.Client, 0)
+func ReadMeshes() ([]*model.Host, error) {
+	clients := make([]*model.Host, 0)
 	/*
 		files, err := ioutil.ReadDir(filepath.Join(os.Getenv("WG_CONF_DIR")))
 		if err != nil {
@@ -170,7 +170,7 @@ func ReadMeshes() ([]*model.Client, error) {
 						"path": f.Name(),
 					}).Error("failed to deserialize client")
 				} else {
-					clients = append(clients, c.(*model.Client))
+					clients = append(clients, c.(*model.Host))
 				}
 			}
 		}

@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import auth from "./modules/auth";
-import client from "./modules/client";
+import host from "./modules/host";
 import server from "./modules/server";
+import mesh from "./modules/mesh";
 
 Vue.use(Vuex)
 
@@ -13,7 +14,8 @@ export default new Vuex.Store({
   actions:{},
   modules: {
     auth,
-    client,
+    host,
+    mesh,
     server
   }
 })

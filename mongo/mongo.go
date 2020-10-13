@@ -76,7 +76,7 @@ func Deserialize(id string, col string) (interface{}, error) {
 	var filter interface{}
 	err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
 
-	var c *model.Client
+	var c *model.Host
 	err = collection.FindOne(ctx, filter).Decode(&c)
 
 	return c, nil
@@ -107,8 +107,8 @@ func DeleteClient(id string, col string) error {
 }
 
 // ReadAllClients from MongoDB
-func ReadAllClients() []*model.Client {
-	clients := make([]*model.Client, 0)
+func ReadAllClients() []*model.Host {
+	hosts := make([]*model.Host, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -128,22 +128,22 @@ func ReadAllClients() []*model.Client {
 
 		defer cursor.Close(ctx)
 		for cursor.Next(ctx) {
-			var client *model.Client
-			err = cursor.Decode(&client)
+			var host *model.Host
+			err = cursor.Decode(&host)
 			if err == nil {
-				clients = append(clients, client)
+				hosts = append(hosts, host)
 			}
 		}
 
 	}
 
-	return clients
+	return hosts
 
 }
 
 // ReadAllMeshes from MongoDB
-func ReadAllMeshes() []*model.Client {
-	clients := make([]*model.Client, 0)
+func ReadAllMeshes() []*model.Host {
+	hosts := make([]*model.Host, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -163,15 +163,15 @@ func ReadAllMeshes() []*model.Client {
 
 		defer cursor.Close(ctx)
 		for cursor.Next(ctx) {
-			var client *model.Client
-			err = cursor.Decode(&client)
+			var host *model.Host
+			err = cursor.Decode(&host)
 			if err == nil {
-				clients = append(clients, client)
+				hosts = append(hosts, host)
 			}
 		}
 
 	}
 
-	return clients
+	return hosts
 
 }

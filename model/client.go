@@ -7,8 +7,8 @@ import (
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 )
 
-// Client structure
-type Client struct {
+// Host structure
+type Host struct {
 	Id                        string    `json:"id"`
 	MeshID                    string    `json:"meshid"`
 	MeshName                  string    `json:"meshName"`
@@ -38,7 +38,7 @@ type Client struct {
 }
 
 // IsValid check if model is valid
-func (a Client) IsValid() []error {
+func (a Host) IsValid() []error {
 	errs := make([]error, 0)
 
 	// check if the name empty
