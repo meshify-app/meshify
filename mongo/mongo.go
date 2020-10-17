@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -13,6 +14,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+///
+/// Mongo DB primitives
+///
 
 // Serialize write interface to disk
 func Serialize(id string, col string, c interface{}) error {
@@ -58,7 +63,7 @@ func Serialize(id string, col string, c interface{}) error {
 }
 
 // Deserialize read interface from disk
-func Deserialize(id string, col string) (interface{}, error) {
+func Deserialize(id string, col string, t reflect.Type) (interface{}, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -76,14 +81,30 @@ func Deserialize(id string, col string) (interface{}, error) {
 	var filter interface{}
 	err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
 
-	var c *model.Host
-	err = collection.FindOne(ctx, filter).Decode(&c)
+	switch t.String() {
+	case "model.Host":
+		var c *model.Host
+		err = collection.FindOne(ctx, filter).Decode(&c)
+		return c, nil
 
-	return c, nil
+	case "model.User":
+		var c *model.User
+		err = collection.FindOne(ctx, filter).Decode(&c)
+		return c, nil
+
+	case "model.Mesh":
+		var c *model.Mesh
+		err = collection.FindOne(ctx, filter).Decode(&c)
+		return c, nil
+	}
+
+	log.Infof("reflect.TypeOf(t) = %v", t.String())
+
+	return nil, nil
 }
 
-// DeleteClient removes the given client id
-func DeleteClient(id string, col string) error {
+// DeleteHost removes the given id from the given collection
+func DeleteHost(id string, col string) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -106,8 +127,32 @@ func DeleteClient(id string, col string) error {
 	return nil
 }
 
-// ReadAllClients from MongoDB
-func ReadAllClients() []*model.Host {
+// Delete removes the given id from the given collection
+func Delete(id string, ident string, col string) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			log.Error(err)
+		}
+	}()
+
+	collection := client.Database("meshify").Collection(col)
+
+	findstr := fmt.Sprintf("{\"%s\":\"%s\"}", ident, id)
+	var filter interface{}
+	err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
+
+	collection.FindOneAndDelete(ctx, filter)
+
+	return nil
+}
+
+// ReadAllHosts from MongoDB
+func ReadAllHosts() []*model.Host {
 	hosts := make([]*model.Host, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -142,8 +187,8 @@ func ReadAllClients() []*model.Host {
 }
 
 // ReadAllMeshes from MongoDB
-func ReadAllMeshes() []*model.Host {
-	hosts := make([]*model.Host, 0)
+func ReadAllMeshes() []*model.Mesh {
+	meshes := make([]*model.Mesh, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -163,15 +208,50 @@ func ReadAllMeshes() []*model.Host {
 
 		defer cursor.Close(ctx)
 		for cursor.Next(ctx) {
-			var host *model.Host
-			err = cursor.Decode(&host)
+			var mesh *model.Mesh
+			err = cursor.Decode(&mesh)
 			if err == nil {
-				hosts = append(hosts, host)
+				meshes = append(meshes, mesh)
 			}
 		}
 
 	}
 
-	return hosts
+	return meshes
+
+}
+
+// ReadAllUsers from MongoDB
+func ReadAllUsers() []*model.User {
+	users := make([]*model.User, 0)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			log.Error(err)
+		}
+	}()
+
+	collection := client.Database("meshify").Collection("users")
+
+	cursor, err := collection.Find(ctx, bson.D{})
+
+	if err == nil {
+
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var user *model.User
+			err = cursor.Decode(&user)
+			if err == nil {
+				users = append(users, user)
+			}
+		}
+
+	}
+
+	return users
 
 }

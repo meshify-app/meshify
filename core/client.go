@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sort"
 	"strconv"
 	"time"
@@ -20,24 +21,24 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-// CreateClient client with all necessary data
-func CreateClient(client *model.Host) (*model.Host, error) {
+// CreateHost host with all necessary data
+func CreateHost(host *model.Host) (*model.Host, error) {
 
 	u := uuid.NewV4()
-	client.Id = u.String()
+	host.Id = u.String()
 
 	key, err := wgtypes.GeneratePrivateKey()
 	if err != nil {
 		return nil, err
 	}
-	client.PrivateKey = key.String()
-	client.PublicKey = key.PublicKey().String()
+	host.PrivateKey = key.String()
+	host.PublicKey = key.PublicKey().String()
 
 	presharedKey, err := wgtypes.GenerateKey()
 	if err != nil {
 		return nil, err
 	}
-	client.PresharedKey = presharedKey.String()
+	host.PresharedKey = presharedKey.String()
 
 	reserverIps, err := GetAllReservedIps()
 	if err != nil {
@@ -45,7 +46,7 @@ func CreateClient(client *model.Host) (*model.Host, error) {
 	}
 
 	ips := make([]string, 0)
-	for _, network := range client.Address {
+	for _, network := range host.Address {
 		ip, err := util.GetAvailableIp(network, reserverIps)
 		if err != nil {
 			return nil, err
@@ -57,95 +58,95 @@ func CreateClient(client *model.Host) (*model.Host, error) {
 		}
 		ips = append(ips, ip)
 	}
-	client.Address = ips
-	client.AllowedIPs = ips
-	client.Created = time.Now().UTC()
-	client.Updated = client.Created
+	host.Address = ips
+	host.AllowedIPs = ips
+	host.Created = time.Now().UTC()
+	host.Updated = host.Created
 
-	// check if client is valid
-	errs := client.IsValid()
+	// check if host is valid
+	errs := host.IsValid()
 	if len(errs) != 0 {
 		for _, err := range errs {
 			log.WithFields(log.Fields{
 				"err": err,
-			}).Error("client validation error")
+			}).Error("host validation error")
 		}
-		return nil, errors.New("failed to validate client")
+		return nil, errors.New("failed to validate host")
 	}
 
-	err = mongo.Serialize(client.Id, "hosts", client)
+	err = mongo.Serialize(host.Id, "hosts", host)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err := mongo.Deserialize(client.Id, "hosts")
+	v, err := mongo.Deserialize(host.Id, "hosts", reflect.TypeOf(model.Host{}))
 	if err != nil {
 		return nil, err
 	}
-	client = v.(*model.Host)
+	host = v.(*model.Host)
 
 	// data modified, dump new config
-	return client, UpdateServerConfigWg()
+	return host, UpdateServerConfigWg()
 }
 
-// ReadClient client by id
-func ReadClient(id string) (*model.Host, error) {
-	v, err := mongo.Deserialize(id, "hosts")
+// ReadHost host by id
+func ReadHost(id string) (*model.Host, error) {
+	v, err := mongo.Deserialize(id, "hosts", reflect.TypeOf(model.Host{}))
 	if err != nil {
 		return nil, err
 	}
-	client := v.(*model.Host)
+	host := v.(*model.Host)
 
-	return client, nil
+	return host, nil
 }
 
-// UpdateClient preserve keys
-func UpdateClient(Id string, client *model.Host) (*model.Host, error) {
-	v, err := mongo.Deserialize(Id, "hosts")
+// UpdateHost preserve keys
+func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
+	v, err := mongo.Deserialize(Id, "hosts", reflect.TypeOf(model.Host{}))
 	if err != nil {
 		return nil, err
 	}
 	current := v.(*model.Host)
 
-	if current.Id != client.Id {
+	if current.Id != host.Id {
 		return nil, errors.New("records Id mismatch")
 	}
 
-	// check if client is valid
-	errs := client.IsValid()
+	// check if host is valid
+	errs := host.IsValid()
 	if len(errs) != 0 {
 		for _, err := range errs {
 			log.WithFields(log.Fields{
 				"err": err,
-			}).Error("client validation error")
+			}).Error("host validation error")
 		}
-		return nil, errors.New("failed to validate client")
+		return nil, errors.New("failed to validate host")
 	}
 
 	// keep keys
-	client.PrivateKey = current.PrivateKey
-	client.PublicKey = current.PublicKey
-	client.Updated = time.Now().UTC()
+	host.PrivateKey = current.PrivateKey
+	host.PublicKey = current.PublicKey
+	host.Updated = time.Now().UTC()
 
-	err = mongo.Serialize(client.Id, "hosts", client)
+	err = mongo.Serialize(host.Id, "hosts", host)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err = mongo.Deserialize(Id, "hosts")
+	v, err = mongo.Deserialize(Id, "hosts", reflect.TypeOf(model.Host{}))
 	if err != nil {
 		return nil, err
 	}
-	client = v.(*model.Host)
+	host = v.(*model.Host)
 
 	// data modified, dump new config
-	return client, UpdateServerConfigWg()
+	return host, UpdateServerConfigWg()
 }
 
-// DeleteClient from disk
-func DeleteClient(id string) error {
+// DeleteHost from disk
+func DeleteHost(id string) error {
 
-	err := mongo.DeleteClient(id, "hosts")
+	err := mongo.DeleteHost(id, "hosts")
 	//	path := filepath.Join(os.Getenv("WG_CONF_DIR"), id)
 	//	err := os.Remove(path)
 	if err != nil {
@@ -156,9 +157,9 @@ func DeleteClient(id string) error {
 	return UpdateServerConfigWg()
 }
 
-// ReadClients all clients
-func ReadClients() ([]*model.Host, error) {
-	clients := make([]*model.Host, 0)
+// ReadHosts all hosts
+func ReadHosts() ([]*model.Host, error) {
+	hosts := make([]*model.Host, 0)
 	/*
 		files, err := ioutil.ReadDir(filepath.Join(os.Getenv("WG_CONF_DIR")))
 		if err != nil {
@@ -166,7 +167,7 @@ func ReadClients() ([]*model.Host, error) {
 		}
 
 		for _, f := range files {
-			// clients file name is an uuid
+			// hosts file name is an uuid
 			_, err := uuid.FromString(f.Name())
 			if err == nil {
 				c, err := mongo.Deserialize(f.Name())
@@ -174,25 +175,25 @@ func ReadClients() ([]*model.Host, error) {
 					log.WithFields(log.Fields{
 						"err":  err,
 						"path": f.Name(),
-					}).Error("failed to deserialize client")
+					}).Error("failed to deserialize host")
 				} else {
-					clients = append(clients, c.(*model.Host))
+					hosts = append(hosts, c.(*model.Host))
 				}
 			}
 		}
 	*/
-	clients = mongo.ReadAllClients()
+	hosts = mongo.ReadAllHosts()
 
-	sort.Slice(clients, func(i, j int) bool {
-		return clients[i].Created.After(clients[j].Created)
+	sort.Slice(hosts, func(i, j int) bool {
+		return hosts[i].Created.After(hosts[j].Created)
 	})
 
-	return clients, nil
+	return hosts, nil
 }
 
-// ReadClientConfig in wg format
-func ReadClientConfig(id string) ([]byte, error) {
-	client, err := ReadClient(id)
+// ReadHostConfig in wg format
+func ReadHostConfig(id string) ([]byte, error) {
+	host, err := ReadHost(id)
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +203,7 @@ func ReadClientConfig(id string) ([]byte, error) {
 		return nil, err
 	}
 
-	configDataWg, err := template.DumpClientWg(client, server)
+	configDataWg, err := template.DumpClientWg(host, server)
 	if err != nil {
 		return nil, err
 	}
@@ -210,14 +211,14 @@ func ReadClientConfig(id string) ([]byte, error) {
 	return configDataWg, nil
 }
 
-// EmailClient send email to client
-func EmailClient(id string) error {
-	client, err := ReadClient(id)
+// EmailHost send email to host
+func EmailHost(id string) error {
+	host, err := ReadHost(id)
 	if err != nil {
 		return err
 	}
 
-	configData, err := ReadClientConfig(id)
+	configData, err := ReadHostConfig(id)
 	if err != nil {
 		return err
 	}
@@ -253,7 +254,7 @@ func EmailClient(id string) error {
 	defer os.Remove(tmpfilePng.Name()) // clean up
 
 	// get email body
-	emailBody, err := template.DumpEmail(client, filepath.Base(tmpfilePng.Name()))
+	emailBody, err := template.DumpEmail(host, filepath.Base(tmpfilePng.Name()))
 	if err != nil {
 		return err
 	}
@@ -272,7 +273,7 @@ func EmailClient(id string) error {
 	m := gomail.NewMessage()
 
 	m.SetHeader("From", os.Getenv("SMTP_FROM"))
-	m.SetAddressHeader("To", client.Email, client.Name)
+	m.SetAddressHeader("To", host.Email, host.Name)
 	m.SetHeader("Subject", "WireGuard VPN Configuration")
 	m.SetBody("text/html", string(emailBody))
 	m.Attach(tmpfileCfg.Name())

@@ -105,7 +105,7 @@
                         >
                             <v-list-item>
                                 <v-list-item-content>
-                                    <v-list-item-title class="headline">{{ mesh.name }}</v-list-item-title>
+                                    <v-list-item-title class="headline">{{ mesh.mesnName }}</v-list-item-title>
                                     <v-list-item-subtitle>{{ mesh.email }}</v-list-item-subtitle>
                                     <v-list-item-subtitle>Created: {{ mesh.created | formatDate }} by {{ mesh.createdBy }}</v-list-item-subtitle>
                                     <v-list-item-subtitle>Updated: {{ mesh.updated | formatDate }} by {{ mesh.updatedBy }}</v-list-item-subtitle>
@@ -347,13 +347,13 @@
                                     v-model="valid"
                             >
                                 <v-text-field
-                                        v-model="mesh.name"
+                                        v-model="mesh.meshName"
                                         label="Friendly name"
                                         :rules="[ v => !!v || 'Mesh name is required',]"
                                         required
                                 />
                                 <v-combobox
-                                        v-model="mesh.address"
+                                        v-model="mesh.default.address"
                                         chips
                                         hint="Write IPv4 or IPv6 CIDR and hit enter"
                                         label="Addresses"
@@ -373,7 +373,7 @@
                                     </template>
                                 </v-combobox>
                                 <v-combobox
-                                    v-model="mesh.dns"
+                                    v-model="mesh.default.dns"
                                     chips
                                     hint="Write IP address(es) and hit enter or leave empty.  If not empty, be sure to include your local resolver."
                                     label="DNS servers for this mesh"
@@ -386,7 +386,7 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="server.dns.splice(server.dns.indexOf(item), 1)"
+                                                @click:close="mesh.default.dns.splice(mesh.default.dns.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
@@ -524,7 +524,7 @@
       valid: false,
       search: '',
       headers: [
-        { text: 'Name', value: 'name', },
+        { text: 'Name', value: 'meshName', },
 //        { text: 'Email', value: 'email', },
 //        { text: "Endpoint", value: 'endpoint', },
         { text: 'IP address pool', value: 'address', },
@@ -539,7 +539,7 @@
       ...mapGetters({
         user: 'auth/user',
         server: 'server/server',
-        meshes: 'mesh/mesh',
+        meshes: 'mesh/meshes',
       }),
     },
 
@@ -591,7 +591,7 @@
       },
 
       remove(mesh) {
-        if(confirm(`Do you really want to delete ${mesh.name} ?`)){
+        if(confirm(`Do you really want to delete ${mesh.meshName} ?`)){
           this.deleteMesh(mesh)
         }
       },
@@ -626,19 +626,19 @@
           this.errorMesh('Please provide at least one valid CIDR address for mesh allowed IPs');
           return;
         }
-        for (let i = 0; i < mesh.allowedIPs.length; i++){
-          if (this.$isCidr(mesh.allowedIPs[i]) === 0) {
+        for (let i = 0; i < mesh.default.allowedIPs.length; i++){
+          if (this.$isCidr(mesh.default.allowedIPs[i]) === 0) {
             this.errorMesh('Invalid CIDR detected, please correct before submitting');
             return
           }
         }
         // check address
-        if (mesh.address.length < 1) {
+        if (mesh.default.address.length < 1) {
           this.errorMesh('Please provide at least one valid CIDR address for mesh');
           return;
         }
-        for (let i = 0; i < mesh.address.length; i++){
-          if (this.$isCidr(mesh.address[i]) === 0) {
+        for (let i = 0; i < mesh.default.address.length; i++){
+          if (this.$isCidr(mesh.default.address[i]) === 0) {
             this.errorMesh('Invalid CIDR detected, please correct before submitting');
             return
           }

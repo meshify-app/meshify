@@ -26,6 +26,16 @@ const routes = [
     }
   },
   {
+    path: '/users',
+    name: 'users',
+    component: function () {
+      return import(/* webpackChunkName: "Users" */ '../views/Users.vue')
+    },
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/server',
     name: 'server',
     component: function () {

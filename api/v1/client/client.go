@@ -17,17 +17,17 @@ func ApplyRoutes(r *gin.RouterGroup) {
 	g := r.Group("/host")
 	{
 
-		g.POST("", createClient)
-		g.GET("/:id", readClient)
-		g.PATCH("/:id", updateClient)
-		g.DELETE("/:id", deleteClient)
-		g.GET("", readClients)
-		g.GET("/:id/config", configClient)
-		g.GET("/:id/email", emailClient)
+		g.POST("", createHost)
+		g.GET("/:id", readHost)
+		g.PATCH("/:id", updateHost)
+		g.DELETE("/:id", deleteHost)
+		g.GET("", readHosts)
+		g.GET("/:id/config", configHost)
+		g.GET("/:id/email", emailHost)
 	}
 }
 
-func createClient(c *gin.Context) {
+func createHost(c *gin.Context) {
 	var data model.Host
 
 	if err := c.ShouldBindJSON(&data); err != nil {
@@ -52,7 +52,7 @@ func createClient(c *gin.Context) {
 	}
 	data.CreatedBy = user.Email
 
-	client, err := core.CreateClient(&data)
+	client, err := core.CreateHost(&data)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -64,10 +64,10 @@ func createClient(c *gin.Context) {
 	c.JSON(http.StatusOK, client)
 }
 
-func readClient(c *gin.Context) {
+func readHost(c *gin.Context) {
 	id := c.Param("id")
 
-	client, err := core.ReadClient(id)
+	client, err := core.ReadHost(id)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -79,7 +79,7 @@ func readClient(c *gin.Context) {
 	c.JSON(http.StatusOK, client)
 }
 
-func updateClient(c *gin.Context) {
+func updateHost(c *gin.Context) {
 	var data model.Host
 	id := c.Param("id")
 
@@ -105,7 +105,7 @@ func updateClient(c *gin.Context) {
 	}
 	data.UpdatedBy = user.Name
 
-	client, err := core.UpdateClient(id, &data)
+	client, err := core.UpdateHost(id, &data)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -117,10 +117,10 @@ func updateClient(c *gin.Context) {
 	c.JSON(http.StatusOK, client)
 }
 
-func deleteClient(c *gin.Context) {
+func deleteHost(c *gin.Context) {
 	id := c.Param("id")
 
-	err := core.DeleteClient(id)
+	err := core.DeleteHost(id)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -132,8 +132,8 @@ func deleteClient(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-func readClients(c *gin.Context) {
-	clients, err := core.ReadClients()
+func readHosts(c *gin.Context) {
+	clients, err := core.ReadHosts()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -145,8 +145,8 @@ func readClients(c *gin.Context) {
 	c.JSON(http.StatusOK, clients)
 }
 
-func configClient(c *gin.Context) {
-	configData, err := core.ReadClientConfig(c.Param("id"))
+func configHost(c *gin.Context) {
+	configData, err := core.ReadHostConfig(c.Param("id"))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -175,10 +175,10 @@ func configClient(c *gin.Context) {
 	return
 }
 
-func emailClient(c *gin.Context) {
+func emailHost(c *gin.Context) {
 	id := c.Param("id")
 
-	err := core.EmailClient(id)
+	err := core.EmailHost(id)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,

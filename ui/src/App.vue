@@ -44,7 +44,7 @@
         authStatus: 'auth/authStatus',
         authRedirectUrl: 'auth/authRedirectUrl',
         authError: 'auth/error',
-        clientError: 'client/error',
+        clientError: 'host/error',
         serverError: 'server/error',
       })
     },

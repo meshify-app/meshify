@@ -2,8 +2,10 @@ package apiv1
 
 import (
 	"github.com/gin-gonic/gin"
+	user "gitlab.127-0-0-1.fr/vx3r/wg-gen-web/api/v1/Users"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/api/v1/auth"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/api/v1/client"
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/api/v1/mesh"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/api/v1/server"
 )
 
@@ -14,6 +16,8 @@ func ApplyRoutes(r *gin.RouterGroup, private bool) {
 		if private {
 			client.ApplyRoutes(v1)
 			server.ApplyRoutes(v1)
+			user.ApplyRoutes(v1)
+			mesh.ApplyRoutes(v1)
 		} else {
 			auth.ApplyRoutes(v1)
 

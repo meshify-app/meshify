@@ -115,7 +115,7 @@ func UpdateServer(server *model.Server) (*model.Server, error) {
 
 // UpdateServerConfigWg in wg format
 func UpdateServerConfigWg() error {
-	clients, err := ReadClients()
+	clients, err := ReadHosts()
 	if err != nil {
 		return err
 	}
@@ -135,7 +135,7 @@ func UpdateServerConfigWg() error {
 
 // GetAllReservedIps the list of all reserved IPs, client and server
 func GetAllReservedIps() ([]string, error) {
-	clients, err := ReadClients()
+	clients, err := ReadHosts()
 	if err != nil {
 		return nil, err
 	}

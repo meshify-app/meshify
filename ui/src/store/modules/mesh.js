@@ -13,7 +13,7 @@ const getters = {
     return state.meshes;
   },
   getMeshConfig: (state) => (id) => {
-    let item = state.meshes.find(item => item.id === id)
+    let item = state.meshes.find(item => item.meshid === id)
     return item ? item.config : null
   }
 }
@@ -69,7 +69,7 @@ const actions = {
   readMeshConfig({ state, commit }, mesh){
     ApiService.getWithConfig(`/mesh/${mesh.meshid}`, {responseType: 'arraybuffer'})
       .then(resp => {
-        commit('meshes', { mesh: mesh, config: resp })
+        commit('mesh', { mesh: mesh, config: resp })
       })
       .catch(err => {
         commit('error', err)

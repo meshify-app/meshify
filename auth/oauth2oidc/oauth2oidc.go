@@ -112,7 +112,6 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 
 	user.Issuer = iDToken.Issuer
 	user.IssuedAt = iDToken.IssuedAt
-	user.ID = user.Email
 
 	domain := "grapid.us.auth0.com"
 	id := "ySeco0qQJonrTLRp3Ww3Y3R70418DnjA"
@@ -153,9 +152,18 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 	var b interface{}
 	err = bson.UnmarshalExtJSON([]byte(data), true, &b)
 
-	//	err = client.Database("meshify").Collection("users").Find("{'_id':'%s'}")
+	findstr := fmt.Sprintf("{\"email\":\"%s\"}", user.Email)
+	var filter interface{}
+	err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
 
-	res, err := collection.InsertOne(ctx, b)
+	update := bson.M{
+		"$set": b,
+	}
+
+	opts := options.Update().SetUpsert(true)
+	res, err := collection.UpdateOne(ctx, filter, update, opts)
+
+	//res, err := collection.InsertOne(ctx, b)
 
 	log.Infof("Res: %v", res)
 

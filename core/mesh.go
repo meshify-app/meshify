@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"reflect"
 	"sort"
 	"time"
 
@@ -11,27 +12,13 @@ import (
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/mongo"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/template"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
-	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
 
 // CreateMesh mesh with all necessary data
-func CreateMesh(client *model.Host) (*model.Host, error) {
+func CreateMesh(mesh *model.Mesh) (*model.Mesh, error) {
 
 	u := uuid.NewV4()
-	client.Id = u.String()
-
-	key, err := wgtypes.GeneratePrivateKey()
-	if err != nil {
-		return nil, err
-	}
-	client.PrivateKey = key.String()
-	client.PublicKey = key.PublicKey().String()
-
-	presharedKey, err := wgtypes.GenerateKey()
-	if err != nil {
-		return nil, err
-	}
-	client.PresharedKey = presharedKey.String()
+	mesh.MeshID = u.String()
 
 	reserverIps, err := GetAllReservedIps()
 	if err != nil {
@@ -39,7 +26,7 @@ func CreateMesh(client *model.Host) (*model.Host, error) {
 	}
 
 	ips := make([]string, 0)
-	for _, network := range client.Address {
+	for _, network := range mesh.Default.Address {
 		ip, err := util.GetAvailableIp(network, reserverIps)
 		if err != nil {
 			return nil, err
@@ -51,95 +38,98 @@ func CreateMesh(client *model.Host) (*model.Host, error) {
 		}
 		ips = append(ips, ip)
 	}
-	client.Address = ips
-	client.AllowedIPs = ips
-	client.Created = time.Now().UTC()
-	client.Updated = client.Created
+	mesh.Default.Address = ips
+	mesh.Default.AllowedIPs = ips
+	mesh.Created = time.Now().UTC()
+	mesh.Updated = mesh.Created
 
-	// check if client is valid
-	errs := client.IsValid()
+	// check if mesh is valid
+	errs := mesh.IsValid()
 	if len(errs) != 0 {
 		for _, err := range errs {
 			log.WithFields(log.Fields{
 				"err": err,
-			}).Error("client validation error")
+			}).Error("mesh validation error")
 		}
-		return nil, errors.New("failed to validate client")
+		return nil, errors.New("failed to validate mesh")
 	}
 
-	err = mongo.Serialize(client.Id, "mesh", client)
+	err = mongo.Serialize(mesh.MeshID, "mesh", mesh)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err := mongo.Deserialize(client.Id, "mesh")
+	v, err := mongo.Deserialize(mesh.MeshID, "mesh", reflect.TypeOf(model.Mesh{}))
 	if err != nil {
 		return nil, err
 	}
-	client = v.(*model.Host)
+	mesh = v.(*model.Mesh)
 
 	// data modified, dump new config
-	return client, UpdateServerConfigWg()
+	return mesh, UpdateServerConfigWg()
 }
 
-// ReadMesh client by id
-func ReadMesh(id string) (*model.Host, error) {
-	v, err := mongo.Deserialize(id, "mesh")
+// ReadMesh mesh by id
+func ReadMesh(id string) (*model.Mesh, error) {
+	v, err := mongo.Deserialize(id, "mesh", reflect.TypeOf(model.Mesh{}))
 	if err != nil {
 		return nil, err
 	}
-	client := v.(*model.Host)
+	mesh := v.(*model.Mesh)
 
-	return client, nil
+	return mesh, nil
 }
 
 // UpdateMesh preserve keys
-func UpdateMesh(Id string, client *model.Host) (*model.Host, error) {
-	v, err := mongo.Deserialize(Id, "mesh")
+func UpdateMesh(Id string, mesh *model.Mesh) (*model.Mesh, error) {
+	v, err := mongo.Deserialize(Id, "mesh", reflect.TypeOf(model.Mesh{}))
 	if err != nil {
 		return nil, err
 	}
-	current := v.(*model.Host)
+	//	current := v.(*model.Mesh)
 
-	if current.Id != client.Id {
-		return nil, errors.New("records Id mismatch")
+	if v == nil {
+		return nil, errors.New("Mesh is nil")
+		//		x: = fmt.Sprintf("could not retrieve mesh %s", Id)
+		//		return nil, errors.New(x)
 	}
 
-	// check if client is valid
-	errs := client.IsValid()
+	//	if current.MeshID != Id {
+	//		return nil, errors.New("records Id mismatch")
+	//	}
+
+	// check if mesh is valid
+	errs := mesh.IsValid()
 	if len(errs) != 0 {
 		for _, err := range errs {
 			log.WithFields(log.Fields{
 				"err": err,
-			}).Error("client validation error")
+			}).Error("mesh validation error")
 		}
-		return nil, errors.New("failed to validate client")
+		return nil, errors.New("failed to validate mesh")
 	}
 
-	// keep keys
-	client.PrivateKey = current.PrivateKey
-	client.PublicKey = current.PublicKey
-	client.Updated = time.Now().UTC()
+	mesh.Updated = time.Now().UTC()
 
-	err = mongo.Serialize(client.Id, "mesh", client)
+	err = mongo.Serialize(mesh.MeshID, "mesh", mesh)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err = mongo.Deserialize(Id, "mesh")
+	v, err = mongo.Deserialize(Id, "mesh", reflect.TypeOf(model.Mesh{}))
 	if err != nil {
 		return nil, err
 	}
-	client = v.(*model.Host)
+	mesh = v.(*model.Mesh)
 
 	// data modified, dump new config
-	return client, UpdateServerConfigWg()
+	return mesh, UpdateServerConfigWg()
 }
 
 // DeleteMesh from disk
 func DeleteMesh(id string) error {
 
-	err := mongo.DeleteClient(id, "mesh")
+	err := mongo.Delete(id, "meshid", "mesh")
 	//	path := filepath.Join(os.Getenv("WG_CONF_DIR"), id)
 	//	err := os.Remove(path)
 	if err != nil {
@@ -151,8 +141,8 @@ func DeleteMesh(id string) error {
 }
 
 // ReadMeshes all clients
-func ReadMeshes() ([]*model.Host, error) {
-	clients := make([]*model.Host, 0)
+func ReadMeshes() ([]*model.Mesh, error) {
+	meshes := make([]*model.Mesh, 0)
 	/*
 		files, err := ioutil.ReadDir(filepath.Join(os.Getenv("WG_CONF_DIR")))
 		if err != nil {
@@ -175,18 +165,18 @@ func ReadMeshes() ([]*model.Host, error) {
 			}
 		}
 	*/
-	clients = mongo.ReadAllMeshes()
+	meshes = mongo.ReadAllMeshes()
 
-	sort.Slice(clients, func(i, j int) bool {
-		return clients[i].Created.After(clients[j].Created)
+	sort.Slice(meshes, func(i, j int) bool {
+		return meshes[i].Created.After(meshes[j].Created)
 	})
 
-	return clients, nil
+	return meshes, nil
 }
 
 // ReadMeshConfig in wg format
 func ReadMeshConfig(id string) ([]byte, error) {
-	client, err := ReadClient(id)
+	client, err := ReadHost(id)
 	if err != nil {
 		return nil, err
 	}

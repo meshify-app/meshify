@@ -27,7 +27,7 @@ func ApplyRoutes(r *gin.RouterGroup) {
 }
 
 func createMesh(c *gin.Context) {
-	var data model.Client
+	var data model.Mesh
 
 	if err := c.ShouldBindJSON(&data); err != nil {
 		log.WithFields(log.Fields{
@@ -79,7 +79,7 @@ func readMesh(c *gin.Context) {
 }
 
 func updateMesh(c *gin.Context) {
-	var data model.Client
+	var data model.Mesh
 	id := c.Param("id")
 
 	if err := c.ShouldBindJSON(&data); err != nil {
