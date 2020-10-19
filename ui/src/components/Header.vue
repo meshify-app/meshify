@@ -7,10 +7,6 @@
             <v-spacer />
 
             <v-toolbar-items>
-                <v-btn to="/users">
-                    Users
-                    <v-icon right dark>mdi-account-multiple</v-icon>
-                </v-btn>
                 <v-btn to="/hosts">
                     Hosts
                     <v-icon right dark>mdi-account-network-outline</v-icon>
@@ -19,10 +15,14 @@
                     Meshes
                     <v-icon right dark>mdi-vpn</v-icon>
                 </v-btn>
-                <v-btn to="/server">
+                <v-btn to="/users">
+                    Users
+                    <v-icon right dark>mdi-account-multiple</v-icon>
+                </v-btn>
+<!--                <v-btn to="/server">
                     Server
                     <v-icon right dark>mdi-vpn</v-icon>
-                </v-btn>
+                </v-btn> -->
             </v-toolbar-items>
 
             <v-menu

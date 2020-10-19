@@ -27,9 +27,9 @@
                     :items="meshes"
                     :search="search"
             >
-                <template v-slot:item.address="{ item }">
+                <template v-slot:item.default.address="{ item }">
                     <v-chip
-                            v-for="(ip, i) in item.address"
+                            v-for="(ip, i) in item.default.address"
                             :key="i"
                             color="#336699"
                             text-color="white"
@@ -38,9 +38,9 @@
                         {{ ip }}
                     </v-chip>
                 </template>
-                <template v-slot:item.tags="{ item }">
+                <template v-slot:item.default.tags="{ item }">
                     <v-chip
-                            v-for="(tag, i) in item.tags"
+                            v-for="(tag, i) in item.default.tags"
                             :key="i"
                             color="blue-grey"
                             text-color="white"
@@ -105,8 +105,7 @@
                         >
                             <v-list-item>
                                 <v-list-item-content>
-                                    <v-list-item-title class="headline">{{ mesh.mesnName }}</v-list-item-title>
-                                    <v-list-item-subtitle>{{ mesh.email }}</v-list-item-subtitle>
+                                    <v-list-item-title class="headline">{{ mesh.meshName }}</v-list-item-title>
                                     <v-list-item-subtitle>Created: {{ mesh.created | formatDate }} by {{ mesh.createdBy }}</v-list-item-subtitle>
                                     <v-list-item-subtitle>Updated: {{ mesh.updated | formatDate }} by {{ mesh.updatedBy }}</v-list-item-subtitle>
                                 </v-list-item-content>
@@ -120,7 +119,7 @@
 
                             <v-card-text class="text--primary">
                                 <v-chip
-                                        v-for="(ip, i) in mesh.address"
+                                        v-for="(ip, i) in mesh.default.address"
                                         :key="i"
                                         color="indigo"
                                         text-color="white"
@@ -131,7 +130,7 @@
                             </v-card-text>
                             <v-card-text class="text--primary">
                                 <v-chip
-                                        v-for="(tag, i) in mesh.tags"
+                                        v-for="(tag, i) in mesh.default.tags"
                                         :key="i"
                                         color="blue-grey"
                                         text-color="white"
@@ -207,7 +206,7 @@
                                                 v-on:change="update(mesh)"
                                         />
                                     </template>
-                                    <span> {{mesh.enable ? 'Disable' : 'Enable'}} this mesh</span>
+                                    <span> {{mesh.default.enable ? 'Disable' : 'Enable'}} this mesh</span>
                                 </v-tooltip>
 
                             </v-card-actions>
@@ -233,19 +232,14 @@
                                     v-model="valid"
                             >
                                 <v-text-field
-                                        v-model="mesh.name"
+                                        v-model="mesh.meshName"
                                         label="Mesh friendly name"
                                         :rules="[ v => !!v || 'Mesh name is required', ]"
                                         required
                                 />
-                                <v-text-field
-                                        v-model="mesh.email"
-                                        label="Mesh email"
-                                        :rules="[ v => (/.+@.+\..+/.test(v) || v === '') || 'E-mail must be valid',]"
-                                />
                                 <v-select
-                                        v-model="mesh.address"
-                                        :items="server.address"
+                                        v-model="mesh.default.address"
+                                        :items="mesh.default.address"
                                         label="Mesh IP will be chosen from these networks"
                                         :rules="[ v => !!v || 'Network is required', ]"
                                         multiple
@@ -254,7 +248,7 @@
                                         required
                                 />
                                 <v-combobox
-                                        v-model="mesh.allowedIPs"
+                                        v-model="mesh.default.allowedIPs"
                                         chips
                                         hint="Write IPv4 or IPv6 CIDR and hit enter"
                                         label="Allowed IPs"
@@ -267,14 +261,14 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="mesh.allowedIPs.splice(mesh.allowedIPs.indexOf(item), 1)"
+                                                @click:close="mesh.default.allowedIPs.splice(mesh.default.allowedIPs.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
                                     </template>
                                 </v-combobox>
                                 <v-combobox
-                                        v-model="mesh.tags"
+                                        v-model="mesh.default.tags"
                                         chips
                                         hint="Enter a tag, hit tab, hit enter."
                                         label="Tags"
@@ -287,14 +281,14 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="mesh.tags.splice(mesh.tags.indexOf(item), 1)"
+                                                @click:close="mesh.default.tags.splice(mesh.default.tags.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
                                     </template>
                                 </v-combobox>
                                 <v-switch
-                                        v-model="mesh.enable"
+                                        v-model="mesh.default.enable"
                                         color="success"
                                         inset
                                         :label="mesh.enable ? 'Enable mesh after creation': 'Disable mesh after creation'"
@@ -366,12 +360,43 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="mesh.address.splice(mesh.address.indexOf(item), 1)"
+                                                @click:close="mesh.default.address.splice(mesh.default.address.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
                                     </template>
                                 </v-combobox>
+                                <v-combobox
+                                        v-model="mesh.default.tags"
+                                        chips
+                                        hint="Write tag name and hit enter"
+                                        label="Tags"
+                                        multiple
+                                        dark
+                                >
+                                    <template v-slot:selection="{ attrs, item, select, selected }">
+                                        <v-chip
+                                                v-bind="attrs"
+                                                :input-value="selected"
+                                                close
+                                                @click="select"
+                                                @click:close="mesh.default.tags.splice(mesh.default.tags.indexOf(item), 1)"
+                                        >
+                                            <strong>{{ item }}</strong>&nbsp;
+                                        </v-chip>
+                                    </template>
+                                </v-combobox>
+                            </v-form>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+            <v-expansion-panels>
+            <v-expansion-panel>
+                <v-expansion-panel-header dark>Advanced configuration</v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <div class="d-flex flex-no-wrap justify-space-between">
+                            <v-col cols="12">
                                 <v-combobox
                                     v-model="mesh.default.dns"
                                     chips
@@ -394,7 +419,7 @@
                                 </v-combobox>
 
                                 <v-combobox
-                                        v-model="mesh.allowedIPs"
+                                        v-model="mesh.default.allowedIPs"
                                         chips
                                         hint="Write IPv4 or IPv6 CIDR and hit enter"
                                         label="Allowed IPs"
@@ -407,62 +432,32 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="mesh.allowedIPs.splice(mesh.allowedIPs.indexOf(item), 1)"
+                                                @click:close="mesh.default.allowedIPs.splice(mesh.default.allowedIPs.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
                                     </template>
                                 </v-combobox>
+
                                 <v-text-field
                                         type="number"
-                                        v-model="mesh.mtu"
-                                        label="Define global MTU"
+                                        v-model="mesh.default.mtu"
+                                        label="Define default global MTU"
                                         hint="Leave at 0 and let us take care of MTU"
                                 />
                                 <v-text-field
                                         type="number"
-                                        v-model="mesh.persistentKeepalive"
+                                        v-model="mesh.default.persistentKeepalive"
                                         label="Persistent keepalive"
                                         hint="To disable, set to 0.  Recommended value 29 (seconds)"
                                 />
-                                <v-combobox
-                                        v-model="mesh.tags"
-                                        chips
-                                        hint="Write tag name and hit enter"
-                                        label="Tags"
-                                        multiple
-                                        dark
-                                >
-                                    <template v-slot:selection="{ attrs, item, select, selected }">
-                                        <v-chip
-                                                v-bind="attrs"
-                                                :input-value="selected"
-                                                close
-                                                @click="select"
-                                                @click:close="mesh.tags.splice(mesh.tags.indexOf(item), 1)"
-                                        >
-                                            <strong>{{ item }}</strong>&nbsp;
-                                        </v-chip>
-                                    </template>
-                                </v-combobox>
-                            </v-form>
-                        </v-col>
-                    </v-row>
-                </v-card-text>
-            </v-card>
-            <v-expansion-panels>
-            <v-expansion-panel>
-                <v-expansion-panel-header dark>Server configuration</v-expansion-panel-header>
-                    <v-expansion-panel-content>
-                        <div class="d-flex flex-no-wrap justify-space-between">
-                            <v-col cols="12">
                                 <v-text-field
-                                        v-model="mesh.publicKey"
+                                        v-model="mesh.default.publicKey"
                                         label="Public key"
                                         disabled
                                 />
                                 <v-text-field
-                                        v-model="mesh.endpoint"
+                                        v-model="mesh.default.endpoint"
                                         label="Public endpoint for clients to connect to"
                                         :rules="[
                             v => !!v || 'Public endpoint for clients to connect to is required',
@@ -470,7 +465,7 @@
                                         required
                                 />
                                 <v-text-field
-                                        v-model="mesh.listenPort"
+                                        v-model="mesh.default.listenPort"
                                         type="number"
                                         :rules="[
                             v => !!v || 'Listen port is required',
@@ -527,8 +522,8 @@
         { text: 'Name', value: 'meshName', },
 //        { text: 'Email', value: 'email', },
 //        { text: "Endpoint", value: 'endpoint', },
-        { text: 'IP address pool', value: 'address', },
-        { text: 'Created by', value: 'created', sortable: false, },
+        { text: 'IP address pool', value: 'default.address', },
+        { text: 'Created', value: 'created', sortable: false, },
         { text: 'Tags', value: 'tags', },
         { text: 'Actions', value: 'action', sortable: false, },
 
@@ -566,22 +561,22 @@
           name: "",
           email: this.user.email,
           enable: true,
-          allowedIPs: this.server.address,
-          address: this.server.address,
-          meshName: this.server.meshName,
-          meshid: this.server.meshid,
+          allowedIPs: "",
+          address: "100.0.0.0/24",
+          meshName: "",
+          meshid: "",
           tags: [],
         }
         this.dialogCreate = true;
       },
 
       create(mesh) {
-        if (mesh.allowedIPs.length < 0) {
+        if (mesh.default.allowedIPs.length < 0) {
           this.errorMesh('Please provide at least one valid CIDR address for mesh allowed IPs')
           return;
         }
-        for (let i = 0; i < mesh.allowedIPs.length; i++){
-          if (this.$isCidr(mesh.allowedIPs[i]) === 0) {
+        for (let i = 0; i < mesh.default.allowedIPs.length; i++){
+          if (this.$isCidr(mesh.default.allowedIPs[i]) === 0) {
             this.errorMesh('Invalid CIDR detected, please correct before submitting')
             return
           }
@@ -614,15 +609,15 @@
 
       update(mesh) {
 
-        this.mesh.listenPort = parseInt(this.mesh.listenPort, 10);
-        this.mesh.persistentKeepalive = parseInt(this.mesh.persistentKeepalive, 10);
-        this.mesh.mtu = parseInt(this.mesh.mtu, 10);
+        this.mesh.default.listenPort = parseInt(this.mesh.default.listenPort, 10);
+        this.mesh.default.persistentKeepalive = parseInt(this.mesh.default.persistentKeepalive, 10);
+        this.mesh.default.mtu = parseInt(this.mesh.default.mtu, 10);
 //        this.mesh.meshid = this.server.meshid
 //        this.mesh.meshName = this.server.meshName
 
 
         // check allowed IPs
-        if (mesh.allowedIPs.length < 1) {
+        if (mesh.default.allowedIPs.length < 0) {
           this.errorMesh('Please provide at least one valid CIDR address for mesh allowed IPs');
           return;
         }

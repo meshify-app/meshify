@@ -38,6 +38,12 @@
                                 class="pr-1 pl-1"
                                 @click.stop="startUpdate(item)"
                         >
+                            mdi-account-switch
+                        </v-icon>
+                        <v-icon
+                                class="pr-1 pl-1"
+                                @click.stop="startUpdate(item)"
+                        >
                             mdi-square-edit-outline
                         </v-icon>
                         <v-icon
@@ -463,7 +469,7 @@
         { text: 'Name', value: 'name', },
 //        { text: "Endpoint", value: 'endpoint', },
 //        { text: 'IP address pool', value: 'address', },
-        { text: 'Created', value: 'created_at', sortable: false, },
+        { text: 'Issued', value: 'issuedAt', sortable: false, },
 //        { text: 'Tags', value: 'tags', },
         { text: 'Actions', value: 'action', sortable: false, },
 
