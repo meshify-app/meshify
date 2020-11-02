@@ -75,6 +75,12 @@
                         </v-icon>
                         <v-icon
                                 class="pr-1 pl-1"
+                                @click.stop="email(item)"
+                        >
+                            mdi-email-send-outline
+                        </v-icon>                        
+                        <v-icon
+                                class="pr-1 pl-1"
                                 @click="remove(item)"
                         >
                             mdi-trash-can-outline
@@ -240,10 +246,10 @@
                                         required
                                 />
                                 <v-select
-                                        v-model="host.address"
-                                        :items="server.address"
-                                        label="host IP will be chosen from these networks"
-                                        :rules="[ v => !!v || 'Network is required', ]"
+                                        v-model="meshList"
+                                        :items="meshList"
+                                        label="Join this mesh"
+                                        :rules="[ v => !!v || 'Mesh is required', ]"
                                         multiple
                                         chips
                                         persistent-hint
@@ -348,6 +354,16 @@
                                         :rules="[ v => !!v || 'host name is required',]"
                                         required
                                 />
+
+                                <v-combobox
+                                        v-model="selected"
+                                        :items="meshList"
+                                        label="Join this mesh"
+                                        :rules="[ v => !!v || 'Mesh is required', ]"
+                                        single
+                                        persistent-hint
+                                        required
+                                />
                                 <v-combobox
                                         v-model="host.address"
                                         chips
@@ -382,7 +398,7 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="server.dns.splice(server.dns.indexOf(item), 1)"
+                                                @click:close="mesh.default.splice(mesh.default.dns.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
@@ -516,12 +532,15 @@
       dialogCreate: false,
       dialogUpdate: false,
       host: null,
+      mesh: null,
       panel: 1,
       valid: false,
+      meshList: [],
+      selected: '',
       search: '',
       headers: [
         { text: 'Name', value: 'name', },
-//        { text: 'Email', value: 'email', },
+        { text: 'Mesh', value: 'meshName', },
         { text: "Endpoint", value: 'endpoint', },
         { text: 'IP addresses', value: 'address', },
         { text: 'Created by', value: 'created', sortable: false, },
@@ -538,26 +557,27 @@
         user: 'auth/user',
         server: 'server/server',
         hosts: 'host/hosts',
+        meshes: 'mesh/meshes',
         hostQrcodes: 'host/hostQrcodes',
       }),
     },
 
     mounted () {
-      this.readAllhosts()
-      this.readServer()
+      this.readAllHosts()
+      this.readAllMeshes()
     },
 
     methods: {
       ...mapActions('host', {
         errorhost: 'error',
-        readAllhosts: 'readAll',
+        readAllHosts: 'readAll',
         creathost: 'create',
         updatehost: 'update',
         deletehost: 'delete',
         emailhost: 'email',
       }),
-      ...mapActions('server', {
-        readServer: 'read',
+      ...mapActions('mesh', {
+        readAllMeshes: 'readAll',
       }),
 
       startCreate() {
@@ -565,11 +585,17 @@
           name: "",
           email: this.user.email,
           enable: true,
-          allowedIPs: this.server.allowedIPs,
-          address: this.server.address,
-          meshName: this.server.meshName,
-          meshid: this.server.meshid,
+//          meshName: this.meshes[0].meshName,
+//          meshID: this.meshes[0].meshid,
+//          allowedIPs: this.meshes[0].default.allowedIPs,
+//          address: this.meshes[0].default.address,
+//          meshName: this.meshes[0].default.meshName,
+//          meshid: this.meshes[0].default.meshid,
           tags: [],
+        }
+        
+        for (let i=0; i<this.meshes.length; i++) {
+            this.meshList[i] = this.meshes[i].meshName
         }
         this.dialogCreate = true;
       },
@@ -609,6 +635,13 @@
       startUpdate(host) {
         this.host = host;
         this.dialogUpdate = true;
+        this.selected = this.host.meshName;
+
+       var i=0;
+        for (i=0; i<this.meshes.length; i++) {
+            this.meshList[i] = this.meshes[i].meshName
+        }
+
       },
 
       update(host) {
@@ -616,6 +649,7 @@
         this.host.listenPort = parseInt(this.host.listenPort, 10);
         this.host.persistentKeepalive = parseInt(this.host.persistentKeepalive, 10);
         this.host.mtu = parseInt(this.host.mtu, 10);
+        this.host.meshName = this.selected
 //        this.host.meshid = this.server.meshid
 //        this.host.meshName = this.server.meshName
 

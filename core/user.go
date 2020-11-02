@@ -2,14 +2,17 @@ package core
 
 import (
 	"errors"
+	"os"
 	"reflect"
 	"sort"
+	"strconv"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/mongo"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/template"
+	"gopkg.in/gomail.v2"
 )
 
 // CreateUser user with all necessary data
@@ -162,4 +165,38 @@ func ReadUserConfig(id string) ([]byte, error) {
 	}
 
 	return configDataWg, nil
+}
+
+// EmailHost send email to host
+func EmailUser(id string) error {
+	// get email body
+	emailBody, err := template.DumpUserEmail()
+	if err != nil {
+		return err
+	}
+
+	// port to int
+	port, err := strconv.Atoi(os.Getenv("SMTP_PORT"))
+	if err != nil {
+		return err
+	}
+
+	d := gomail.NewDialer(os.Getenv("SMTP_HOST"), port, os.Getenv("SMTP_USERNAME"), os.Getenv("SMTP_PASSWORD"))
+	s, err := d.Dial()
+	if err != nil {
+		return err
+	}
+	m := gomail.NewMessage()
+
+	m.SetHeader("From", os.Getenv("SMTP_FROM"))
+	m.SetAddressHeader("To", id, id)
+	m.SetHeader("Subject", "Meshify.app Invitation")
+	m.SetBody("text/html", string(emailBody))
+
+	err = gomail.Send(s, m)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

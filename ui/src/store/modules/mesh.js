@@ -13,7 +13,7 @@ const getters = {
     return state.meshes;
   },
   getMeshConfig: (state) => (id) => {
-    let item = state.meshes.find(item => item.meshid === id)
+    let item = state.meshes.find(item => item.id === id)
     return item ? item.config : null
   }
 }
@@ -46,7 +46,7 @@ const actions = {
   },
 
   update({ commit, dispatch }, mesh){
-    ApiService.patch(`/mesh/${mesh.meshid}`, mesh)
+    ApiService.patch(`/mesh/${mesh.id}`, mesh)
       .then(resp => {
         dispatch('readMeshConfig', resp)
         commit('update', resp)
@@ -57,7 +57,7 @@ const actions = {
   },
 
   delete({ commit }, mesh){
-    ApiService.delete(`/mesh/${mesh.meshid}`)
+    ApiService.delete(`/mesh/${mesh.id}`)
       .then(() => {
         commit('delete', mesh)
       })
@@ -67,9 +67,9 @@ const actions = {
   },
 
   readMeshConfig({ state, commit }, mesh){
-    ApiService.getWithConfig(`/mesh/${mesh.meshid}`, {responseType: 'arraybuffer'})
+    ApiService.getWithConfig(`/mesh/${mesh.id}`, {responseType: 'arraybuffer'})
       .then(resp => {
-        commit('mesh', { mesh: mesh, config: resp })
+//        commit('meshes', { mesh: mesh, config: resp })
       })
       .catch(err => {
         commit('error', err)
@@ -94,7 +94,7 @@ const mutations = {
     state.meshes.push(mesh)
   },
   update(state, mesh){
-    let index = state.meshes.findIndex(x => x.meshid === mesh.meshid);
+    let index = state.meshes.findIndex(x => x.id === mesh.id);
     if (index !== -1) {
       state.meshes.splice(index, 1);
       state.meshes.push(mesh);
@@ -103,7 +103,7 @@ const mutations = {
     }
   },
   delete(state, mesh){
-    let index = state.meshes.findIndex(x => x.meshid === mesh.meshid);
+    let index = state.meshes.findIndex(x => x.id === mesh.id);
     if (index !== -1) {
       state.meshes.splice(index, 1);
     } else {

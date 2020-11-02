@@ -18,6 +18,7 @@ func ApplyRoutes(r *gin.RouterGroup) {
 	{
 
 		g.POST("", inviteUser)
+		g.GET("/:id/invite", emailUser)
 		g.GET("/:id", readUser)
 		g.PATCH("/:id", updateUser)
 		g.DELETE("/:id", deleteUser)
@@ -171,4 +172,19 @@ func configUsers(c *gin.Context) {
 	}
 	c.Data(http.StatusOK, "image/png", png)
 	return
+}
+
+func emailUser(c *gin.Context) {
+	id := c.Param("id")
+
+	err := core.EmailUser(id)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to send email to client")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }

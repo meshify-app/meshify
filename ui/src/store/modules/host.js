@@ -59,7 +59,7 @@ const actions = {
     ApiService.patch(`/host/${host.id}`, host)
       .then(resp => {
 //        dispatch('readQrcode', resp)
-        dispatch('readConfig', resp)
+//        dispatch('readConfig', resp)
         commit('update', resp)
       })
       .catch(err => {

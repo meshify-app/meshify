@@ -237,10 +237,10 @@
                                         :rules="[ v => !!v || 'Mesh name is required', ]"
                                         required
                                 />
-                                <v-select
+                                <v-combobox
                                         v-model="mesh.default.address"
-                                        :items="mesh.default.address"
-                                        label="Mesh IP will be chosen from these networks"
+                                        :items="server.address"
+                                        label="IP subnet for this mesh"
                                         :rules="[ v => !!v || 'Network is required', ]"
                                         multiple
                                         chips
@@ -329,7 +329,7 @@
                 max-width="550"
         >
             <v-card>
-                <v-card-title class="headline">Edit Host</v-card-title>
+                <v-card-title class="headline">Edit Mesh</v-card-title>
                 <v-card-text>
 
                     <v-row>
@@ -540,7 +540,7 @@
 
     mounted () {
       this.readAllMeshes()
-      this.readServer()
+//      this.readServer()
     },
 
     methods: {
@@ -561,11 +561,13 @@
           name: "",
           email: this.user.email,
           enable: true,
-          allowedIPs: "",
-          address: "100.0.0.0/24",
           meshName: "",
-          meshid: "",
+          id: "",
           tags: [],
+        }
+        this.mesh.default = {
+          allowedIPs: [],
+          address: [],
         }
         this.dialogCreate = true;
       },
