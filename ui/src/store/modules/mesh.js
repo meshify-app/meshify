@@ -27,7 +27,7 @@ const actions = {
     ApiService.get("/mesh")
       .then(resp => {
         commit('meshes', resp)
-        dispatch('readMeshConfigs')
+//        dispatch('readMeshConfigs')
       })
       .catch(err => {
         commit('error', err)

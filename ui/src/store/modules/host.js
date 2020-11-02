@@ -36,7 +36,7 @@ const actions = {
       .then(resp => {
         commit('hosts', resp)
 //        dispatch('readQrcodes')
-        dispatch('readConfigs')
+//        dispatch('readConfigs')
       })
       .catch(err => {
         commit('error', err)

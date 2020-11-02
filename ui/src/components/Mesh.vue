@@ -239,7 +239,7 @@
                                 />
                                 <v-combobox
                                         v-model="mesh.default.address"
-                                        :items="server.address"
+                                        :items="mesh.default.address"
                                         label="IP subnet for this mesh"
                                         :rules="[ v => !!v || 'Network is required', ]"
                                         multiple

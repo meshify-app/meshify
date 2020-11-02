@@ -365,6 +365,37 @@
                                         required
                                 />
                                 <v-combobox
+                                        v-model="host.tags"
+                                        chips
+                                        hint="Write tag name and hit enter"
+                                        label="Tags"
+                                        multiple
+                                        dark
+                                >
+                                    <template v-slot:selection="{ attrs, item, select, selected }">
+                                        <v-chip
+                                                v-bind="attrs"
+                                                :input-value="selected"
+                                                close
+                                                @click="select"
+                                                @click:close="host.tags.splice(host.tags.indexOf(item), 1)"
+                                        >
+                                            <strong>{{ item }}</strong>&nbsp;
+                                        </v-chip>
+                                    </template>
+                                </v-combobox>
+                            </v-form>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+            <v-expansion-panels>
+            <v-expansion-panel>
+                <v-expansion-panel-header dark>Advanced configuration</v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <div class="d-flex flex-no-wrap justify-space-between">
+                            <v-col cols="12">
+                                <v-combobox
                                         v-model="host.address"
                                         chips
                                         hint="Write IPv4 or IPv6 CIDR and hit enter"
@@ -437,37 +468,7 @@
                                         label="Persistent keepalive"
                                         hint="To disable, set to 0.  Recommended value 29 (seconds)"
                                 />
-                                <v-combobox
-                                        v-model="host.tags"
-                                        chips
-                                        hint="Write tag name and hit enter"
-                                        label="Tags"
-                                        multiple
-                                        dark
-                                >
-                                    <template v-slot:selection="{ attrs, item, select, selected }">
-                                        <v-chip
-                                                v-bind="attrs"
-                                                :input-value="selected"
-                                                close
-                                                @click="select"
-                                                @click:close="host.tags.splice(host.tags.indexOf(item), 1)"
-                                        >
-                                            <strong>{{ item }}</strong>&nbsp;
-                                        </v-chip>
-                                    </template>
-                                </v-combobox>
-                            </v-form>
-                        </v-col>
-                    </v-row>
-                </v-card-text>
-            </v-card>
-            <v-expansion-panels>
-            <v-expansion-panel>
-                <v-expansion-panel-header dark>Server configuration</v-expansion-panel-header>
-                    <v-expansion-panel-content>
-                        <div class="d-flex flex-no-wrap justify-space-between">
-                            <v-col cols="12">
+
                                 <v-text-field
                                         v-model="host.publicKey"
                                         label="Public key"

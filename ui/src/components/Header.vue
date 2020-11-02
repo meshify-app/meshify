@@ -7,13 +7,13 @@
             <v-spacer />
 
             <v-toolbar-items>
-                <v-btn to="/hosts">
-                    Hosts
-                    <v-icon right dark>mdi-account-network-outline</v-icon>
-                </v-btn>
                 <v-btn to="/mesh">
                     Meshes
                     <v-icon right dark>mdi-vpn</v-icon>
+                </v-btn>
+                <v-btn to="/hosts">
+                    Hosts
+                    <v-icon right dark>mdi-account-network-outline</v-icon>
                 </v-btn>
                 <v-btn to="/users">
                     Users

@@ -74,12 +74,12 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 		return nil, errors.New("failed to validate host")
 	}
 
-	err = mongo.Serialize(host.Id, "hosts", host)
+	err = mongo.Serialize(host.Id, "id", "hosts", host)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err := mongo.Deserialize(host.Id, "hosts", reflect.TypeOf(model.Host{}))
+	v, err := mongo.Deserialize(host.Id, "id", "hosts", reflect.TypeOf(model.Host{}))
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 
 // ReadHost host by id
 func ReadHost(id string) (*model.Host, error) {
-	v, err := mongo.Deserialize(id, "hosts", reflect.TypeOf(model.Host{}))
+	v, err := mongo.Deserialize(id, "id", "hosts", reflect.TypeOf(model.Host{}))
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func ReadHost(id string) (*model.Host, error) {
 
 // UpdateHost preserve keys
 func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
-	v, err := mongo.Deserialize(Id, "hosts", reflect.TypeOf(model.Host{}))
+	v, err := mongo.Deserialize(Id, "id", "hosts", reflect.TypeOf(model.Host{}))
 	if err != nil {
 		return nil, err
 	}
@@ -128,12 +128,12 @@ func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
 	host.PublicKey = current.PublicKey
 	host.Updated = time.Now().UTC()
 
-	err = mongo.Serialize(host.Id, "hosts", host)
+	err = mongo.Serialize(host.Id, "id", "hosts", host)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err = mongo.Deserialize(Id, "hosts", reflect.TypeOf(model.Host{}))
+	v, err = mongo.Deserialize(Id, "id", "hosts", reflect.TypeOf(model.Host{}))
 	if err != nil {
 		return nil, err
 	}

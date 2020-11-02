@@ -32,12 +32,12 @@ func CreateUser(user *model.User) (*model.User, error) {
 		return nil, errors.New("failed to validate user")
 	}
 
-	err := mongo.Serialize(user.Email, "users", user)
+	err := mongo.Serialize(user.Email, "email", "users", user)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err := mongo.Deserialize(user.Email, "users", reflect.TypeOf(model.User{}))
+	v, err := mongo.Deserialize(user.Email, "email", "users", reflect.TypeOf(model.User{}))
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func CreateUser(user *model.User) (*model.User, error) {
 
 // ReadUser user by id
 func ReadUser(id string) (*model.User, error) {
-	v, err := mongo.Deserialize(id, "users", reflect.TypeOf(model.User{}))
+	v, err := mongo.Deserialize(id, "email", "users", reflect.TypeOf(model.User{}))
 	if err != nil {
 		return nil, err
 	}
@@ -60,13 +60,14 @@ func ReadUser(id string) (*model.User, error) {
 
 // UpdateUser preserve keys
 func UpdateUser(Id string, user *model.User) (*model.User, error) {
-	v, err := mongo.Deserialize(Id, "users", reflect.TypeOf(model.User{}))
+	v, err := mongo.Deserialize(Id, "email", "users", reflect.TypeOf(model.User{}))
 	if err != nil {
 		return nil, err
 	}
 	current := v.(*model.User)
 
-	if current.Email != user.Email {
+	if current != nil && user != nil &&
+		current.Email != user.Email {
 		return nil, errors.New("records Id mismatch")
 	}
 
@@ -84,12 +85,12 @@ func UpdateUser(Id string, user *model.User) (*model.User, error) {
 	// keep keys
 	user.Updated = time.Now().UTC()
 
-	err = mongo.Serialize(user.Email, "users", user)
+	err = mongo.Serialize(user.Email, "email", "users", user)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err = mongo.Deserialize(Id, "users", reflect.TypeOf(model.User{}))
+	v, err = mongo.Deserialize(Id, "email", "users", reflect.TypeOf(model.User{}))
 	if err != nil {
 		return nil, err
 	}

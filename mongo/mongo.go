@@ -21,7 +21,7 @@ import (
 ///
 
 // Serialize write interface to disk
-func Serialize(id string, col string, c interface{}) error {
+func Serialize(id string, parm string, col string, c interface{}) error {
 	//b, err := json.MarshalIndent(c, "", "  ")
 	//if err != nil {
 	//	return err
@@ -44,7 +44,7 @@ func Serialize(id string, col string, c interface{}) error {
 
 	collection := client.Database("meshify").Collection(col)
 
-	findstr := fmt.Sprintf("{\"id\":\"%s\"}", id)
+	findstr := fmt.Sprintf("{\"%s\":\"%s\"}", parm, id)
 	var filter interface{}
 	err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
 
@@ -64,7 +64,7 @@ func Serialize(id string, col string, c interface{}) error {
 }
 
 // Deserialize read interface from disk
-func Deserialize(id string, col string, t reflect.Type) (interface{}, error) {
+func Deserialize(id string, parm string, col string, t reflect.Type) (interface{}, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -78,7 +78,7 @@ func Deserialize(id string, col string, t reflect.Type) (interface{}, error) {
 
 	collection := client.Database("meshify").Collection(col)
 
-	findstr := fmt.Sprintf("{\"id\":\"%s\"}", id)
+	findstr := fmt.Sprintf("{\"%s\":\"%s\"}", parm, id)
 	var filter interface{}
 	err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
 

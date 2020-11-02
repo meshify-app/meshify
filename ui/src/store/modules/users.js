@@ -47,7 +47,7 @@ const actions = {
     ApiService.patch(`/users/${user.id}`, user)
       .then(resp => {
 //        dispatch('readQrcode', resp)
-        dispatch('readConfig', resp)
+//        dispatch('readConfig', resp)
         commit('update', resp)
       })
       .catch(err => {
