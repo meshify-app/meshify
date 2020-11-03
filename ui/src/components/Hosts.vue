@@ -391,7 +391,7 @@
             </v-card>
             <v-expansion-panels>
             <v-expansion-panel>
-                <v-expansion-panel-header dark>Advanced configuration</v-expansion-panel-header>
+                <v-expansion-panel-header dark>Advanced Configuration</v-expansion-panel-header>
                     <v-expansion-panel-content>
                         <div class="d-flex flex-no-wrap justify-space-between">
                             <v-col cols="12">
