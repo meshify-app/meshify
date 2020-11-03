@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
+	"github.com/alan-grapid/meshify/util"
 )
 
 // Host structure
