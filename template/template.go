@@ -7,8 +7,8 @@ import (
 	"strings"
 	"text/template"
 
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
+	model "github.com/alan-grapid/meshify/model"
+	util "github.com/alan-grapid/meshify/util"
 )
 
 var (

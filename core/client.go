@@ -10,13 +10,13 @@ import (
 	"strconv"
 	"time"
 
+	model "github.com/alan-grapid/meshify/model"
+	mongo "github.com/alan-grapid/meshify/mongo"
+	template "github.com/alan-grapid/meshify/template"
+	util "github.com/alan-grapid/meshify/util"
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/mongo"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/template"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 	"gopkg.in/gomail.v2"
 )

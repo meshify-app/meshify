@@ -1,10 +1,11 @@
 package fake
 
 import (
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
-	"golang.org/x/oauth2"
 	"time"
+
+	model "github.com/alan-grapid/meshify/model"
+	util "github.com/alan-grapid/meshify/util"
+	"golang.org/x/oauth2"
 )
 
 // Fake in order to implement interface, struct is required

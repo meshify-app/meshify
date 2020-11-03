@@ -1,15 +1,16 @@
 package auth
 
 import (
+	"net/http"
+	"time"
+
+	auth "github.com/alan-grapid/meshify/auth"
+	model "github.com/alan-grapid/meshify/model"
+	util "github.com/alan-grapid/meshify/util"
 	"github.com/gin-gonic/gin"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/auth"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 	"golang.org/x/oauth2"
-	"net/http"
-	"time"
 )
 
 // ApplyRoutes applies router to gin Router

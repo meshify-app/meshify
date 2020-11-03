@@ -1,4 +1,4 @@
-module gitlab.127-0-0-1.fr/vx3r/wg-gen-web
+module github.com/alan-grapid/meshify/
 
 go 1.14
 

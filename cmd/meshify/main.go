@@ -8,6 +8,11 @@ import (
 	"strings"
 	"time"
 
+	api "github.com/alan-grapid/meshify/api"
+	auth "github.com/alan-grapid/meshify/auth"
+	core "github.com/alan-grapid/meshify/core"
+	util "github.com/alan-grapid/meshify/util"
+	version "github.com/alan-grapid/meshify/version"
 	helmet "github.com/danielkov/gin-helmet"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
@@ -15,11 +20,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/api"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/auth"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/core"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/version"
 	"golang.org/x/oauth2"
 )
 

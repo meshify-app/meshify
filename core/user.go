@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"time"
 
+	model "github.com/alan-grapid/meshify/model"
+	mongo "github.com/alan-grapid/meshify/mongo"
+	template "github.com/alan-grapid/meshify/template"
 	log "github.com/sirupsen/logrus"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/mongo"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/template"
 	"gopkg.in/gomail.v2"
 )
 

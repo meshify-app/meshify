@@ -3,12 +3,12 @@ package mesh
 import (
 	"net/http"
 
+	auth "github.com/alan-grapid/meshify/auth"
+	core "github.com/alan-grapid/meshify/core"
+	model "github.com/alan-grapid/meshify/model"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/auth"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/core"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
 	"golang.org/x/oauth2"
 )
 
