@@ -37,7 +37,7 @@ const actions = {
   create({ commit, dispatch }, mesh){
     ApiService.post("/mesh", mesh)
       .then(resp => {
-        dispatch('readMeshConfig', resp)
+//        dispatch('readMeshConfig', resp)
         commit('create', resp)
       })
       .catch(err => {
@@ -48,7 +48,7 @@ const actions = {
   update({ commit, dispatch }, mesh){
     ApiService.patch(`/mesh/${mesh.id}`, mesh)
       .then(resp => {
-        dispatch('readMeshConfig', resp)
+//        dispatch('readMeshConfig', resp)
         commit('update', resp)
       })
       .catch(err => {

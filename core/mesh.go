@@ -54,12 +54,12 @@ func CreateMesh(mesh *model.Mesh) (*model.Mesh, error) {
 		return nil, errors.New("failed to validate mesh")
 	}
 
-	err = mongo.Serialize(mesh.MeshID, "id", "mesh", mesh)
+	err = mongo.Serialize(mesh.MeshID, "meshid", "mesh", mesh)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err := mongo.Deserialize(mesh.MeshID, "id", "mesh", reflect.TypeOf(model.Mesh{}))
+	v, err := mongo.Deserialize(mesh.MeshID, "meshid", "mesh", reflect.TypeOf(model.Mesh{}))
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func CreateMesh(mesh *model.Mesh) (*model.Mesh, error) {
 
 // ReadMesh mesh by id
 func ReadMesh(id string) (*model.Mesh, error) {
-	v, err := mongo.Deserialize(id, "id", "mesh", reflect.TypeOf(model.Mesh{}))
+	v, err := mongo.Deserialize(id, "meshid", "mesh", reflect.TypeOf(model.Mesh{}))
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func ReadMesh(id string) (*model.Mesh, error) {
 
 // UpdateMesh preserve keys
 func UpdateMesh(Id string, mesh *model.Mesh) (*model.Mesh, error) {
-	v, err := mongo.Deserialize(Id, "id", "mesh", reflect.TypeOf(model.Mesh{}))
+	v, err := mongo.Deserialize(Id, "meshid", "mesh", reflect.TypeOf(model.Mesh{}))
 	if err != nil {
 		return nil, err
 	}
@@ -111,12 +111,12 @@ func UpdateMesh(Id string, mesh *model.Mesh) (*model.Mesh, error) {
 
 	mesh.Updated = time.Now().UTC()
 
-	err = mongo.Serialize(mesh.MeshID, "id", "mesh", mesh)
+	err = mongo.Serialize(mesh.MeshID, "meshid", "mesh", mesh)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err = mongo.Deserialize(Id, "id", "mesh", reflect.TypeOf(model.Mesh{}))
+	v, err = mongo.Deserialize(Id, "meshid", "mesh", reflect.TypeOf(model.Mesh{}))
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func UpdateMesh(Id string, mesh *model.Mesh) (*model.Mesh, error) {
 // DeleteMesh from disk
 func DeleteMesh(id string) error {
 
-	err := mongo.Delete(id, "id", "mesh")
+	err := mongo.Delete(id, "meshid", "mesh")
 	//	path := filepath.Join(os.Getenv("WG_CONF_DIR"), id)
 	//	err := os.Remove(path)
 	if err != nil {
