@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/alan-grapid/meshify/auth/fake"
-	"github.com/alan-grapid/meshify/auth/github"
-	"github.com/alan-grapid/meshify/auth/oauth2oidc"
-	model "github.com/alan-grapid/meshify/model"
+	"github.com/grapid/meshify/auth/fake"
+	"github.com/grapid/meshify/auth/github"
+	"github.com/grapid/meshify/auth/oauth2oidc"
+	model "github.com/grapid/meshify/model"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 )

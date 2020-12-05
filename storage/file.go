@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	model "github.com/alan-grapid/meshify/model"
-	util "github.com/alan-grapid/meshify/util"
+	model "github.com/grapid/meshify/model"
+	util "github.com/grapid/meshify/util"
 )
 
 // Serialize write interface to disk

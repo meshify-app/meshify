@@ -9,10 +9,10 @@ import (
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
 
-	model "github.com/alan-grapid/meshify/model"
-	storage "github.com/alan-grapid/meshify/storage"
-	template "github.com/alan-grapid/meshify/template"
-	util "github.com/alan-grapid/meshify/util"
+	model "github.com/grapid/meshify/model"
+	storage "github.com/grapid/meshify/storage"
+	template "github.com/grapid/meshify/template"
+	util "github.com/grapid/meshify/util"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
 

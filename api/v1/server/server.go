@@ -3,11 +3,11 @@ package server
 import (
 	"net/http"
 
-	auth "github.com/alan-grapid/meshify/auth"
-	core "github.com/alan-grapid/meshify/core"
-	model "github.com/alan-grapid/meshify/model"
-	version "github.com/alan-grapid/meshify/version"
 	"github.com/gin-gonic/gin"
+	auth "github.com/grapid/meshify/auth"
+	core "github.com/grapid/meshify/core"
+	model "github.com/grapid/meshify/model"
+	version "github.com/grapid/meshify/version"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 )

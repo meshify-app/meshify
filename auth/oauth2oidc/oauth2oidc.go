@@ -7,8 +7,8 @@ import (
 
 	"encoding/json"
 
-	model "github.com/alan-grapid/meshify/model"
 	"github.com/coreos/go-oidc"
+	model "github.com/grapid/meshify/model"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

@@ -4,7 +4,7 @@ FROM golang:alpine AS build-back
 WORKDIR /app
 ARG COMMIT
 COPY . .
-RUN go build -o wg-gen-web-linux -ldflags="-X 'github.com/alan-grapid/meshify/version.Version=${COMMIT}'" github.com/alan-grapid/meshify/cmd/wg-gen-web
+RUN go build -o wg-gen-web-linux -ldflags="-X 'github.com/grapid/meshify/version.Version=${COMMIT}'" github.com/grapid/meshify/cmd/wg-gen-web
 
 FROM node:10-alpine AS build-front
 WORKDIR /app

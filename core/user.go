@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"time"
 
-	model "github.com/alan-grapid/meshify/model"
-	mongo "github.com/alan-grapid/meshify/mongo"
-	template "github.com/alan-grapid/meshify/template"
+	model "github.com/grapid/meshify/model"
+	mongo "github.com/grapid/meshify/mongo"
+	template "github.com/grapid/meshify/template"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/gomail.v2"
 )

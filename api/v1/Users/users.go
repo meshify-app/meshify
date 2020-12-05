@@ -3,10 +3,10 @@ package user
 import (
 	"net/http"
 
-	auth "github.com/alan-grapid/meshify/auth"
-	core "github.com/alan-grapid/meshify/core"
-	model "github.com/alan-grapid/meshify/model"
 	"github.com/gin-gonic/gin"
+	auth "github.com/grapid/meshify/auth"
+	core "github.com/grapid/meshify/core"
+	model "github.com/grapid/meshify/model"
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
 	"golang.org/x/oauth2"

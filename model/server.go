@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	util "github.com/alan-grapid/meshify/util"
+	util "github.com/grapid/meshify/util"
 )
 
 // Server structure

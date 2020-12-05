@@ -7,8 +7,8 @@ import (
 	"strings"
 	"text/template"
 
-	model "github.com/alan-grapid/meshify/model"
-	util "github.com/alan-grapid/meshify/util"
+	model "github.com/grapid/meshify/model"
+	util "github.com/grapid/meshify/util"
 )
 
 var (

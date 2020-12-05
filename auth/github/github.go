@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	model "github.com/alan-grapid/meshify/model"
+	model "github.com/grapid/meshify/model"
 	"golang.org/x/oauth2"
 	oauth2Github "golang.org/x/oauth2/github"
 )
