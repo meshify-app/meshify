@@ -15,6 +15,7 @@ A control plane for [WireGuard](https://wireguard.com).
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/vx3r/wg-gen-web)
 
 ## Why another one ?
+```
                   @@@
                  @@@@@
  @@@              @@@              @@@
@@ -32,7 +33,7 @@ A control plane for [WireGuard](https://wireguard.com).
                  @@@@@
                 @@@@@@@
                  @@@@@
-
+```
 
 
 
