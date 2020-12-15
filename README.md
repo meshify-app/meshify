@@ -1,12 +1,11 @@
 # Wg Gen Web
 
-<h1 align="center"><img height="420" src="./wg-gen-web_cover.png" alt="Simple Web based configuration generator for WireGuard"></h1>
+<h1 align="center"><img height="420" src="./ui/src/assets/meshify.png" alt="A WireGuard control plane"></h1>
 
-Simple Web based configuration generator for [WireGuard](https://wireguard.com).
+A control plane for [WireGuard](https://wireguard.com).
 
 [![pipeline status](https://github.com/grapid/meshify/badges/master/pipeline.svg)](https://github.com/grapid/meshify/commits/master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vx3r/wg-gen-web)](https://goreportcard.com/report/github.com/vx3r/wg-gen-web)
-![Gitlab pipeline status (self-hosted)](https://img.shields.io/gitlab/pipeline/vx3r/wg-gen-web?gitlab_url=https%3A%2F%2Fgitlab.127-0-0-1.fr%2F)
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 ![Discord](https://img.shields.io/discord/681699554189377567)
 ![Build multi-arch Docker Images via buildx](https://github.com/vx3r/wg-gen-web/workflows/Build%20multi-arch%20Docker%20Images%20via%20buildx/badge.svg)
@@ -16,6 +15,26 @@ Simple Web based configuration generator for [WireGuard](https://wireguard.com).
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/vx3r/wg-gen-web)
 
 ## Why another one ?
+                  @@@
+                 @@@@@
+ @@@              @@@              @@@
+@@@@@                             @@@@@
+ @@@ @@                         @@ @@@
+  @     @@                   @@     @
+  @         @@    @@@    @@         @
+  @             @@@@@@@             @
+  @               @@@               @
+  @                                 @
+  @                                 @
+ @@@                               @@@
+@@@@@                             @@@@@
+ @@@                               @@@
+                 @@@@@
+                @@@@@@@
+                 @@@@@
+
+
+
 
 All WireGuard UI implementations are trying to manage the service by applying configurations and creating network rules.
 This implementation only generates configuration and its up to you to create network rules and apply configuration to WireGuard.
