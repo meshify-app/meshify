@@ -1,7 +1,7 @@
 <template>
-  <v-content>
+  <v-main>
     <Hosts/>
-  </v-content>
+  </v-main>
 </template>
 
 <script>

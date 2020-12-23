@@ -1,7 +1,7 @@
 <template>
-  <v-content>
+  <v-main>
     <Mesh/>
-  </v-content>
+  </v-main>
 </template>
 
 <script>
