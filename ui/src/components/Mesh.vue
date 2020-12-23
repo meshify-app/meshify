@@ -588,8 +588,9 @@
       },
 
       remove(mesh) {
-        if(confirm(`Do you really want to delete ${mesh.meshName} ?`)){
-          this.deleteMesh(mesh)
+        if(confirm(`Do you really want to delete ${mesh.meshName}?`)){
+            mesh.id = mesh.meshid
+            this.deleteMesh(mesh)
         }
       },
 

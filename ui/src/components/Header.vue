@@ -9,7 +9,7 @@
             <v-toolbar-items>
                 <v-btn to="/mesh">
                     Meshes
-                    <v-icon right dark>mdi-vpn</v-icon>
+                    <img class="mr-3" :src="require('../assets/meshify-bw.png')" height="32" alt="meshify"/>
                 </v-btn>
                 <v-btn to="/hosts">
                     Hosts
