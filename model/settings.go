@@ -10,6 +10,7 @@ import (
 type Settings struct {
 	PrivateKey          string   `json:"privateKey"                bson:"privateKey"`
 	PublicKey           string   `json:"publicKey"                 bson:"publicKey"`
+	PresharedKey        string   `json:"presharedKey"              bson:"presharedKey"`
 	AllowedIPs          []string `json:"allowedIPs"                bson:"allowedIPs"`
 	Address             []string `json:"address"                   bson:"address"`
 	Dns                 []string `json:"dns"                       bson:"dns"`

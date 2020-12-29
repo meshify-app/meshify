@@ -9,7 +9,7 @@ import (
 
 // Server structure
 type Server struct {
-	MeshID              string    `json:"meshid"`
+	MeshID              string    `json:"id"`
 	MeshName            string    `json:"meshName"`
 	Address             []string  `json:"address"`
 	ListenPort          int       `json:"listenPort"`

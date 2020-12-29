@@ -7,9 +7,9 @@
             <v-spacer />
 
             <v-toolbar-items>
-                <v-btn to="/mesh">
+                <v-btn to="/mesh" right>
                     Meshes
-                    <img class="mr-3" :src="require('../assets/meshify-bw.png')" height="32" alt="meshify"/>
+                    <img class="ml-1" :src="require('../assets/meshify-bw.png')" height="32" width="32" alt="meshify"/>
                 </v-btn>
                 <v-btn to="/hosts">
                     Hosts

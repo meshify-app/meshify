@@ -9,7 +9,7 @@
                     <div class="d-flex flex-no-wrap justify-space-between">
                         <v-col cols="12">
                             <v-text-field
-                                    v-model="server.meshid"
+                                    v-model="server.id"
                                     label="Mesh ID"
                                     disabled
                             />

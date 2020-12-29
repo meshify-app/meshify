@@ -250,7 +250,6 @@
                                         :items="meshList"
                                         label="Join this mesh"
                                         :rules="[ v => !!v || 'Mesh is required', ]"
-                                        multiple
                                         chips
                                         persistent-hint
                                         required
@@ -470,12 +469,12 @@
                                 />
 
                                 <v-text-field
-                                        v-model="host.publicKey"
+                                        v-model="host.Current.publicKey"
                                         label="Public key"
                                         disabled
                                 />
                                 <v-text-field
-                                        v-model="host.endpoint"
+                                        v-model="host.Current.endpoint"
                                         label="Public endpoint for hosts to connect to"
                                         :rules="[
                             v => !!v || 'Public endpoint for hosts to connect to is required',
@@ -483,7 +482,7 @@
                                         required
                                 />
                                 <v-text-field
-                                        v-model="host.listenPort"
+                                        v-model="host.Current.listenPort"
                                         type="number"
                                         :rules="[
                             v => !!v || 'Listen port is required',
@@ -542,8 +541,8 @@
       headers: [
         { text: 'Name', value: 'name', },
         { text: 'Mesh', value: 'meshName', },
-        { text: "Endpoint", value: 'endpoint', },
-        { text: 'IP addresses', value: 'address', },
+        { text: "Endpoint", value: 'Current.endpoint', },
+        { text: 'IP addresses', value: 'Current.address', },
         { text: 'Created by', value: 'created', sortable: false, },
         { text: 'Tags', value: 'tags', },
         { text: 'Actions', value: 'action', sortable: false, },
@@ -587,12 +586,13 @@
           email: this.user.email,
           enable: true,
 //          meshName: this.meshes[0].meshName,
-//          meshID: this.meshes[0].meshid,
+//          meshID: this.meshes[0].id,
 //          allowedIPs: this.meshes[0].default.allowedIPs,
 //          address: this.meshes[0].default.address,
 //          meshName: this.meshes[0].default.meshName,
-//          meshid: this.meshes[0].default.meshid,
+//          id: this.meshes[0].default.id,
           tags: [],
+          Current: {},
         }
         
         for (let i=0; i<this.meshes.length; i++) {
@@ -642,6 +642,7 @@
         for (i=0; i<this.meshes.length; i++) {
             this.meshList[i] = this.meshes[i].meshName
         }
+        this.selected = this.host.meshName;
 
       },
 
@@ -651,7 +652,7 @@
         this.host.persistentKeepalive = parseInt(this.host.persistentKeepalive, 10);
         this.host.mtu = parseInt(this.host.mtu, 10);
         this.host.meshName = this.selected
-//        this.host.meshid = this.server.meshid
+//        this.host.id = this.server.id
 //        this.host.meshName = this.server.meshName
 
 

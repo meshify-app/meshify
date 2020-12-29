@@ -8,13 +8,12 @@ import (
 // Mesh structure
 type Mesh struct {
 	ID        string    `json:"id"          bson:"id"`
-	MeshID    string    `json:"meshid"      bson:"meshid"`
 	MeshName  string    `json:"meshName"    bson:"meshName"`
 	CreatedBy string    `json:"createdBy"   bson:"createdBy"`
 	UpdatedBy string    `json:"updatedBy"   bson:"updatedBy"`
 	Created   time.Time `json:"created"     bson:"created"`
 	Updated   time.Time `json:"updated"     bson:"updated"`
-	Default   Host      `json:"default"     bson:"default"`
+	Default   Settings  `json:"default"     bson:"default"`
 }
 
 // IsValid check if model is valid

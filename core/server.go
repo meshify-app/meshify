@@ -148,7 +148,7 @@ func GetAllReservedIps() ([]string, error) {
 	reserverIps := make([]string, 0)
 
 	for _, client := range clients {
-		for _, cidr := range client.Address {
+		for _, cidr := range client.Current.Address {
 			ip, err := util.GetIpFromCidr(cidr)
 			if err != nil {
 				log.WithFields(log.Fields{

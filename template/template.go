@@ -350,7 +350,7 @@ MTU = {{.Server.Mtu}}
 {{- end}}
 [Peer]
 PublicKey = {{ .Server.PublicKey }}
-PresharedKey = {{ .Host.PresharedKey }}
+PresharedKey = {{ .Host.Current.PresharedKey }}
 AllowedIPs = {{ StringsJoin .Host.AllowedIPs ", " }}
 Endpoint = {{ .Server.Endpoint }}
 {{ if and (ne .Server.PersistentKeepalive 0) (not .Host.IgnorePersistentKeepalive) -}}
@@ -376,9 +376,9 @@ PostDown = {{ .Server.PostDown }}
 {{ if .Enable -}}
 # {{.Name}} / {{.Email}} / Updated: {{.Updated}} / Created: {{.Created}}
 [Peer]
-PublicKey = {{ .PublicKey }}
-PresharedKey = {{ .PresharedKey }}
-AllowedIPs = {{ StringsJoin .Address ", " }}
+PublicKey = {{ .Current.PublicKey }}
+PresharedKey = {{ .Current.PresharedKey }}
+AllowedIPs = {{ StringsJoin .Current.Address ", " }}
 {{- end }}
 {{ end }}`
 )

@@ -69,23 +69,10 @@
                         </v-icon>
                         <v-icon
                                 class="pr-1 pl-1"
-                                @click.stop="forceFileDownload(item)"
-                        >
-                            mdi-cloud-download-outline
-                        </v-icon>
-                        <v-icon
-                                class="pr-1 pl-1"
                                 @click="remove(item)"
                         >
                             mdi-trash-can-outline
                         </v-icon>
-                        <v-switch
-                                dark
-                                class="pr-1 pl-1"
-                                color="success"
-                                v-model="item.enable"
-                                v-on:change="update(item)"
-                        />
                     </v-row>
                 </template>
 
@@ -144,20 +131,6 @@
                                     <template v-slot:activator="{ on }">
                                         <v-btn
                                                 text
-                                                v-on:click="forceFileDownload(mesh)"
-                                                v-on="on"
-                                        >
-                                            <span class="d-none d-lg-flex">Download</span>
-                                            <v-icon right dark>mdi-cloud-download-outline</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span>Download</span>
-                                </v-tooltip>
-
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                                text
                                                 @click.stop="startUpdate(mesh)"
                                                 v-on="on"
                                         >
@@ -181,34 +154,6 @@
                                     </template>
                                     <span>Delete</span>
                                 </v-tooltip>
-
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                                text
-                                                @click="email(mesh)"
-                                                v-on="on"
-                                        >
-                                            <span class="d-none d-lg-flex">Send Email</span>
-                                            <v-icon right dark>mdi-email-send-outline</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span>Send Email</span>
-                                </v-tooltip>
-                                <v-spacer/>
-                                <v-tooltip right>
-                                    <template v-slot:activator="{ on }">
-                                        <v-switch
-                                                dark
-                                                v-on="on"
-                                                color="success"
-                                                v-model="mesh.enable"
-                                                v-on:change="update(mesh)"
-                                        />
-                                    </template>
-                                    <span> {{mesh.default.enable ? 'Disable' : 'Enable'}} this mesh</span>
-                                </v-tooltip>
-
                             </v-card-actions>
                         </v-card>
                     </v-col>
@@ -589,7 +534,7 @@
 
       remove(mesh) {
         if(confirm(`Do you really want to delete ${mesh.meshName}?`)){
-            mesh.id = mesh.meshid
+            mesh.id = mesh.id
             this.deleteMesh(mesh)
         }
       },
@@ -615,7 +560,7 @@
         this.mesh.default.listenPort = parseInt(this.mesh.default.listenPort, 10);
         this.mesh.default.persistentKeepalive = parseInt(this.mesh.default.persistentKeepalive, 10);
         this.mesh.default.mtu = parseInt(this.mesh.default.mtu, 10);
-//        this.mesh.meshid = this.server.meshid
+//        this.mesh.id = this.server.id
 //        this.mesh.meshName = this.server.meshName
 
 
@@ -647,7 +592,7 @@
       },
 
       forceFileDownload(mesh){
-        let config = this.getMeshConfig(mesh.meshid)
+        let config = this.getMeshConfig(mesh.id)
         if (!config) {
           this.errorMesh('Failed to download mesh config');
           return

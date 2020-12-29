@@ -31,14 +31,14 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	if err != nil {
 		return nil, err
 	}
-	host.PrivateKey = key.String()
-	host.PublicKey = key.PublicKey().String()
+	host.Current.PrivateKey = key.String()
+	host.Current.PublicKey = key.PublicKey().String()
 
 	presharedKey, err := wgtypes.GenerateKey()
 	if err != nil {
 		return nil, err
 	}
-	host.PresharedKey = presharedKey.String()
+	host.Current.PresharedKey = presharedKey.String()
 
 	reserverIps, err := GetAllReservedIps()
 	if err != nil {
@@ -46,7 +46,7 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	}
 
 	ips := make([]string, 0)
-	for _, network := range host.Address {
+	for _, network := range host.Default.Address {
 		ip, err := util.GetAvailableIp(network, reserverIps)
 		if err != nil {
 			return nil, err
@@ -58,8 +58,8 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 		}
 		ips = append(ips, ip)
 	}
-	host.Address = ips
-	host.AllowedIPs = ips
+	host.Current.Address = ips
+	host.Current.AllowedIPs = ips
 	host.Created = time.Now().UTC()
 	host.Updated = host.Created
 
@@ -124,8 +124,8 @@ func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
 	}
 
 	// keep keys
-	host.PrivateKey = current.PrivateKey
-	host.PublicKey = current.PublicKey
+	host.Current.PrivateKey = current.Current.PrivateKey
+	host.Current.PublicKey = current.Current.PublicKey
 	host.Updated = time.Now().UTC()
 
 	err = mongo.Serialize(host.Id, "id", "hosts", host)
