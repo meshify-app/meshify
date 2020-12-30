@@ -12,7 +12,7 @@ type Host struct {
 	Id        string    `json:"id"                        bson:"id"`
 	Name      string    `json:"name"                      bson:"name"`
 	Email     string    `json:"email"                     bson:"email"`
-	Enable    bool      `json:"enable"         			  bson:"enable"`
+	Enable    bool      `json:"enable"                    bson:"enable"`
 	Tags      []string  `json:"tags"                      bson:"tags"`
 	CreatedBy string    `json:"createdBy"                 bson:"createdBy"`
 	UpdatedBy string    `json:"updatedBy"                 bson:"updatedBy"`
@@ -52,9 +52,6 @@ func (a Host) IsValid() []error {
 		}
 	*/ // check if the address empty
 
-	if len(a.Current.Address) == 0 {
-		a.Current.Address = a.Default.Address
-	}
 	if len(a.Current.Address) == 0 {
 		errs = append(errs, fmt.Errorf("address field is required"))
 	}

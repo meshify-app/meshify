@@ -18,7 +18,7 @@ import (
 func CreateMesh(mesh *model.Mesh) (*model.Mesh, error) {
 
 	u := uuid.NewV4()
-	mesh.ID = u.String()
+	mesh.Id = u.String()
 
 	reserverIps, err := GetAllReservedIps()
 	if err != nil {
@@ -54,12 +54,12 @@ func CreateMesh(mesh *model.Mesh) (*model.Mesh, error) {
 		return nil, errors.New("failed to validate mesh")
 	}
 
-	err = mongo.Serialize(mesh.ID, "id", "mesh", mesh)
+	err = mongo.Serialize(mesh.Id, "id", "mesh", mesh)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err := mongo.Deserialize(mesh.ID, "id", "mesh", reflect.TypeOf(model.Mesh{}))
+	v, err := mongo.Deserialize(mesh.Id, "id", "mesh", reflect.TypeOf(model.Mesh{}))
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func UpdateMesh(Id string, mesh *model.Mesh) (*model.Mesh, error) {
 
 	mesh.Updated = time.Now().UTC()
 
-	err = mongo.Serialize(mesh.ID, "id", "mesh", mesh)
+	err = mongo.Serialize(mesh.Id, "id", "mesh", mesh)
 	if err != nil {
 		return nil, err
 	}

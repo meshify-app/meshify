@@ -286,6 +286,12 @@
                                     v-model="valid"
                             >
                                 <v-text-field
+                                        v-model="mesh.id"
+                                        label="Id"
+                                        :rules="[ v => !!v || 'Mesh id is required',]"
+                                        required
+                                />
+                                <v-text-field
                                         v-model="mesh.meshName"
                                         label="Friendly name"
                                         :rules="[ v => !!v || 'Mesh name is required',]"
@@ -465,6 +471,7 @@
       search: '',
       headers: [
         { text: 'Name', value: 'meshName', },
+        { text: 'ID', value:'id', },
 //        { text: 'Email', value: 'email', },
 //        { text: "Endpoint", value: 'endpoint', },
         { text: 'IP address pool', value: 'default.address', },

@@ -7,7 +7,7 @@ import (
 
 // Mesh structure
 type Mesh struct {
-	ID        string    `json:"id"          bson:"id"`
+	Id        string    `json:"id"          bson:"id"`
 	MeshName  string    `json:"meshName"    bson:"meshName"`
 	CreatedBy string    `json:"createdBy"   bson:"createdBy"`
 	UpdatedBy string    `json:"updatedBy"   bson:"updatedBy"`
@@ -19,6 +19,10 @@ type Mesh struct {
 // IsValid check if model is valid
 func (a Mesh) IsValid() []error {
 	errs := make([]error, 0)
+
+	if a.Id == "" {
+		errs = append(errs, fmt.Errorf("Id is required"))
+	}
 
 	// check if the name empty
 	if a.MeshName == "" {

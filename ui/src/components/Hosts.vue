@@ -541,6 +541,7 @@
       headers: [
         { text: 'Name', value: 'name', },
         { text: 'Mesh', value: 'meshName', },
+        { text: 'ID', value:'id', },
         { text: "Endpoint", value: 'Current.endpoint', },
         { text: 'IP addresses', value: 'Current.address', },
         { text: 'Created by', value: 'created', sortable: false, },
