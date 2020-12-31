@@ -20,21 +20,16 @@ func CreateMesh(mesh *model.Mesh) (*model.Mesh, error) {
 	u := uuid.NewV4()
 	mesh.Id = u.String()
 
-	reserverIps, err := GetAllReservedIps()
-	if err != nil {
-		return nil, err
-	}
-
 	ips := make([]string, 0)
 	for _, network := range mesh.Default.Address {
-		ip, err := util.GetAvailableIp(network, reserverIps)
+		ip, err := util.GetNetworkAddress(network)
 		if err != nil {
 			return nil, err
 		}
 		if util.IsIPv6(ip) {
-			ip = ip + "/128"
+			ip = ip + "/64"
 		} else {
-			ip = ip + "/32"
+			ip = ip + "/24"
 		}
 		ips = append(ips, ip)
 	}
@@ -54,7 +49,7 @@ func CreateMesh(mesh *model.Mesh) (*model.Mesh, error) {
 		return nil, errors.New("failed to validate mesh")
 	}
 
-	err = mongo.Serialize(mesh.Id, "id", "mesh", mesh)
+	err := mongo.Serialize(mesh.Id, "id", "mesh", mesh)
 	if err != nil {
 		return nil, err
 	}

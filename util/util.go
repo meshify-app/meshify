@@ -55,6 +55,19 @@ func DirectoryExists(name string) bool {
 	return info.IsDir()
 }
 
+// GetNetworkAddress gets the valid start of a subnet
+func GetNetworkAddress(cidr string) (string, error) {
+
+	_, ipnet, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return "", err
+	}
+	networkAddr := ipnet.IP.String()
+
+	return networkAddr, nil
+
+}
+
 // GetAvailableIp search for an available ip in cidr against a list of reserved ips
 func GetAvailableIp(cidr string, reserved []string) (string, error) {
 	ip, ipnet, err := net.ParseCIDR(cidr)
