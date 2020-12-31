@@ -27,6 +27,20 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	u := uuid.NewV4()
 	host.Id = u.String()
 
+	// read the meshes and configure the default values
+	meshes, err := ReadMeshes()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, mesh := range meshes {
+		if mesh.MeshName == host.MeshName {
+			host.Default = mesh.Default
+			host.Current = mesh.Default
+			host.MeshId = mesh.Id
+		}
+	}
+
 	key, err := wgtypes.GeneratePrivateKey()
 	if err != nil {
 		return nil, err
@@ -40,7 +54,7 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	}
 	host.Current.PresharedKey = presharedKey.String()
 
-	reserverIps, err := GetAllReservedIps()
+	reserverIps, err := GetAllReservedMeshIps(host.MeshName)
 	if err != nil {
 		return nil, err
 	}
@@ -87,6 +101,34 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 
 	// data modified, dump new config
 	return host, UpdateServerConfigWg()
+}
+
+// GetAllReservedIps the list of all reserved IPs, client and server
+func GetAllReservedMeshIps(meshName string) ([]string, error) {
+	clients, err := ReadHosts()
+	if err != nil {
+		return nil, err
+	}
+
+	reserverIps := make([]string, 0)
+
+	for _, client := range clients {
+		if client.MeshName == meshName {
+			for _, cidr := range client.Current.Address {
+				ip, err := util.GetIpFromCidr(cidr)
+				if err != nil {
+					log.WithFields(log.Fields{
+						"err":  err,
+						"cidr": cidr,
+					}).Error("failed to ip from cidr")
+				} else {
+					reserverIps = append(reserverIps, ip)
+				}
+			}
+		}
+	}
+
+	return reserverIps, nil
 }
 
 // ReadHost host by id

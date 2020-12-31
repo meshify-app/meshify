@@ -11,6 +11,8 @@ import (
 type Host struct {
 	Id        string    `json:"id"                        bson:"id"`
 	Name      string    `json:"name"                      bson:"name"`
+	MeshId    string    `json:"meshid"                    bson:"meshid"`
+	MeshName  string    `json:"meshName"                  bson:"meshName"`
 	Email     string    `json:"email"                     bson:"email"`
 	Enable    bool      `json:"enable"                    bson:"enable"`
 	Tags      []string  `json:"tags"                      bson:"tags"`

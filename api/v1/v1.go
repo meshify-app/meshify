@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	user "github.com/grapid/meshify/api/v1/Users"
 	"github.com/grapid/meshify/api/v1/auth"
-	"github.com/grapid/meshify/api/v1/client"
+	host "github.com/grapid/meshify/api/v1/host"
 	"github.com/grapid/meshify/api/v1/mesh"
 	"github.com/grapid/meshify/api/v1/server"
 )
@@ -14,7 +14,7 @@ func ApplyRoutes(r *gin.RouterGroup, private bool) {
 	v1 := r.Group("/v1.0")
 	{
 		if private {
-			client.ApplyRoutes(v1)
+			host.ApplyRoutes(v1)
 			server.ApplyRoutes(v1)
 			user.ApplyRoutes(v1)
 			mesh.ApplyRoutes(v1)

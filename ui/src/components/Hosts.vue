@@ -246,7 +246,7 @@
                                         required
                                 />
                                 <v-select
-                                        v-model="meshList"
+                                        v-model="host.meshName"
                                         :items="meshList"
                                         label="Join this mesh"
                                         :rules="[ v => !!v || 'Mesh is required', ]"
@@ -255,7 +255,7 @@
                                         required
                                 />
                                 <v-combobox
-                                        v-model="host.allowedIPs"
+                                        v-model="host.current.allowedIPs"
                                         chips
                                         hint="Write IPv4 or IPv6 CIDR and hit enter"
                                         label="Allowed IPs"
@@ -268,7 +268,7 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="host.allowedIPs.splice(host.allowedIPs.indexOf(item), 1)"
+                                                @click:close="host.current.allowedIPs.splice(host.current.allowedIPs.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
@@ -436,7 +436,7 @@
                                 </v-combobox>
 
                                 <v-combobox
-                                        v-model="host.allowedIPs"
+                                        v-model="host.current.allowedIPs"
                                         chips
                                         hint="Write IPv4 or IPv6 CIDR and hit enter"
                                         label="Allowed IPs"
@@ -449,7 +449,7 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="host.allowedIPs.splice(host.allowedIPs.indexOf(item), 1)"
+                                                @click:close="host.current.allowedIPs.splice(host.current.allowedIPs.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
@@ -469,12 +469,12 @@
                                 />
 
                                 <v-text-field
-                                        v-model="host.Current.publicKey"
+                                        v-model="host.current.publicKey"
                                         label="Public key"
                                         disabled
                                 />
                                 <v-text-field
-                                        v-model="host.Current.endpoint"
+                                        v-model="host.current.endpoint"
                                         label="Public endpoint for hosts to connect to"
                                         :rules="[
                             v => !!v || 'Public endpoint for hosts to connect to is required',
@@ -482,7 +482,7 @@
                                         required
                                 />
                                 <v-text-field
-                                        v-model="host.Current.listenPort"
+                                        v-model="host.current.listenPort"
                                         type="number"
                                         :rules="[
                             v => !!v || 'Listen port is required',
@@ -541,9 +541,9 @@
       headers: [
         { text: 'Name', value: 'name', },
         { text: 'Mesh', value: 'meshName', },
-        { text: 'ID', value:'id', },
-        { text: "Endpoint", value: 'Current.endpoint', },
-        { text: 'IP addresses', value: 'Current.address', },
+//        { text: 'ID', value:'id', },
+        { text: "Endpoint", value: 'current.endpoint', },
+        { text: 'IP addresses', value: 'current.address', },
         { text: 'Created by', value: 'created', sortable: false, },
         { text: 'Tags', value: 'tags', },
         { text: 'Actions', value: 'action', sortable: false, },
@@ -593,12 +593,13 @@
 //          meshName: this.meshes[0].default.meshName,
 //          id: this.meshes[0].default.id,
           tags: [],
-          Current: {},
+          current: {},
         }
         
         for (let i=0; i<this.meshes.length; i++) {
             this.meshList[i] = this.meshes[i].meshName
         }
+
         this.dialogCreate = true;
       },
 
@@ -649,32 +650,32 @@
 
       update(host) {
 
-        this.host.listenPort = parseInt(this.host.listenPort, 10);
-        this.host.persistentKeepalive = parseInt(this.host.persistentKeepalive, 10);
-        this.host.mtu = parseInt(this.host.mtu, 10);
+        this.host.current.listenPort = parseInt(this.host.current.listenPort, 10);
+        this.host.current.persistentKeepalive = parseInt(this.host.current.persistentKeepalive, 10);
+        this.host.current.mtu = parseInt(this.host.current.mtu, 10);
         this.host.meshName = this.selected
 //        this.host.id = this.server.id
 //        this.host.meshName = this.server.meshName
 
 
         // check allowed IPs
-        if (host.allowedIPs.length < 1) {
+        if (host.current.allowedIPs.length < 1) {
           this.errorhost('Please provide at least one valid CIDR address for host allowed IPs');
           return;
         }
-        for (let i = 0; i < host.allowedIPs.length; i++){
-          if (this.$isCidr(host.allowedIPs[i]) === 0) {
+        for (let i = 0; i < host.current.allowedIPs.length; i++){
+          if (this.$isCidr(host.current.allowedIPs[i]) === 0) {
             this.errorhost('Invalid CIDR detected, please correct before submitting');
             return
           }
         }
         // check address
-        if (host.address.length < 1) {
+        if (host.current.address.length < 1) {
           this.errorhost('Please provide at least one valid CIDR address for host');
           return;
         }
-        for (let i = 0; i < host.address.length; i++){
-          if (this.$isCidr(host.address[i]) === 0) {
+        for (let i = 0; i < host.current.address.length; i++){
+          if (this.$isCidr(host.current.address[i]) === 0) {
             this.errorhost('Invalid CIDR detected, please correct before submitting');
             return
           }

@@ -340,8 +340,8 @@ var (
 `
 
 	clientTpl = `[Interface]
-Address = {{ StringsJoin .Host.Address ", " }}
-PrivateKey = {{ .Host.PrivateKey }}
+Address = {{ StringsJoin .Host.Current.Address ", " }}
+PrivateKey = {{ .Host.Current.PrivateKey }}
 {{ if ne (len .Server.Dns) 0 -}}
 DNS = {{ StringsJoin .Server.Dns ", " }}
 {{- end }}
@@ -349,13 +349,11 @@ DNS = {{ StringsJoin .Server.Dns ", " }}
 MTU = {{.Server.Mtu}}
 {{- end}}
 [Peer]
-PublicKey = {{ .Server.PublicKey }}
+PublicKey = {{ .Host.Current.PublicKey }}
 PresharedKey = {{ .Host.Current.PresharedKey }}
-AllowedIPs = {{ StringsJoin .Host.AllowedIPs ", " }}
+AllowedIPs = {{ StringsJoin .Host.Current.AllowedIPs ", " }}
 Endpoint = {{ .Server.Endpoint }}
-{{ if and (ne .Server.PersistentKeepalive 0) (not .Host.IgnorePersistentKeepalive) -}}
-PersistentKeepalive = {{.Server.PersistentKeepalive}}
-{{- end}}
+PersistentKeepalive = {{.Host.Current.PersistentKeepalive}}
 `
 
 	wgTpl = `# Updated: {{ .Server.Updated }} / Created: {{ .Server.Created }}
