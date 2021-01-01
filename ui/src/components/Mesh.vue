@@ -193,26 +193,6 @@
                                         required
                                 />
                                 <v-combobox
-                                        v-model="mesh.default.allowedIPs"
-                                        chips
-                                        hint="Write IPv4 or IPv6 CIDR and hit enter"
-                                        label="Allowed IPs"
-                                        multiple
-                                        dark
-                                >
-                                    <template v-slot:selection="{ attrs, item, select, selected }">
-                                        <v-chip
-                                                v-bind="attrs"
-                                                :input-value="selected"
-                                                close
-                                                @click="select"
-                                                @click:close="mesh.default.allowedIPs.splice(mesh.default.allowedIPs.indexOf(item), 1)"
-                                        >
-                                            <strong>{{ item }}</strong>&nbsp;
-                                        </v-chip>
-                                    </template>
-                                </v-combobox>
-                                <v-combobox
                                         v-model="mesh.default.tags"
                                         chips
                                         hint="Enter a tag, hit tab, hit enter."
@@ -232,18 +212,6 @@
                                         </v-chip>
                                     </template>
                                 </v-combobox>
-                                <v-switch
-                                        v-model="mesh.default.enable"
-                                        color="success"
-                                        inset
-                                        :label="mesh.enable ? 'Enable mesh after creation': 'Disable mesh after creation'"
-                                />
-                                <v-switch
-                                        v-model="mesh.ignorePersistentKeepalive"
-                                        color="red"
-                                        inset
-                                        :label="'Ignore global persistent keepalive: ' + (mesh.ignorePersistentKeepalive ? 'Yes': 'NO')"
-                                />
                             </v-form>
                         </v-col>
                     </v-row>
@@ -401,19 +369,6 @@
                                         v-model="mesh.default.persistentKeepalive"
                                         label="Persistent keepalive"
                                         hint="To disable, set to 0.  Recommended value 29 (seconds)"
-                                />
-                                <v-text-field
-                                        v-model="mesh.default.publicKey"
-                                        label="Public key"
-                                        disabled
-                                />
-                                <v-text-field
-                                        v-model="mesh.default.endpoint"
-                                        label="Public endpoint for clients to connect to"
-                                        :rules="[
-                            v => !!v || 'Public endpoint for clients to connect to is required',
-                            ]"
-                                        required
                                 />
                                 <v-text-field
                                         v-model="mesh.default.listenPort"

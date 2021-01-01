@@ -300,12 +300,6 @@
                                         inset
                                         :label="host.enable ? 'Enable host after creation': 'Disable host after creation'"
                                 />
-                                <v-switch
-                                        v-model="host.ignorePersistentKeepalive"
-                                        color="red"
-                                        inset
-                                        :label="'Ignore global persistent keepalive: ' + (host.ignorePersistentKeepalive ? 'Yes': 'NO')"
-                                />
                             </v-form>
                         </v-col>
                     </v-row>
@@ -395,7 +389,7 @@
                         <div class="d-flex flex-no-wrap justify-space-between">
                             <v-col cols="12">
                                 <v-combobox
-                                        v-model="host.address"
+                                        v-model="host.current.address"
                                         chips
                                         hint="Write IPv4 or IPv6 CIDR and hit enter"
                                         label="Addresses"
@@ -408,33 +402,12 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="host.address.splice(host.address.indexOf(item), 1)"
+                                                @click:close="host.current.address.splice(host.current.address.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
                                     </template>
                                 </v-combobox>
-                                <v-combobox
-                                    v-model="host.dns"
-                                    chips
-                                    hint="Write IP address(es) and hit enter or leave empty.  If not empty, be sure to include your local resolver."
-                                    label="DNS servers for this host"
-                                    multiple
-                                    dark
-                                >
-                                    <template v-slot:selection="{ attrs, item, select, selected }">
-                                        <v-chip
-                                                v-bind="attrs"
-                                                :input-value="selected"
-                                                close
-                                                @click="select"
-                                                @click:close="mesh.default.splice(mesh.default.dns.indexOf(item), 1)"
-                                        >
-                                            <strong>{{ item }}</strong>&nbsp;
-                                        </v-chip>
-                                    </template>
-                                </v-combobox>
-
                                 <v-combobox
                                         v-model="host.current.allowedIPs"
                                         chips
@@ -455,19 +428,26 @@
                                         </v-chip>
                                     </template>
                                 </v-combobox>
-                                <v-text-field
-                                        type="number"
-                                        v-model="host.mtu"
-                                        label="Define global MTU"
-                                        hint="Leave at 0 and let us take care of MTU"
-                                />
-                                <v-text-field
-                                        type="number"
-                                        v-model="host.persistentKeepalive"
-                                        label="Persistent keepalive"
-                                        hint="To disable, set to 0.  Recommended value 29 (seconds)"
-                                />
-
+                                <v-combobox
+                                    v-model="host.current.dns"
+                                    chips
+                                    hint="Write IP address(es) and hit enter or leave empty.  If not empty, be sure to include your local resolver."
+                                    label="DNS servers for this host"
+                                    multiple
+                                    dark
+                                >
+                                    <template v-slot:selection="{ attrs, item, select, selected }">
+                                        <v-chip
+                                                v-bind="attrs"
+                                                :input-value="selected"
+                                                close
+                                                @click="select"
+                                                @click:close="host.current.splice(host.current.dns.indexOf(item), 1)"
+                                        >
+                                            <strong>{{ item }}</strong>&nbsp;
+                                        </v-chip>
+                                    </template>
+                                </v-combobox>
                                 <v-text-field
                                         v-model="host.current.publicKey"
                                         label="Public key"
@@ -476,19 +456,23 @@
                                 <v-text-field
                                         v-model="host.current.endpoint"
                                         label="Public endpoint for hosts to connect to"
-                                        :rules="[
-                            v => !!v || 'Public endpoint for hosts to connect to is required',
-                            ]"
-                                        required
                                 />
                                 <v-text-field
                                         v-model="host.current.listenPort"
                                         type="number"
-                                        :rules="[
-                            v => !!v || 'Listen port is required',
-                            ]"
                                         label="Listen port"
-                                        required
+                                />
+                                <v-text-field
+                                        type="number"
+                                        v-model="host.current.mtu"
+                                        label="Define global MTU"
+                                        hint="Leave at 0 and let us take care of MTU"
+                                />
+                                <v-text-field
+                                        type="number"
+                                        v-model="host.current.persistentKeepalive"
+                                        label="Persistent keepalive"
+                                        hint="To disable, set to 0.  Recommended value 29 (seconds)"
                                 />
                             </v-col>
                         </div>
@@ -541,10 +525,10 @@
       headers: [
         { text: 'Name', value: 'name', },
         { text: 'Mesh', value: 'meshName', },
+        { text: 'IP addresses', value: 'current.address', },
 //        { text: 'ID', value:'id', },
         { text: "Endpoint", value: 'current.endpoint', },
-        { text: 'IP addresses', value: 'current.address', },
-        { text: 'Created by', value: 'created', sortable: false, },
+//        { text: 'Created by', value: 'created', sortable: false, },
         { text: 'Tags', value: 'tags', },
         { text: 'Actions', value: 'action', sortable: false, },
 
