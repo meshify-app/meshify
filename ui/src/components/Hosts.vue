@@ -245,39 +245,21 @@
                             >
                                 <v-text-field
                                         v-model="host.name"
-                                        label="host friendly name"
+                                        label="Host friendly name"
                                         :rules="[ v => !!v || 'host name is required', ]"
                                         required
                                 />
-                                <v-select
-                                        v-model="host.meshName"
-                                        :items="meshList"
+                                <v-select return-object
+                                        v-model="meshList.selected"
+                                        :items="meshList.items"
+                                        item-text = "text"
+                                        item-value = "value"
                                         label="Join this mesh"
                                         :rules="[ v => !!v || 'Mesh is required', ]"
-                                        chips
+                                        single
                                         persistent-hint
                                         required
                                 />
-                                <v-combobox
-                                        v-model="host.current.allowedIPs"
-                                        chips
-                                        hint="Write IPv4 or IPv6 CIDR and hit enter"
-                                        label="Allowed IPs"
-                                        multiple
-                                        dark
-                                >
-                                    <template v-slot:selection="{ attrs, item, select, selected }">
-                                        <v-chip
-                                                v-bind="attrs"
-                                                :input-value="selected"
-                                                close
-                                                @click="select"
-                                                @click:close="host.current.allowedIPs.splice(host.current.allowedIPs.indexOf(item), 1)"
-                                        >
-                                            <strong>{{ item }}</strong>&nbsp;
-                                        </v-chip>
-                                    </template>
-                                </v-combobox>
                                 <v-combobox
                                         v-model="host.tags"
                                         chips
@@ -352,9 +334,11 @@
                                         required
                                 />
 
-                                <v-combobox
-                                        v-model="selected"
-                                        :items="meshList"
+                                <v-select return-object
+                                        v-model="meshList.selected"
+                                        :items="meshList.items"
+                                        item-text = "text"
+                                        item-value = "value"
                                         label="Join this mesh"
                                         :rules="[ v => !!v || 'Mesh is required', ]"
                                         single
@@ -523,7 +507,7 @@
       mesh: null,
       panel: 1,
       valid: false,
-      meshList: [],
+      meshList: {},
       selected: '',
       search: '',
       headers: [
@@ -584,24 +568,25 @@
           current: {},
         }
         
+        this.meshList = { selected: { "text": "",  "value": ""},
+                          items: [] }
+
+        var selected = 0;
         for (let i=0; i<this.meshes.length; i++) {
-            this.meshList[i] = this.meshes[i].meshName
+            this.meshList.items[i]= { "text": this.meshes[i].meshName, "value": this.meshes[i].id }
+            if (this.meshList.items[i].text == this.host.meshName) {
+                selected = i
+            }
         }
 
+        this.meshList.selected = this.meshList.items[selected];
         this.dialogCreate = true;
       },
 
       create(host) {
-/*        if (host.allowedIPs.length < 0) {
-          this.errorhost('Please provide at least one valid CIDR address for host allowed IPs')
-          return;
-        }
-        for (let i = 0; i < host.allowedIPs.length; i++){
-          if (this.$isCidr(host.allowedIPs[i]) === 0) {
-            this.errorhost('Invalid CIDR detected, please correct before submitting')
-            return
-          }
-        }*/
+
+        this.host.meshName = this.meshList.selected.text
+        this.host.meshid = this.meshList.selected.value
         this.dialogCreate = false;
         this.creathost(host)
       },
@@ -625,14 +610,21 @@
 
       startUpdate(host) {
         this.host = host;
-        this.dialogUpdate = true;
-        this.selected = this.host.meshName;
 
-       var i=0;
-        for (i=0; i<this.meshes.length; i++) {
-            this.meshList[i] = this.meshes[i].meshName
+        this.meshList = { selected: { "text": this.host.meshName,  "value": this.host.meshid },
+                          items: [] }
+
+        var selected = 0;
+        for (let i=0; i<this.meshes.length; i++) {
+            this.meshList.items[i]= { "text": this.meshes[i].meshName, "value": this.meshes[i].id }
+            if (this.meshList.items[i].text == this.host.meshName) {
+                selected = i
+            }
         }
-        this.selected = this.host.meshName;
+
+        this.meshList.selected = this.meshList.items[selected];
+
+        this.dialogUpdate = true;
 
       },
 
@@ -642,9 +634,8 @@
         this.host.current.listenPort = parseInt(this.host.current.listenPort, 10);
         this.host.current.persistentKeepalive = parseInt(this.host.current.persistentKeepalive, 10);
         this.host.current.mtu = parseInt(this.host.current.mtu, 10);
-        this.host.meshName = this.selected
-//        this.host.id = this.server.id
-//        this.host.meshName = this.server.meshName
+        this.host.meshName = this.meshList.selected.text
+        this.host.meshid = this.meshList.selected.value
 
 
         // check allowed IPs
