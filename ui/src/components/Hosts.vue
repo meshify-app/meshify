@@ -628,6 +628,10 @@
 
       },
 
+      reconcile(host, template) {
+
+      },
+
       update(host) {
 
         this.host = host
@@ -637,7 +641,39 @@
         this.host.meshName = this.meshList.selected.text
         this.host.meshid = this.meshList.selected.value
 
+        for (let i=0; i<this.meshes.length; i++) {
+            if ( this.host.meshid == this.meshList.items[i].value ) {
+                var template = this.meshes[i]
+                this.host.current.address = []
 
+                if (host.current.listenPort == host.default.listenPort) {
+                    host.current.listenPort = template.listenPort
+                }
+
+                if (host.current.allowedIPs == host.default.allowedIPs) {
+                    host.current.allowedIPs = template.allowedIPs
+                } else {
+                    host.current.allowedIPs = []
+                }
+
+                if (host.current.mtu == host.default.mtu) {
+                    host.current.mtu = template.mtu
+                }
+
+                if (host.current.dns == host.default.dns) {
+                    host.current.dns = template.dns
+                } else {
+                    host.current.dns = []
+                }
+
+                if (host.current.persistentKeepalive == host.default.persistentKeepalive) {
+                    host.current.persistentKeepalive = template.persistentKeepalive
+                }
+                this.host.default = this.meshes[i].default
+            } 
+        }
+
+/*
         // check allowed IPs
         if (host.current.allowedIPs.length < 1) {
           this.errorhost('Please provide at least one valid CIDR address for host allowed IPs');
@@ -660,6 +696,7 @@
             return
           }
         }
+        */
         // all good, submit
         this.dialogUpdate = false;
         this.updatehost(host)

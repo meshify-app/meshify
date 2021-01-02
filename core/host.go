@@ -154,6 +154,35 @@ func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
 		return nil, errors.New("records Id mismatch")
 	}
 
+	if len(host.Current.Address) == 0 ||
+		(len(host.Default.Address) > 0 && len(current.Default.Address) > 0 &&
+			(host.Default.Address[0] != current.Default.Address[0])) {
+		reserverIps, err := GetAllReservedMeshIps(host.MeshName)
+		if err != nil {
+			return nil, err
+		}
+
+		ips := make([]string, 0)
+		for _, network := range host.Default.Address {
+			ip, err := util.GetAvailableIp(network, reserverIps)
+			if err != nil {
+				return nil, err
+			}
+			if util.IsIPv6(ip) {
+				ip = ip + "/128"
+			} else {
+				ip = ip + "/32"
+			}
+			ips = append(ips, ip)
+		}
+		host.Current.Address = ips
+		host.Current.AllowedIPs = ips
+	}
+
+	if host.Current.Dns == nil {
+		host.Current.Dns = host.Default.Dns
+	}
+
 	// check if host is valid
 	errs := host.IsValid()
 	if len(errs) != 0 {
