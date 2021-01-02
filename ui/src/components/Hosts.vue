@@ -27,6 +27,10 @@
                     :items="hosts"
                     :search="search"
             >
+                <template v-slot:item.name="{ item }">
+                        {{ item.name }}
+                    </v-chip>
+                </template>
                 <template v-slot:item.address="{ item }">
                     <v-chip
                             v-for="(ip, i) in item.address"
@@ -634,6 +638,7 @@
 
       update(host) {
 
+        this.host = host
         this.host.current.listenPort = parseInt(this.host.current.listenPort, 10);
         this.host.current.persistentKeepalive = parseInt(this.host.current.persistentKeepalive, 10);
         this.host.current.mtu = parseInt(this.host.current.mtu, 10);
