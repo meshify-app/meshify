@@ -29,9 +29,12 @@
                     left
                     bottom
             >
+
                 <template v-slot:activator="{ on }">
                     <v-btn icon v-on="on">
-                        <img class="m1-m1" height="32" width="32" alt="User Profile" :src="user.picture"/>
+                        <v-avatar size="36">
+                            <img alt="user.name" :src="user.picture"/>
+                        </v-avatar>
                     </v-btn>
                 </template>
 
