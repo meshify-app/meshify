@@ -638,39 +638,46 @@
         this.host.current.listenPort = parseInt(this.host.current.listenPort, 10);
         this.host.current.persistentKeepalive = parseInt(this.host.current.persistentKeepalive, 10);
         this.host.current.mtu = parseInt(this.host.current.mtu, 10);
-        this.host.meshName = this.meshList.selected.text
-        this.host.meshid = this.meshList.selected.value
 
-        for (let i=0; i<this.meshes.length; i++) {
-            if ( this.host.meshid == this.meshList.items[i].value ) {
-                var template = this.meshes[i]
-                this.host.current.address = []
+        var changed = false;
+        if (this.host.meshid != this.meshList.selected.value) {
+            this.host.meshName = this.meshList.selected.text
+            this.host.meshid = this.meshList.selected.value
+            changed = true;
+        }
 
-                if (host.current.listenPort == host.default.listenPort) {
-                    host.current.listenPort = template.listenPort
-                }
+        if (changed) {
+            for (let i=0; i<this.meshes.length; i++) {
+                if ( this.host.meshid == this.meshList.items[i].value ) {
+                    var template = this.meshes[i]
+                    this.host.current.address = []
 
-                if (host.current.allowedIPs == host.default.allowedIPs) {
-                    host.current.allowedIPs = template.allowedIPs
-                } else {
-                    host.current.allowedIPs = []
-                }
+                    if (host.current.listenPort == host.default.listenPort) {
+                        host.current.listenPort = template.listenPort
+                    }
 
-                if (host.current.mtu == host.default.mtu) {
-                    host.current.mtu = template.mtu
-                }
+                    if (host.current.allowedIPs == host.default.allowedIPs) {
+                        host.current.allowedIPs = template.allowedIPs
+                    } else {
+                        host.current.allowedIPs = []
+                    }
 
-                if (host.current.dns == host.default.dns) {
-                    host.current.dns = template.dns
-                } else {
-                    host.current.dns = []
-                }
+                    if (host.current.mtu == host.default.mtu) {
+                        host.current.mtu = template.mtu
+                    }
 
-                if (host.current.persistentKeepalive == host.default.persistentKeepalive) {
-                    host.current.persistentKeepalive = template.persistentKeepalive
-                }
-                this.host.default = this.meshes[i].default
-            } 
+                    if (host.current.dns == host.default.dns) {
+                        host.current.dns = template.dns
+                    } else {
+                        host.current.dns = []
+                    }
+
+                    if (host.current.persistentKeepalive == host.default.persistentKeepalive) {
+                        host.current.persistentKeepalive = template.persistentKeepalive
+                    }
+                    this.host.default = this.meshes[i].default
+                } 
+            }
         }
 
 /*
