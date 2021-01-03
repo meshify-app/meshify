@@ -13,7 +13,7 @@
                 </v-btn>
                 <v-btn to="/hosts">
                     Hosts
-                    <v-icon right dark>mdi-account-network-outline</v-icon>
+                    <v-icon right dark>mdi-network-outline</v-icon>
                 </v-btn>
                 <v-btn to="/users">
                     Users
@@ -46,7 +46,11 @@
                     <v-list-item three-line>
                         <v-list-item-content>
                             <div class="overline mb-4">connected as</div>
-                            <v-list-item-title class="headline mb-1">{{user.name}}</v-list-item-title>
+                            <v-list-item-title class="headline mb-1">{{user.name}}
+                            <v-avatar size="64">
+                                <img alt="user.name" :src="user.picture"/>
+                            </v-avatar>
+                            </v-list-item-title>
                             <v-list-item-subtitle>Email: {{user.email}}</v-list-item-subtitle>
                             <v-list-item-subtitle>Issuer: {{user.issuer}}</v-list-item-subtitle>
                             <v-list-item-subtitle>Issued at: {{ user.issuedAt | formatDate }}</v-list-item-subtitle>

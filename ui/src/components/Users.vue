@@ -18,7 +18,7 @@
                         @click="startCreate"
                 >
                     Invite new user
-                    <v-icon right dark>mdi-vpn</v-icon>
+                    <v-icon right dark>mdi-account-plus</v-icon>
                 </v-btn>
             </v-card-title>
             <v-data-table

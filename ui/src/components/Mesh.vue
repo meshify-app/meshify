@@ -18,7 +18,7 @@
                         @click="startCreate"
                 >
                     Create new mesh
-                    <v-icon right dark>mdi-vpn</v-icon>
+                    <img class="ml-1" :src="require('../assets/meshify-bw.png')" height="32" width="32" alt="meshify"/>
                 </v-btn>
             </v-card-title>
             <v-data-table

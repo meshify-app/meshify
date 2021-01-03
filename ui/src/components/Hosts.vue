@@ -18,7 +18,7 @@
                         @click="startCreate"
                 >
                     Add host manually
-                    <v-icon right dark>mdi-account-network-outline</v-icon>
+                    <v-icon right dark>mdi-network-outline</v-icon>
                 </v-btn>
             </v-card-title>
             <v-data-table
