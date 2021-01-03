@@ -13,6 +13,7 @@ type User struct {
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
 	Profile   string    `json:"profile"`
+	Picture   string    `json:"picture"`
 	Issuer    string    `json:"issuer"`
 	Plan      string    `json:"plan"`
 	IssuedAt  time.Time `json:"issuedAt"`

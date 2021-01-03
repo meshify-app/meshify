@@ -31,7 +31,7 @@
             >
                 <template v-slot:activator="{ on }">
                     <v-btn icon v-on="on">
-                        <v-icon>mdi-account-circle</v-icon>
+                        <img class="m1-m1" height="32" width="32" alt="User Profile" :src="user.picture"/>
                     </v-btn>
                 </template>
 

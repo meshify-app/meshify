@@ -113,9 +113,9 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 	user.Issuer = iDToken.Issuer
 	user.IssuedAt = iDToken.IssuedAt
 
-	domain := "grapid.us.auth0.com"
-	id := "ySeco0qQJonrTLRp3Ww3Y3R70418DnjA"
-	secret := "GvScjRyIurakPGih1PP1eH69lf1xaTA8j1gGh3YXzKmLqEZ6kACAEcfH_VyChn6v"
+	domain := os.Getenv("OAUTH2_PROVIDER_URL")
+	id := os.Getenv("OAUTH2_CLIENT_ID")
+	secret := os.Getenv("OAUTH2_CLIENT_SECRET")
 	m, err := management.New(domain, id, secret)
 	if err != nil {
 		log.Errorf("Error talking to auth0: %v", err)
@@ -132,6 +132,8 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 			user.Plan = u.UserMetadata["Plan"].(string)
 		}
 	}
+
+	user.Picture = *u.Picture
 
 	log.Infof("user.Plan: %s", user.Plan)
 
