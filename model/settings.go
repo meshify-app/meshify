@@ -18,6 +18,8 @@ type Settings struct {
 	ListenPort          int      `json:"listenPort"                bson:"listenPort"`
 	Endpoint            string   `json:"endpoint"                  bson:"endpoint"`
 	Mtu                 int      `json:"mtu"                       bson:"mtu"`
+	SubnetRouting       bool     `json:"subnetRouting"             bson:"subnetRouting"`
+	STUN                bool     `json:"stun"                      bson:"stun"`
 	PreUp               string   `json:"preUp"                     bson:"preUp"`
 	PostUp              string   `json:"postUp"                    bson:"postUp"`
 	PreDown             string   `json:"preDown"                   bson:"preDown"`

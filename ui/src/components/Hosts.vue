@@ -462,6 +462,13 @@
                                         label="Persistent keepalive"
                                         hint="To disable, set to 0.  Recommended value 29 (seconds)"
                                 />
+                                <v-switch
+                                        v-model="host.current.subnetRouting"
+                                        color="success"
+                                        inset
+                                        label="Enable subnet routing"
+                               />
+
                             </v-col>
                         </div>
                     </v-expansion-panel-content>

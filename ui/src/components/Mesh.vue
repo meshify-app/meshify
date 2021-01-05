@@ -379,6 +379,13 @@
                                         label="Listen port"
                                         required
                                 />
+                                    <v-switch
+                                        v-model="mesh.default.stun"
+                                        color="success"
+                                        inset
+                                        label="All hosts must have STUN enabled for this mesh."
+                               />
+
                             </v-col>
                         </div>
                     </v-expansion-panel-content>

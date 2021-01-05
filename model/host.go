@@ -16,6 +16,8 @@ type Host struct {
 	Email     string    `json:"email"                     bson:"email"`
 	Enable    bool      `json:"enable"                    bson:"enable"`
 	Tags      []string  `json:"tags"                      bson:"tags"`
+	Platform  string    `json:"platform"                  bson:"platform"`
+	Version   string    `json:"version"                   bson:"version"`
 	CreatedBy string    `json:"createdBy"                 bson:"createdBy"`
 	UpdatedBy string    `json:"updatedBy"                 bson:"updatedBy"`
 	Created   time.Time `json:"created"                   bson:"created"`
