@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <v-app-bar app>
-            <img class="mr-3" :src="require('../assets/meshify.png')" height="50" alt="meshify"/>
+            <a href="/"><img class="mr-3" :src="require('../assets/meshify.png')" height="50" alt="meshify"/></a>
             <v-toolbar-title to="/">meshify.app</v-toolbar-title>
 
             <v-spacer />
