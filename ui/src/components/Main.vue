@@ -2,7 +2,7 @@
     <v-container>
         <v-card>
             <v-card-title>
-                Hosts
+                Main
                 <v-spacer></v-spacer>
                 <v-text-field
                         v-if="listView"
@@ -71,6 +71,18 @@
                         >
                             mdi-square-edit-outline
                         </v-icon>
+                        <v-icon
+                                class="pr-1 pl-1"
+                                @click.stop="forceFileDownload(item)"
+                        >
+                            mdi-cloud-download-outline
+                        </v-icon>
+                        <v-icon
+                                class="pr-1 pl-1"
+                                @click.stop="email(item)"
+                        >
+                            mdi-email-send-outline
+                        </v-icon>                        
                         <v-icon
                                 class="pr-1 pl-1"
                                 @click="remove(item)"
@@ -144,6 +156,20 @@
                                     <template v-slot:activator="{ on }">
                                         <v-btn
                                                 text
+                                                v-on:click="forceFileDownload(host)"
+                                                v-on="on"
+                                        >
+                                            <span class="d-none d-lg-flex">Download</span>
+                                            <v-icon right dark>mdi-cloud-download-outline</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Download</span>
+                                </v-tooltip>
+
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                                text
                                                 @click.stop="startUpdate(host)"
                                                 v-on="on"
                                         >
@@ -166,6 +192,20 @@
                                         </v-btn>
                                     </template>
                                     <span>Delete</span>
+                                </v-tooltip>
+
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                                text
+                                                @click="email(host)"
+                                                v-on="on"
+                                        >
+                                            <span class="d-none d-lg-flex">Send Email</span>
+                                            <v-icon right dark>mdi-email-send-outline</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Send Email</span>
                                 </v-tooltip>
                                 <v-spacer/>
                                 <v-tooltip right>
@@ -464,7 +504,7 @@
   import { mapActions, mapGetters } from 'vuex'
 
   export default {
-    name: 'Hosts',
+    name: 'Main',
 
     data: () => ({
       listView: true,

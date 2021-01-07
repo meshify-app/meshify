@@ -47,21 +47,12 @@ const routes = [
   },
   {
     path: '/',
-    name: 'root',
+    name: 'main',
     meta: {
       requiresAuth: false
     }
   },
 
-  {
-      // catch all 404 - define at the very end
-      path: "*",
-      meta: {
-        requiresAuth: false
-      },
-      component: () => import("../views/NotFound.vue")
-
-  }
 ];
 
 const router = new VueRouter({
