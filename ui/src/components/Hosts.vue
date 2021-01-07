@@ -99,7 +99,7 @@
                                 :color="host.enable ? '#1F7087' : 'warning'"
                                 class="mx-auto"
                                 raised
-                                shaped
+                                shaped 
                         >
                             <v-list-item>
                                 <v-list-item-content>
