@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -142,8 +141,11 @@ func main() {
 			return
 		}
 
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.Next()
 		return
+
+		//		c.AbortWithStatus(http.StatusUnauthorized)
+		//		return
 	})
 
 	// apply api router private

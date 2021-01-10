@@ -47,7 +47,7 @@ const routes = [
   },
   {
     path: '/',
-    name: 'main',
+    name: 'root',
     meta: {
       requiresAuth: false
     }

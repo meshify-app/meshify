@@ -7,6 +7,7 @@ import (
 	auth "github.com/grapid/meshify/auth"
 	core "github.com/grapid/meshify/core"
 	model "github.com/grapid/meshify/model"
+	util "github.com/grapid/meshify/util"
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
 	"golang.org/x/oauth2"
@@ -38,6 +39,8 @@ func createHost(c *gin.Context) {
 		return
 	}
 
+	a := c.Request.Header.Get(util.AuthTokenHeaderName)
+	log.Infof("%v", a)
 	// get creation user from token and add to client infos
 	oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)
 	oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
@@ -119,8 +122,23 @@ func updateHost(c *gin.Context) {
 
 func deleteHost(c *gin.Context) {
 	id := c.Param("id")
+	// get update user from token and add to client infos
 
-	err := core.DeleteHost(id)
+	oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)
+	oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
+	user, err := oauth2Client.UserInfo(oauth2Token)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"oauth2Token": oauth2Token,
+			"err":         err,
+		}).Error("failed to get user with oauth token")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	log.Infof("User %s deleted host %s", user.Name, id)
+
+	err = core.DeleteHost(id)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,

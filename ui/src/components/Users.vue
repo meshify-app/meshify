@@ -322,26 +322,14 @@
           email: this.authuser.email,
           toAddress: "",
           enable: true,
-          allowedIPs: this.server.address,
-          address: this.server.address,
-          userName: this.server.userName,
-          userid: this.server.userid,
+          userName: "",
+          userid: "",
           tags: [],
         }
         this.dialogCreate = true;
       },
 
       create(user) {
-        if (user.allowedIPs.length < 0) {
-          this.errorUser('Please provide at least one valid CIDR address for user allowed IPs')
-          return;
-        }
-        for (let i = 0; i < user.allowedIPs.length; i++){
-          if (this.$isCidr(user.allowedIPs[i]) === 0) {
-            this.errorUser('Invalid CIDR detected, please correct before submitting')
-            return
-          }
-        }
         this.dialogCreate = false;
         this.createUser(user)
       },
