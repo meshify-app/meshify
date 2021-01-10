@@ -341,7 +341,7 @@
       },
 
       email(toAddress) {
-        this.DialogCreate = false;
+        this.dialogCreate = false;
         if (!toAddress) {
           this.errorUser('email address is not defined')
           return
