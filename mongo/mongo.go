@@ -153,7 +153,7 @@ func Delete(id string, ident string, col string) error {
 }
 
 // ReadAllHosts from MongoDB
-func ReadAllHosts() []*model.Host {
+func ReadAllHosts(id string) []*model.Host {
 	hosts := make([]*model.Host, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -168,7 +168,14 @@ func ReadAllHosts() []*model.Host {
 
 	collection := client.Database("meshify").Collection("hosts")
 
-	cursor, err := collection.Find(ctx, bson.D{})
+	filter := bson.D{}
+	if id != "" {
+		findstr := fmt.Sprintf("{\"%s\":\"%s\"}", "id", id)
+		err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
+
+	}
+
+	cursor, err := collection.Find(ctx, filter)
 
 	if err == nil {
 

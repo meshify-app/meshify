@@ -14,11 +14,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/oauth2"
+	"gopkg.in/auth0.v4/management"
 
 	//	"gopkg.in/auth0.v4"
 	"os"
-
-	"gopkg.in/auth0.v4/management"
 )
 
 // Oauth2idc in order to implement interface, struct is required

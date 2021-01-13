@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"sort"
 	"strconv"
 	"time"
 
@@ -228,37 +227,17 @@ func DeleteHost(id string) error {
 	return UpdateServerConfigWg()
 }
 
+// ReadHost2 host by id
+func ReadHost2(id string) ([]*model.Host, error) {
+	hosts := make([]*model.Host, 0)
+	hosts = mongo.ReadAllHosts(id)
+	return hosts, nil
+}
+
 // ReadHosts all hosts
 func ReadHosts() ([]*model.Host, error) {
 	hosts := make([]*model.Host, 0)
-	/*
-		files, err := ioutil.ReadDir(filepath.Join(os.Getenv("WG_CONF_DIR")))
-		if err != nil {
-			return nil, err
-		}
-
-		for _, f := range files {
-			// hosts file name is an uuid
-			_, err := uuid.FromString(f.Name())
-			if err == nil {
-				c, err := mongo.Deserialize(f.Name())
-				if err != nil {
-					log.WithFields(log.Fields{
-						"err":  err,
-						"path": f.Name(),
-					}).Error("failed to deserialize host")
-				} else {
-					hosts = append(hosts, c.(*model.Host))
-				}
-			}
-		}
-	*/
-	hosts = mongo.ReadAllHosts()
-
-	sort.Slice(hosts, func(i, j int) bool {
-		return hosts[i].Created.After(hosts[j].Created)
-	})
-
+	hosts = mongo.ReadAllHosts("")
 	return hosts, nil
 }
 

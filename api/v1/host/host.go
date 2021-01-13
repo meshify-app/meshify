@@ -9,7 +9,6 @@ import (
 	model "github.com/grapid/meshify/model"
 	util "github.com/grapid/meshify/util"
 	log "github.com/sirupsen/logrus"
-	"github.com/skip2/go-qrcode"
 	"golang.org/x/oauth2"
 )
 
@@ -164,7 +163,7 @@ func readHosts(c *gin.Context) {
 }
 
 func configHost(c *gin.Context) {
-	configData, err := core.ReadHostConfig(c.Param("id"))
+	configData, err := core.ReadHost2(c.Param("id"))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -173,23 +172,26 @@ func configHost(c *gin.Context) {
 		return
 	}
 
-	formatQr := c.DefaultQuery("qrcode", "false")
-	if formatQr == "false" {
-		// return config as txt file
-		c.Header("Content-Disposition", "attachment; filename=wg0.conf")
-		c.Data(http.StatusOK, "application/config", configData)
-		return
-	}
-	// return config as png qrcode
-	png, err := qrcode.Encode(string(configData), qrcode.Medium, 250)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error("failed to create qrcode")
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-	c.Data(http.StatusOK, "image/png", png)
+	c.JSON(http.StatusOK, configData)
+
+	/*	formatQr := c.DefaultQuery("qrcode", "false")
+		if formatQr == "false" {
+			// return config as txt file
+			c.Header("Content-Disposition", "attachment; filename=wg0.conf")
+			c.Data(http.StatusOK, "application/config", configData)
+			return
+		}
+		// return config as png qrcode
+		png, err := qrcode.Encode(string(configData), qrcode.Medium, 250)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("failed to create qrcode")
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		c.Data(http.StatusOK, "image/png", png)*/
+
 	return
 }
 
