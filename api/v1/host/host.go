@@ -23,6 +23,7 @@ func ApplyRoutes(r *gin.RouterGroup) {
 		g.DELETE("/:id", deleteHost)
 		g.GET("", readHosts)
 		g.GET("/:id/config", configHost)
+		g.GET("/:id/status", statusHost)
 		g.GET("/:id/email", emailHost)
 	}
 }
@@ -160,6 +161,44 @@ func readHosts(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, clients)
+}
+
+func statusHost(c *gin.Context) {
+
+	meshes, err := core.ReadHost2(c.Param("id"))
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to read client config")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	clients, err := core.ReadHosts()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to list clients")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	var msg model.Message
+	msg.Id = c.Param("id")
+
+	for i, mesh := range meshes {
+		msg.Config = append(msg.Config, model.HostConfig{})
+		msg.Config[i].MeshName = mesh.MeshName
+		msg.Config[i].MeshId = mesh.MeshId
+
+		for _, client := range clients {
+			if client.MeshId == msg.Config[i].MeshId {
+				msg.Config[i].Hosts = append(msg.Config[i].Hosts, *client)
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, msg)
 }
 
 func configHost(c *gin.Context) {
