@@ -2,9 +2,9 @@ package model
 
 // Peer structure
 type HostConfig struct {
-	MeshName string
-	MeshId   string
-	Hosts    []Host
+	MeshName string `json:"meshName"  bson:"meshName"`
+	MeshId   string `json:"meshid"    bson:"meshid"`
+	Hosts    []Host `json:hosts"      bson:"hosts"`
 }
 
 // Host structure
