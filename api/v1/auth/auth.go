@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	auth "github.com/grapid/meshify/auth"
-	model "github.com/grapid/meshify/model"
-	util "github.com/grapid/meshify/util"
+	auth "github.com/meshify-app/meshify/auth"
+	model "github.com/meshify-app/meshify/model"
+	util "github.com/meshify-app/meshify/util"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"

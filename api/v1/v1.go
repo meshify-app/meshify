@@ -2,11 +2,11 @@ package apiv1
 
 import (
 	"github.com/gin-gonic/gin"
-	user "github.com/grapid/meshify/api/v1/Users"
-	"github.com/grapid/meshify/api/v1/auth"
-	host "github.com/grapid/meshify/api/v1/host"
-	"github.com/grapid/meshify/api/v1/mesh"
-	"github.com/grapid/meshify/api/v1/server"
+	user "github.com/meshify-app/meshify/api/v1/Users"
+	"github.com/meshify-app/meshify/api/v1/auth"
+	host "github.com/meshify-app/meshify/api/v1/host"
+	"github.com/meshify-app/meshify/api/v1/mesh"
+	"github.com/meshify-app/meshify/api/v1/server"
 )
 
 // ApplyRoutes apply routes to gin router

@@ -6,10 +6,10 @@ import (
 	"sort"
 	"time"
 
-	model "github.com/grapid/meshify/model"
-	mongo "github.com/grapid/meshify/mongo"
-	template "github.com/grapid/meshify/template"
-	util "github.com/grapid/meshify/util"
+	model "github.com/meshify-app/meshify/model"
+	mongo "github.com/meshify-app/meshify/mongo"
+	template "github.com/meshify-app/meshify/template"
+	util "github.com/meshify-app/meshify/util"
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
 )

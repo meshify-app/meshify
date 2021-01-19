@@ -4,7 +4,7 @@
 
 A control plane for [WireGuard](https://wireguard.com).
 
-[![pipeline status](https://github.com/grapid/meshify/badges/master/pipeline.svg)](https://github.com/grapid/meshify/commits/master)
+[![pipeline status](https://github.com/meshify-app/meshify/badges/master/pipeline.svg)](https://github.com/meshify-app/meshify/commits/master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vx3r/wg-gen-web)](https://goreportcard.com/report/github.com/vx3r/wg-gen-web)
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 ![Discord](https://img.shields.io/discord/681699554189377567)
@@ -99,8 +99,8 @@ A workaround would be to change the ```WG_INTERFACE_NAME``` to something differe
 ### Directly without docker
 
 Fill free to download latest artifacts from my GitLab server:
-* [Backend](https://github.com/grapid/meshify/-/jobs/artifacts/master/download?job=build-back)
-* [Frontend](https://github.com/grapid/meshify/-/jobs/artifacts/master/download?job=build-front)
+* [Backend](https://github.com/meshify-app/meshify/-/jobs/artifacts/master/download?job=build-back)
+* [Frontend](https://github.com/meshify-app/meshify/-/jobs/artifacts/master/download?job=build-front)
 
 Put everything in one directory, create `.env` file with all configurations and run the backend.
 

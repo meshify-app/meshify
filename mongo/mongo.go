@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"time"
 
-	model "github.com/grapid/meshify/model"
+	model "github.com/meshify-app/meshify/model"
 	log "github.com/sirupsen/logrus"
 
 	"go.mongodb.org/mongo-driver/bson"

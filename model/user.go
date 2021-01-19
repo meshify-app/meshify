@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/grapid/meshify/util"
+	"github.com/meshify-app/meshify/util"
 )
 
 // User structure

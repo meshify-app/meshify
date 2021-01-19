@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	auth "github.com/grapid/meshify/auth"
-	core "github.com/grapid/meshify/core"
-	model "github.com/grapid/meshify/model"
+	auth "github.com/meshify-app/meshify/auth"
+	core "github.com/meshify-app/meshify/core"
+	model "github.com/meshify-app/meshify/model"
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
 	"golang.org/x/oauth2"

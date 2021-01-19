@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	apiv1 "github.com/grapid/meshify/api/v1"
+	apiv1 "github.com/meshify-app/meshify/api/v1"
 )
 
 // ApplyRoutes apply routes to gin engine

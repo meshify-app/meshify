@@ -4,7 +4,7 @@ package model
 type HostConfig struct {
 	MeshName string `json:"meshName"  bson:"meshName"`
 	MeshId   string `json:"meshid"    bson:"meshid"`
-	Hosts    []Host `json:hosts"      bson:"hosts"`
+	Hosts    []Host `json:"hosts"      bson:"hosts"`
 }
 
 // Host structure

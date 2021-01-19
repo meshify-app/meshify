@@ -1,4 +1,4 @@
-module github.com/grapid/meshify
+module github.com/meshify-app/meshify
 
 go 1.14
 

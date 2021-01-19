@@ -3,8 +3,8 @@ package fake
 import (
 	"time"
 
-	model "github.com/grapid/meshify/model"
-	util "github.com/grapid/meshify/util"
+	model "github.com/meshify-app/meshify/model"
+	util "github.com/meshify-app/meshify/util"
 	"golang.org/x/oauth2"
 )
 
