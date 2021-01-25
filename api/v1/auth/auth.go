@@ -20,7 +20,6 @@ func ApplyRoutes(r *gin.RouterGroup) {
 		g.GET("/oauth2_url", oauth2URL)
 		g.POST("/oauth2_exchange", oauth2Exchange)
 		g.GET("/user", user)
-		g.GET("/login/:id", login)
 		g.GET("/logout", logout)
 	}
 }
@@ -103,12 +102,6 @@ func oauth2Exchange(c *gin.Context) {
 }
 
 func logout(c *gin.Context) {
-	cacheDb := c.MustGet("cache").(*cache.Cache)
-	cacheDb.Delete(c.Request.Header.Get(util.AuthTokenHeaderName))
-	c.JSON(http.StatusOK, gin.H{})
-}
-
-func login(c *gin.Context) {
 	cacheDb := c.MustGet("cache").(*cache.Cache)
 	cacheDb.Delete(c.Request.Header.Get(util.AuthTokenHeaderName))
 	c.JSON(http.StatusOK, gin.H{})

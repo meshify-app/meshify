@@ -13,6 +13,7 @@ type Host struct {
 	Name      string    `json:"name"                      bson:"name"`
 	MeshId    string    `json:"meshid"                    bson:"meshid"`
 	MeshName  string    `json:"meshName"                  bson:"meshName"`
+	APIKey    string    `json:"apiKey"                    bson:"apiKey"`
 	Email     string    `json:"email"                     bson:"email"`
 	Enable    bool      `json:"enable"                    bson:"enable"`
 	Tags      []string  `json:"tags"                      bson:"tags"`

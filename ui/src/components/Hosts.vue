@@ -501,6 +501,7 @@
         gethostConfig: 'host/gethostConfig',
         user: 'auth/user',
         server: 'server/server',
+        accounts: 'account/accounts',
         hosts: 'host/hosts',
         meshes: 'mesh/meshes',
         hostQrcodes: 'host/hostQrcodes',
@@ -508,6 +509,7 @@
     },
 
     mounted () {
+      this.readAllAccounts(this.user.email)
       this.readAllHosts()
       this.readAllMeshes()
     },
@@ -516,7 +518,7 @@
       ...mapActions('host', {
         errorhost: 'error',
         readAllHosts: 'readAll',
-        creathost: 'create',
+        createhost: 'create',
         updatehost: 'update',
         deletehost: 'delete',
         emailhost: 'email',
@@ -524,6 +526,10 @@
       ...mapActions('mesh', {
         readAllMeshes: 'readAll',
       }),
+      ...mapActions('account', {
+          readAllAccounts: 'readAll',
+      }),
+
 
       startCreate() {
         this.host = {
@@ -559,6 +565,7 @@
 
         this.host.meshName = this.meshList.selected.text
         this.host.meshid = this.meshList.selected.value
+        this.host.accountid = this.accounts[0].id
         this.dialogCreate = false;
         this.creathost(host)
       },
@@ -607,6 +614,9 @@
       update(host) {
 
         this.host = host
+
+        this.host.accountid = this.accounts[0].id;
+
         this.host.current.listenPort = parseInt(this.host.current.listenPort, 10);
         this.host.current.persistentKeepalive = parseInt(this.host.current.persistentKeepalive, 10);
         this.host.current.mtu = parseInt(this.host.current.mtu, 10);

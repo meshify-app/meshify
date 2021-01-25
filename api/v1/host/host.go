@@ -54,6 +54,14 @@ func createHost(c *gin.Context) {
 		return
 	}
 	data.CreatedBy = user.Email
+	data.APIKey, err = util.RandomString(32)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to generate state random string")
+		c.AbortWithStatus(http.StatusInternalServerError)
+	}
 
 	client, err := core.CreateHost(&data)
 	if err != nil {

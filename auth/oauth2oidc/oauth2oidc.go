@@ -8,7 +8,9 @@ import (
 	"encoding/json"
 
 	"github.com/coreos/go-oidc"
+	"github.com/meshify-app/meshify/core"
 	model "github.com/meshify-app/meshify/model"
+	mongodb "github.com/meshify-app/meshify/mongo"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -163,6 +165,25 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 
 	opts := options.Update().SetUpsert(true)
 	res, err := collection.UpdateOne(ctx, filter, update, opts)
+	if err != nil {
+		log.Error(err)
+	}
+
+	accounts := mongodb.ReadAllAccounts(user.Email)
+	if err != nil {
+		log.Error(err)
+	}
+
+	if len(accounts) == 0 {
+		var account model.Account
+
+		account.Email = user.Email
+		_, err := core.CreateAccount(&account)
+		if err != nil {
+			log.Error(err)
+		}
+
+	}
 
 	//res, err := collection.InsertOne(ctx, b)
 

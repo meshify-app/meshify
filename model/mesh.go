@@ -8,6 +8,7 @@ import (
 // Mesh structure
 type Mesh struct {
 	Id        string    `json:"id"          bson:"id"`
+	AccountId string    `json:"accountid"   bson:"accountid"`
 	MeshName  string    `json:"meshName"    bson:"meshName"`
 	CreatedBy string    `json:"createdBy"   bson:"createdBy"`
 	UpdatedBy string    `json:"updatedBy"   bson:"updatedBy"`
