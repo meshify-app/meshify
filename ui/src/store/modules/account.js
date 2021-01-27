@@ -3,6 +3,7 @@ import ApiService from "../../services/api.service";
 const state = {
   error: null,
   accounts: [],
+  organizations: [],
 }
 
 const getters = {
@@ -11,6 +12,9 @@ const getters = {
   },
   accounts(state) {
     return state.accounts;
+  },
+  organizations(state) {
+    return state.organizations;
   },
 }
 
@@ -28,9 +32,27 @@ const actions = {
         commit('error', err)
       })
   },
+  readAllOrgs({ commit, dispatch }, email){
+    ApiService.get(`/organizations/${email}`)
+      .then(resp => {
+        commit('organizations', resp)
+      })
+      .catch(err => {
+        commit('error', err)
+      })
+  },
 
   create({ commit, dispatch }, account){
     ApiService.post(`/accounts/${account.id}`)
+      .then(resp => {
+        commit('create', resp)
+      })
+      .catch(err => {
+        commit('error', err)
+      })
+  },
+  createOrg({ commit, dispatch }, org){
+    ApiService.post(`/organizations/${org.id}`)
       .then(resp => {
         commit('create', resp)
       })

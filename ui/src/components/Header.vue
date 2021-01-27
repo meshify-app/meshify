@@ -16,8 +16,8 @@
                     <v-icon right dark>mdi-network-outline</v-icon>
                 </v-btn>
                 <v-btn to="/users">
-                    Users
-                    <v-icon right dark>mdi-account-multiple</v-icon>
+                    Account
+                    <v-icon right dark>mdi-account-group</v-icon>
                 </v-btn>
 <!--                <v-btn to="/server">
                     Server

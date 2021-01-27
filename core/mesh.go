@@ -136,8 +136,20 @@ func DeleteMesh(id string) error {
 }
 
 // ReadMeshes all clients
-func ReadMeshes() ([]*model.Mesh, error) {
-	meshes := make([]*model.Mesh, 0)
+func ReadMeshes(email string) ([]*model.Mesh, error) {
+
+	accounts := mongo.ReadAllAccounts(email)
+
+	results := make([]*model.Mesh, 0)
+
+	for _, account := range accounts {
+		meshes := make([]*model.Mesh, 0)
+		meshes = mongo.ReadAllMeshes("accountid", account.Id)
+		for _, mesh := range meshes {
+			results = append(results, mesh)
+		}
+	}
+
 	/*
 		files, err := ioutil.ReadDir(filepath.Join(os.Getenv("WG_CONF_DIR")))
 		if err != nil {
@@ -160,13 +172,12 @@ func ReadMeshes() ([]*model.Mesh, error) {
 			}
 		}
 	*/
-	meshes = mongo.ReadAllMeshes()
 
-	sort.Slice(meshes, func(i, j int) bool {
-		return meshes[i].Created.After(meshes[j].Created)
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Created.After(results[j].Created)
 	})
 
-	return meshes, nil
+	return results, nil
 }
 
 // ReadMeshConfig in wg format

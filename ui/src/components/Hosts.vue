@@ -567,7 +567,7 @@
         this.host.meshid = this.meshList.selected.value
         this.host.accountid = this.accounts[0].id
         this.dialogCreate = false;
-        this.creathost(host)
+        this.createhost(host)
       },
 
       remove(host) {

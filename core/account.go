@@ -12,6 +12,45 @@ import (
 )
 
 // CreateAccount with all necessary data
+func CreateOrg(org *model.Organization) (*model.Organization, error) {
+	var err error
+	if org.Id == "" {
+		org.Id, err = util.RandomString(16)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	org.Created = time.Now()
+
+	errs := org.IsValid()
+	if len(errs) != 0 {
+		for _, err := range errs {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("account validation error")
+		}
+		return nil, errors.New("failed to validate account")
+	}
+
+	err = mongo.Serialize(org.Id, "id", "organizations", org)
+
+	if err != nil {
+		return nil, err
+	}
+
+	v, err := mongo.Deserialize(org.Id, "id", "organizations", reflect.TypeOf(model.Organization{}))
+	if err != nil {
+		return nil, err
+	}
+	org = v.(*model.Organization)
+
+	// return current account
+	return org, nil
+
+}
+
+// CreateAccount with all necessary data
 func CreateAccount(account *model.Account) (*model.Account, error) {
 
 	var err error
@@ -62,6 +101,16 @@ func CreateAccount(account *model.Account) (*model.Account, error) {
 func ReadAllAccountsForUser(email string) ([]*model.Account, error) {
 
 	return mongo.ReadAllAccounts(email), nil
+}
+
+// ReadHost host by id
+func ReadAllOrgsForUser(email string) ([]*model.Account, error) {
+
+	return mongo.ReadAllAccounts(email), nil
+}
+
+func DeleteOrg(id string) error {
+	return mongo.Delete(id, "id", "organizations")
 }
 
 // DeleteHost from disk

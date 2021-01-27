@@ -132,7 +132,19 @@ func deleteMesh(c *gin.Context) {
 }
 
 func readMeshes(c *gin.Context) {
-	meshes, err := core.ReadMeshes()
+	oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)
+	oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
+	user, err := oauth2Client.UserInfo(oauth2Token)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"oauth2Token": oauth2Token,
+			"err":         err,
+		}).Error("failed to get user with oauth token")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	meshes, err := core.ReadMeshes(user.Email)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,

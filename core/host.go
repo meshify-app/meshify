@@ -27,7 +27,7 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	host.Id = u.String()
 
 	// read the meshes and configure the default values
-	meshes, err := ReadMeshes()
+	meshes, err := ReadMeshes(host.CreatedBy)
 	if err != nil {
 		return nil, err
 	}
@@ -104,11 +104,7 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 
 // GetAllReservedIps the list of all reserved IPs, client and server
 func GetAllReservedMeshIps(meshName string) ([]string, error) {
-	clients, err := ReadHosts()
-	if err != nil {
-		return nil, err
-	}
-
+	clients := mongo.ReadAllHosts("meshName", meshName)
 	reserverIps := make([]string, 0)
 
 	for _, client := range clients {
@@ -230,15 +226,32 @@ func DeleteHost(id string) error {
 // ReadHost2 host by id
 func ReadHost2(id string) ([]*model.Host, error) {
 	hosts := make([]*model.Host, 0)
-	hosts = mongo.ReadAllHosts(id)
+	hosts = mongo.ReadAllHosts("id", id)
 	return hosts, nil
 }
 
 // ReadHosts all hosts
 func ReadHosts() ([]*model.Host, error) {
 	hosts := make([]*model.Host, 0)
-	hosts = mongo.ReadAllHosts("")
+	hosts = mongo.ReadAllHosts("", "")
 	return hosts, nil
+}
+
+// ReadHosts all hosts
+func ReadHostsForUser(email string) ([]*model.Host, error) {
+	accounts := mongo.ReadAllAccounts(email)
+
+	results := make([]*model.Host, 0)
+
+	for _, account := range accounts {
+		hosts := make([]*model.Host, 0)
+		hosts = mongo.ReadAllHosts("accountid", account.Id)
+		for _, host := range hosts {
+			results = append(results, host)
+		}
+	}
+
+	return results, nil
 }
 
 // ReadHostConfig in wg format

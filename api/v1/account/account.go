@@ -4,9 +4,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/meshify-app/meshify/auth"
 	core "github.com/meshify-app/meshify/core"
 	model "github.com/meshify-app/meshify/model"
+	"github.com/meshify-app/meshify/util"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
 )
 
 // ApplyRoutes applies router to gin Router
@@ -18,6 +21,63 @@ func ApplyRoutes(r *gin.RouterGroup) {
 		g.GET("/:id", readAllAccountsForUser)
 		g.DELETE("/:id", deleteAccount)
 	}
+}
+
+// ApplyRoutes applies router to gin Router
+func ApplyOrgRoutes(r *gin.RouterGroup) {
+	g := r.Group("/organizations")
+	{
+
+		g.POST("/:id", createOrg)
+		g.GET("/:id", readAllOrgsForUser)
+		g.DELETE("/:id", deleteOrg)
+	}
+}
+
+func createOrg(c *gin.Context) {
+	var data model.Organization
+
+	if err := c.ShouldBindJSON(&data); err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to bind")
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
+	}
+
+	a := c.Request.Header.Get(util.AuthTokenHeaderName)
+
+	// get creation user from token and add to client infos
+	oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)
+	oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
+	user, err := oauth2Client.UserInfo(oauth2Token)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"oauth2Token": oauth2Token,
+			"err":         err,
+		}).Error("failed to get user with oauth token")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	org, err := core.CreateOrg(&data)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to create org")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, org)
+
+}
+
+func readAllOrgsForUser(c *gin.Context) {
+
+}
+func deleteOrg(c *gin.Context) {
+
 }
 
 func createAccount(c *gin.Context) {

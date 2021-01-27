@@ -16,6 +16,7 @@ func ApplyRoutes(r *gin.RouterGroup, private bool) {
 	{
 		if private {
 			account.ApplyRoutes(v1)
+			account.ApplyOrgRoutes(v1)
 			host.ApplyRoutes(v1)
 			server.ApplyRoutes(v1)
 			user.ApplyRoutes(v1)

@@ -2,13 +2,13 @@
     <v-container>
         <v-card>
             <v-card-title>
-                Users
+                Account
                 <v-spacer></v-spacer>
                 <v-text-field
                         v-if="listView"
                         v-model="search"
-                        append-icon="mdi-magnify"
-                        label="Search"
+                        append-icon="mdi-account-box"
+                        label="Name"
                         single-line
                         hide-details
                 ></v-text-field>
@@ -17,14 +17,21 @@
                         color="success"
                         @click="startCreate"
                 >
-                    Invite new user
-                    <v-icon right dark>mdi-account-plus</v-icon>
+                    Invite member
+                    <v-icon right dark>mdi-account-group</v-icon>
                 </v-btn>
+            </v-card-title>
+        </v-card>
+        <v-card>
+            <v-card-title>
+                Users
+                <v-spacer></v-spacer>
+                <v-spacer></v-spacer>
             </v-card-title>
             <v-data-table
                     v-if="listView"
                     :headers="headers"
-                    :items="users"
+                    :items="accounts"
                     :search="search"
             >
                 <template v-slot:item.updated="{ item }">
@@ -278,6 +285,11 @@
       panel: 1,
       valid: false,
       search: '',
+      orgheaders: [
+        { text: 'Org ID', value: 'id', },
+        { text: 'Email', value: 'email', },
+
+      ],
       headers: [
         { text: 'Email', value: 'email', },
         { text: 'Name', value: 'name', },
@@ -295,6 +307,7 @@
         authuser: 'auth/user',
         server: 'server/server',
         users: 'user/users',
+        accounts: 'account/accounts'
       }),
     },
 

@@ -86,22 +86,21 @@ func Deserialize(id string, parm string, col string, t reflect.Type) (interface{
 	case "model.Account":
 		var c *model.Account
 		err = collection.FindOne(ctx, filter).Decode(&c)
-		return c, nil
+		return c, err
 
 	case "model.Host":
 		var c *model.Host
 		err = collection.FindOne(ctx, filter).Decode(&c)
-		return c, nil
-
+		return c, err
 	case "model.User":
 		var c *model.User
 		err = collection.FindOne(ctx, filter).Decode(&c)
-		return c, nil
+		return c, err
 
 	case "model.Mesh":
 		var c *model.Mesh
 		err = collection.FindOne(ctx, filter).Decode(&c)
-		return c, nil
+		return c, err
 	}
 
 	log.Infof("reflect.TypeOf(t) = %v", t.String())
@@ -158,7 +157,7 @@ func Delete(id string, ident string, col string) error {
 }
 
 // ReadAllHosts from MongoDB
-func ReadAllHosts(id string) []*model.Host {
+func ReadAllHosts(param string, id string) []*model.Host {
 	hosts := make([]*model.Host, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -175,7 +174,7 @@ func ReadAllHosts(id string) []*model.Host {
 
 	filter := bson.D{}
 	if id != "" {
-		findstr := fmt.Sprintf("{\"%s\":\"%s\"}", "id", id)
+		findstr := fmt.Sprintf("{\"%s\":\"%s\"}", param, id)
 		err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
 
 	}
@@ -200,7 +199,7 @@ func ReadAllHosts(id string) []*model.Host {
 }
 
 // ReadAllMeshes from MongoDB
-func ReadAllMeshes() []*model.Mesh {
+func ReadAllMeshes(param string, id string) []*model.Mesh {
 	meshes := make([]*model.Mesh, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -213,9 +212,15 @@ func ReadAllMeshes() []*model.Mesh {
 		}
 	}()
 
-	collection := client.Database("meshify").Collection("mesh")
+	filter := bson.D{}
+	if id != "" {
+		findstr := fmt.Sprintf("{\"%s\":\"%s\"}", param, id)
+		err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
 
-	cursor, err := collection.Find(ctx, bson.D{})
+	}
+
+	collection := client.Database("meshify").Collection("mesh")
+	cursor, err := collection.Find(ctx, filter)
 
 	if err == nil {
 

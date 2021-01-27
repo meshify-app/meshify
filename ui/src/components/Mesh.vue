@@ -449,11 +449,14 @@
         user: 'auth/user',
         server: 'server/server',
         meshes: 'mesh/meshes',
+        accounts: 'account/accounts',
+
       }),
     },
 
     mounted () {
-      this.readAllMeshes()
+//        this.ReadAllAccounts(this.user.email)
+//      this.readAllMeshes()
 //      this.readServer()
     },
 
@@ -478,6 +481,7 @@
           meshName: "",
           id: "",
           tags: [],
+
         }
         this.mesh.default = {
           allowedIPs: [],
@@ -487,6 +491,7 @@
       },
 
       create(mesh) {
+        this.mesh = mesh
         if (mesh.default.allowedIPs.length < 0) {
           this.errorMesh('Please provide at least one valid CIDR address for mesh allowed IPs')
           return;
@@ -497,6 +502,7 @@
             return
           }
         }
+        mesh.accountid = this.accounts[0].id
         this.dialogCreate = false;
         this.createMesh(mesh)
       },
@@ -526,6 +532,7 @@
 
       update(mesh) {
 
+        mesh.accountid = this.accounts[0].id
         this.mesh.default.listenPort = parseInt(this.mesh.default.listenPort, 10);
         this.mesh.default.persistentKeepalive = parseInt(this.mesh.default.persistentKeepalive, 10);
         this.mesh.default.mtu = parseInt(this.mesh.default.mtu, 10);

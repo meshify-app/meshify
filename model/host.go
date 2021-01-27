@@ -10,6 +10,7 @@ import (
 // Host structure
 type Host struct {
 	Id        string    `json:"id"                        bson:"id"`
+	AccountId string    `json:"accountid"                 bson:"accountid"`
 	Name      string    `json:"name"                      bson:"name"`
 	MeshId    string    `json:"meshid"                    bson:"meshid"`
 	MeshName  string    `json:"meshName"                  bson:"meshName"`
