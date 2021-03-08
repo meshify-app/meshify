@@ -7,8 +7,8 @@
                 <v-text-field
                         v-if="listView"
                         v-model="search"
-                        append-icon="mdi-account-box"
-                        label="Name"
+                        append-icon="mdi-magnify"
+                        label="Search"
                         single-line
                         hide-details
                 ></v-text-field>

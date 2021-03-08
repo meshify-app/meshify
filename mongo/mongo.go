@@ -92,6 +92,7 @@ func Deserialize(id string, parm string, col string, t reflect.Type) (interface{
 		var c *model.Host
 		err = collection.FindOne(ctx, filter).Decode(&c)
 		return c, err
+
 	case "model.User":
 		var c *model.User
 		err = collection.FindOne(ctx, filter).Decode(&c)
@@ -276,6 +277,48 @@ func ReadAllUsers() []*model.User {
 
 // ReadAllAccounts from MongoDB
 func ReadAllAccounts(email string) []*model.Account {
+	accounts := make([]*model.Account, 0)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION_STRING")))
+
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			log.Error(err)
+		}
+	}()
+
+	collection := client.Database("meshify").Collection("accounts")
+
+	filter := bson.D{}
+	if email != "" {
+		findstr := fmt.Sprintf("{\"%s\":\"%s\"}", "email", email)
+		err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
+
+	}
+
+	cursor, err := collection.Find(ctx, filter)
+
+	if err == nil {
+
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var account *model.Account
+			err = cursor.Decode(&account)
+			if err == nil {
+				accounts = append(accounts, account)
+			}
+		}
+
+	}
+
+	return accounts
+
+}
+
+// ReadAllAccountsForUser from MongoDB
+func ReadAllAccountsForUser(email string) []*model.Account {
 	accounts := make([]*model.Account, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

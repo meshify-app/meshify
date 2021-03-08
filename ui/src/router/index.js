@@ -67,7 +67,7 @@ router.beforeEach((to, from, next) => {
       next()
       return
     }
-    next('/')
+    next(window.location.origin)
   } else {
     next()
   }

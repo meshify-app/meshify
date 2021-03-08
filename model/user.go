@@ -17,7 +17,7 @@ type User struct {
 	Picture   string    `json:"picture"      bson:"picture"`
 	Issuer    string    `json:"issuer"       bson:"issuer"`
 	Plan      string    `json:"plan"         bson:"plan"`
-	IssuedAt  time.Time `json:"issuedAt"     bson:"issuedAt`
+	IssuedAt  time.Time `json:"issuedAt"     bson:"issuedAt"`
 	CreatedBy string    `json:"createdBy"    bson:"createdBy"`
 	Created   time.Time `json:"created_at"   bson:"created_at"`
 	UpdatedBy string    `json:"updatedBy"    bson:"updatedBy"`

@@ -223,10 +223,10 @@ func DeleteHost(id string) error {
 	return UpdateServerConfigWg()
 }
 
-// ReadHost2 host by id
-func ReadHost2(id string) ([]*model.Host, error) {
+// ReadHost2 host by param and id
+func ReadHost2(param string, id string) ([]*model.Host, error) {
 	hosts := make([]*model.Host, 0)
-	hosts = mongo.ReadAllHosts("id", id)
+	hosts = mongo.ReadAllHosts(param, id)
 	return hosts, nil
 }
 

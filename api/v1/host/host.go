@@ -186,7 +186,7 @@ func readHosts(c *gin.Context) {
 
 func statusHost(c *gin.Context) {
 
-	meshes, err := core.ReadHost2(c.Param("id"))
+	meshes, err := core.ReadHost2("id", c.Param("id"))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -195,24 +195,25 @@ func statusHost(c *gin.Context) {
 		return
 	}
 
-	clients, err := core.ReadHosts()
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error("failed to list clients")
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-
 	var msg model.Message
 	msg.Id = c.Param("id")
+	msg.Config = append(msg.Config, model.HostConfig{})
 
 	for i, mesh := range meshes {
-		msg.Config = append(msg.Config, model.HostConfig{})
+		clients, err := core.ReadHost2("meshid", mesh.MeshId)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("failed to list clients")
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
 		msg.Config[i].MeshName = mesh.MeshName
 		msg.Config[i].MeshId = mesh.MeshId
 
 		for _, client := range clients {
+			// They should all match
 			if client.MeshId == msg.Config[i].MeshId {
 				msg.Config[i].Hosts = append(msg.Config[i].Hosts, *client)
 			}
@@ -223,7 +224,7 @@ func statusHost(c *gin.Context) {
 }
 
 func configHost(c *gin.Context) {
-	configData, err := core.ReadHost2(c.Param("id"))
+	configData, err := core.ReadHost2("id", c.Param("id"))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
