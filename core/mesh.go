@@ -138,7 +138,7 @@ func DeleteMesh(id string) error {
 // ReadMeshes all clients
 func ReadMeshes(email string) ([]*model.Mesh, error) {
 
-	accounts := mongo.ReadAllAccounts(email)
+	accounts, err := mongo.ReadAllAccounts(email)
 
 	results := make([]*model.Mesh, 0)
 
@@ -177,7 +177,7 @@ func ReadMeshes(email string) ([]*model.Mesh, error) {
 		return results[i].Created.After(results[j].Created)
 	})
 
-	return results, nil
+	return results, err
 }
 
 // ReadMeshConfig in wg format

@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	auth "github.com/meshify-app/meshify/auth"
@@ -17,12 +18,12 @@ func ApplyRoutes(r *gin.RouterGroup) {
 	g := r.Group("/users")
 	{
 
+		g.GET("", readUsers)
 		g.POST("", inviteUser)
-		g.GET("/:id/invite", emailUser)
+		g.GET("/:id/:account/invite", emailUser)
 		g.GET("/:id", readUser)
 		g.PATCH("/:id", updateUser)
 		g.DELETE("/:id", deleteUser)
-		g.GET("", readUsers)
 	}
 }
 
@@ -176,8 +177,20 @@ func configUsers(c *gin.Context) {
 
 func emailUser(c *gin.Context) {
 	id := c.Param("id")
+	account := c.Param("account")
 
-	err := core.EmailUser(id)
+	var a model.Account
+	a.Id = account
+	a.Email = id
+	a.Parent = account
+	a.Role = "User"
+	a.Status = "Pending"
+	a.Created = time.Now()
+	pa, err := core.CreateAccount(&a)
+
+	log.Infof("emailUser account = %v", pa)
+
+	err = core.EmailUser(id)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,

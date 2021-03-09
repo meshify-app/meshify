@@ -3,6 +3,7 @@ package core
 import (
 	"errors"
 	"reflect"
+	"strings"
 	"time"
 
 	model "github.com/meshify-app/meshify/model"
@@ -61,7 +62,11 @@ func CreateAccount(account *model.Account) (*model.Account, error) {
 // ReadHost host by id
 func ReadAllAccountsForUser(email string) ([]*model.Account, error) {
 
-	return mongo.ReadAllAccounts(email), nil
+	if strings.Contains(email, "@") {
+		return mongo.ReadAllAccounts(email)
+	} else {
+		return mongo.ReadAllAccountsForID(email)
+	}
 }
 
 // DeleteHost from disk

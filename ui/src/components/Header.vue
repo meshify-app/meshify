@@ -15,7 +15,7 @@
                     Hosts
                     <v-icon right dark>mdi-network-outline</v-icon>
                 </v-btn>
-                <v-btn to="/users">
+                <v-btn to="/accounts">
                     Account
                     <v-icon right dark>mdi-account-group</v-icon>
                 </v-btn>

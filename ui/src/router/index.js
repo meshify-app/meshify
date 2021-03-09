@@ -26,10 +26,10 @@ const routes = [
     }
   },
   {
-    path: '/users',
-    name: 'users',
+    path: '/accounts',
+    name: 'accounts',
     component: function () {
-      return import(/* webpackChunkName: "Users" */ '../views/Users.vue')
+      return import(/* webpackChunkName: "Accounts" */ '../views/Accounts.vue')
     },
     meta: {
       requiresAuth: true

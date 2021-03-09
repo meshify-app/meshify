@@ -169,7 +169,7 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 		log.Error(err)
 	}
 
-	accounts := mongodb.ReadAllAccounts(user.Email)
+	accounts, err := mongodb.ReadAllAccounts(user.Email)
 	if err != nil {
 		log.Error(err)
 	}
@@ -179,7 +179,7 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 		var account model.Account
 		account.Email = user.Email
 		a, err := core.CreateAccount(&account)
-		log.Infof("account = %v", a)
+		log.Infof("CREATE ACCOUNT = %v", a)
 		if err != nil {
 			log.Error(err)
 		}

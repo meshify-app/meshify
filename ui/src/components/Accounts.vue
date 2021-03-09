@@ -24,14 +24,154 @@
         </v-card>
         <v-card>
             <v-card-title>
-                Users
-                <v-spacer></v-spacer>
+                Accounts
                 <v-spacer></v-spacer>
             </v-card-title>
             <v-data-table
                     v-if="listView"
                     :headers="headers"
                     :items="accounts"
+                    :search="search"
+            >
+                <template v-slot:item.updated="{ item }">
+                    <v-row>
+                        <p>At {{ item.updated | formatDate }} by {{ item.updatedBy }}</p>
+                    </v-row>
+                </template>
+                <template v-slot:item.action="{ item }">
+                    <v-row>
+                        <v-icon
+                                class="pr-1 pl-1"
+                                @click.stop="startUpdate(item)"
+                        >
+                            mdi-account-switch
+                        </v-icon>
+                        <v-icon
+                                class="pr-1 pl-1"
+                                @click.stop="startUpdate(item)"
+                        >
+                            mdi-square-edit-outline
+                        </v-icon>
+                        <v-icon
+                                class="pr-1 pl-1"
+                                @click="remove(item)"
+                        >
+                            mdi-trash-can-outline
+                        </v-icon>
+                    </v-row>
+                </template>
+
+            </v-data-table>
+            <v-card-text v-else>
+                <v-row>
+                    <v-col
+                            v-for="(user, i) in accounts "
+                            :key="i"
+                            sm12 lg6
+                    >
+                        <v-card
+                                :color="user.enable ? '#1F7087' : 'warning'"
+                                class="mx-auto"
+                                raised
+                                shaped
+                        >
+                            <v-list-item>
+                                <v-list-item-content>
+                                    <v-list-item-title class="headline">{{ user.name }}</v-list-item-title>
+                                    <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
+                                </v-list-item-content>
+
+                                <v-list-item-avatar
+                                        tile
+                                        size="150"
+                                >
+                                </v-list-item-avatar>
+                            </v-list-item>
+                            <v-card-actions>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                                text
+                                                v-on:click="forceFileDownload(user)"
+                                                v-on="on"
+                                        >
+                                            <span class="d-none d-lg-flex">Download</span>
+                                            <v-icon right dark>mdi-cloud-download-outline</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Download</span>
+                                </v-tooltip>
+
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                                text
+                                                @click.stop="startUpdate(user)"
+                                                v-on="on"
+                                        >
+                                            <span class="d-none d-lg-flex">Edit</span>
+                                            <v-icon right dark>mdi-square-edit-outline</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Edit</span>
+                                </v-tooltip>
+
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                                text
+                                                @click="remove(user)"
+                                                v-on="on"
+                                        >
+                                            <span class="d-none d-lg-flex">Delete</span>
+                                            <v-icon right dark>mdi-trash-can-outline</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Delete</span>
+                                </v-tooltip>
+
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                                text
+                                                @click="email(user)"
+                                                v-on="on"
+                                        >
+                                            <span class="d-none d-lg-flex">Send Email</span>
+                                            <v-icon right dark>mdi-email-send-outline</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Send Email</span>
+                                </v-tooltip>
+                                <v-spacer/>
+                                <v-tooltip right>
+                                    <template v-slot:activator="{ on }">
+                                        <v-switch
+                                                dark
+                                                v-on="on"
+                                                color="success"
+                                                v-model="user.enable"
+                                                v-on:change="update(user)"
+                                        />
+                                    </template>
+                                    <span> {{user.enable ? 'Disable' : 'Enable'}} this user</span>
+                                </v-tooltip>
+
+                            </v-card-actions>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-card-text>
+        </v-card>
+        <v-card>
+            <v-card-title>
+                Members
+                <v-spacer></v-spacer>
+            </v-card-title>
+            <v-data-table
+                    v-if="listView"
+                    :headers="headers"
+                    :items="users"
                     :search="search"
             >
                 <template v-slot:item.updated="{ item }">
@@ -160,6 +300,7 @@
 
                             </v-card-actions>
                         </v-card>
+
                     </v-col>
                 </v-row>
             </v-card-text>
@@ -274,7 +415,7 @@
   import { mapActions, mapGetters } from 'vuex'
 
   export default {
-    name: 'Users',
+    name: 'Accounts',
 
     data: () => ({
       listView: true,
@@ -290,7 +431,7 @@
         { text: 'Name', value: 'name', },
         { text: "Role", value: 'role', },
         { text: 'ID', value: 'id', },
-//        { text: 'Tags', value: 'tags', },
+        { text: 'Status', value: 'status', },
         { text: 'Actions', value: 'action', sortable: false, },
 
       ],
@@ -300,13 +441,14 @@
       ...mapGetters({
         authuser: 'auth/user',
         server: 'server/server',
-        users: 'user/users',
+        users: 'account/users',
         accounts: 'account/accounts',
       }),
     },
 
     mounted () {
       this.readAllAccounts(this.authuser.email)
+      this.readUsers(this.accounts[0].id)
 //      this.readAllUsers()
 //      this.readServer()
     },
@@ -325,8 +467,8 @@
             readServer: 'read',
         }),
     ...mapActions('account', {
-            readAllAccounts: 'readAll'
-
+            readAllAccounts: 'readAll',
+            readUsers: 'readUsers',
       }),
 
       startCreate() {

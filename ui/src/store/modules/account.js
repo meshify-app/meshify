@@ -3,6 +3,7 @@ import ApiService from "../../services/api.service";
 const state = {
   error: null,
   accounts: [],
+  users: [],
 }
 
 const getters = {
@@ -12,6 +13,9 @@ const getters = {
   accounts(state) {
     return state.accounts;
   },
+  users(state) {
+    return state.users;
+  },
 }
 
 const actions = {
@@ -19,8 +23,8 @@ const actions = {
     commit('error', error)
   },
 
-  readAll({ commit, dispatch }, email){
-    ApiService.get(`/accounts/${email}`)
+  readAll({ commit, dispatch }, id){
+    ApiService.get(`/accounts/${id}`)
       .then(resp => {
         commit('accounts', resp)
       })
@@ -28,7 +32,18 @@ const actions = {
         commit('error', err)
       })
   },
+
+  readUsers({ commit, dispatch }, id){
+    ApiService.get(`/accounts/${id}`)
+      .then(resp => {
+        commit('users', resp)
+      })
+      .catch(err => {
+        commit('error', err)
+      })
+  },
   
+
   create({ commit, dispatch }, account){
     ApiService.post(`/accounts/${account.id}`)
       .then(resp => {
@@ -68,8 +83,14 @@ const mutations = {
   accounts(state, accounts){
     state.accounts = accounts
   },
+  users(state, users) {
+    state.users = users
+  },
   create(state, account){
     state.accounts.push(account)
+  },
+  create(state, user) {
+    state.users.push(user)
   },
   update(state, account){
     let index = state.accounts.findIndex(x => x.id === account.id);
@@ -85,7 +106,24 @@ const mutations = {
     if (index !== -1) {
       state.accounts.splice(index, 1);
     } else {
-      state.error = "delete mesh failed, not in list"
+      state.error = "delete account failed, not in list"
+    }
+  },
+  update(state, user){
+    let index = state.users.findIndex(x => x.id === user.id);
+    if (index !== -1) {
+      state.users.splice(index, 1);
+      state.users.push(user);
+    } else {
+      state.error = "update account (user) failed, not in list"
+    }
+  },
+  delete(state, user){
+    let index = state.users.findIndex(x => x.id === user.id);
+    if (index !== -1) {
+      state.users.splice(index, 1);
+    } else {
+      state.error = "delete user failed, not in list"
     }
   },
 }

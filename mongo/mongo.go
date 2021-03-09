@@ -276,7 +276,7 @@ func ReadAllUsers() []*model.User {
 }
 
 // ReadAllAccounts from MongoDB
-func ReadAllAccounts(email string) []*model.Account {
+func ReadAllAccounts(email string) ([]*model.Account, error) {
 	accounts := make([]*model.Account, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -313,7 +313,49 @@ func ReadAllAccounts(email string) []*model.Account {
 
 	}
 
-	return accounts
+	return accounts, err
+
+}
+
+// ReadAllAccountsForID from MongoDB
+func ReadAllAccountsForID(id string) ([]*model.Account, error) {
+	accounts := make([]*model.Account, 0)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION_STRING")))
+
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			log.Error(err)
+		}
+	}()
+
+	collection := client.Database("meshify").Collection("accounts")
+
+	filter := bson.D{}
+	if id != "" {
+		findstr := fmt.Sprintf("{\"%s\":\"%s\"}", "id", id)
+		err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
+
+	}
+
+	cursor, err := collection.Find(ctx, filter)
+
+	if err == nil {
+
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var account *model.Account
+			err = cursor.Decode(&account)
+			if err == nil {
+				accounts = append(accounts, account)
+			}
+		}
+
+	}
+
+	return accounts, err
 
 }
 

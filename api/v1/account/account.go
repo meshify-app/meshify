@@ -15,7 +15,7 @@ func ApplyRoutes(r *gin.RouterGroup) {
 	{
 
 		g.POST("/:id", createAccount)
-		g.GET("/:id", readAllAccountsForUser)
+		g.GET("/:id", readAllAccounts)
 		g.DELETE("/:id", deleteAccount)
 	}
 }
@@ -39,7 +39,7 @@ func createAccount(c *gin.Context) {
 	c.JSON(http.StatusOK, v)
 }
 
-func readAllAccountsForUser(c *gin.Context) {
+func readAllAccounts(c *gin.Context) {
 	email := c.Param("id")
 
 	accounts, err := core.ReadAllAccountsForUser(email)

@@ -239,7 +239,7 @@ func ReadHosts() ([]*model.Host, error) {
 
 // ReadHosts all hosts
 func ReadHostsForUser(email string) ([]*model.Host, error) {
-	accounts := mongo.ReadAllAccounts(email)
+	accounts, err := mongo.ReadAllAccounts(email)
 
 	results := make([]*model.Host, 0)
 
@@ -251,7 +251,7 @@ func ReadHostsForUser(email string) ([]*model.Host, error) {
 		}
 	}
 
-	return results, nil
+	return results, err
 }
 
 // ReadHostConfig in wg format
