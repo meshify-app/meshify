@@ -335,7 +335,7 @@ func ReadAllAccountsForID(id string) ([]*model.Account, error) {
 
 	filter := bson.D{}
 	if id != "" {
-		findstr := fmt.Sprintf("{\"%s\":\"%s\"}", "id", id)
+		findstr := fmt.Sprintf("{\"%s\":\"%s\"}", "parent", id)
 		err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
 
 	}

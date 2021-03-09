@@ -245,7 +245,7 @@ func ReadHostsForUser(email string) ([]*model.Host, error) {
 
 	for _, account := range accounts {
 		hosts := make([]*model.Host, 0)
-		hosts = mongo.ReadAllHosts("accountid", account.Id)
+		hosts = mongo.ReadAllHosts("accountid", account.Parent)
 		for _, host := range hosts {
 			results = append(results, host)
 		}

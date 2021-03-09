@@ -370,7 +370,7 @@ var (
                   <tbody>
                     <tr>
                     <td align="center" bgcolor="#336699" class="inner-td" style="border-radius:6px; font-size:16px; text-align:center; background-color:inherit;">
-                      <a href="https://my.meshify.app" style="background-color:#336699; border:1px solid #336699; border-color:#336699; border-radius:6px; border-width:1px; color:#ffffff; display:inline-block; font-size:14px; font-weight:normal; letter-spacing:0px; line-height:normal; padding:12px 18px 12px 18px; text-align:center; text-decoration:none; border-style:solid;" target="_blank">Join Mesh</a>
+                      <a href="https://my.meshify.app/join/{{.AccountId}}" style="background-color:#336699; border:1px solid #336699; border-color:#336699; border-radius:6px; border-width:1px; color:#ffffff; display:inline-block; font-size:14px; font-weight:normal; letter-spacing:0px; line-height:normal; padding:12px 18px 12px 18px; text-align:center; text-decoration:none; border-style:solid;" target="_blank">Join Mesh</a>
                     </td>
                     </tr>
                   </tbody>
@@ -650,13 +650,17 @@ func DumpEmail(host *model.Host, qrcodePngName string) ([]byte, error) {
 }
 
 // DumpEmail dump server wg config with go template
-func DumpUserEmail() ([]byte, error) {
+func DumpUserEmail(accountId string) ([]byte, error) {
 	t, err := template.New("email").Parse(userEmailTemplate)
 	if err != nil {
 		return nil, err
 	}
 
-	return dump(t, nil)
+	return dump(t, struct {
+		AccountId string
+	}{
+		AccountId: accountId,
+	})
 }
 
 func dump(tpl *template.Template, data interface{}) ([]byte, error) {

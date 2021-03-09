@@ -180,7 +180,6 @@ func emailUser(c *gin.Context) {
 	account := c.Param("account")
 
 	var a model.Account
-	a.Id = account
 	a.Email = id
 	a.Parent = account
 	a.Role = "User"
@@ -190,7 +189,7 @@ func emailUser(c *gin.Context) {
 
 	log.Infof("emailUser account = %v", pa)
 
-	err = core.EmailUser(id)
+	err = core.EmailUser(id, account)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
