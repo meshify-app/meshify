@@ -4,9 +4,8 @@
             <v-card-title>
                 Join
             </v-card-title>
-            <p>Joining {{ $route.query.id }}</p>
+            <p>Joining {{ $route.params.id }}</p>
             <p>{{ this.result }}</p>
-            <p>{{ this.join.result }}</p>
         </v-card>
     </v-container>
 </template>

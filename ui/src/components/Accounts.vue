@@ -430,7 +430,7 @@
         { text: 'Email', value: 'email', },
         { text: 'Name', value: 'name', },
         { text: "Role", value: 'role', },
-        { text: 'Account', value: 'parent', },
+        { text: 'Account', value: 'id', },
         { text: 'Status', value: 'status', },
         { text: 'Actions', value: 'action', sortable: false, },
 

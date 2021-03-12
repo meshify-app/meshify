@@ -143,10 +143,12 @@ func ReadMeshes(email string) ([]*model.Mesh, error) {
 	results := make([]*model.Mesh, 0)
 
 	for _, account := range accounts {
-		meshes := make([]*model.Mesh, 0)
-		meshes = mongo.ReadAllMeshes("accountid", account.Parent)
-		for _, mesh := range meshes {
-			results = append(results, mesh)
+		if account.Status != "Pending" {
+			meshes := make([]*model.Mesh, 0)
+			meshes = mongo.ReadAllMeshes("accountid", account.Parent)
+			for _, mesh := range meshes {
+				results = append(results, mesh)
+			}
 		}
 	}
 

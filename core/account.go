@@ -31,6 +31,10 @@ func CreateAccount(account *model.Account) (*model.Account, error) {
 		}
 	}
 
+	if account.Parent == "" {
+		account.Parent = account.Id
+	}
+
 	account.Created = time.Now()
 
 	errs := account.IsValid()
@@ -87,7 +91,7 @@ func ActivateAccount(id string) (string, error) {
 	a = v.(*model.Account)
 	a.Status = "Active"
 
-	err = mongo.Serialize(id, "id", "accounts", reflect.TypeOf(model.Account{}))
+	err = mongo.Serialize(id, "id", "accounts", a)
 	if err != nil {
 		return "Error", err
 	}

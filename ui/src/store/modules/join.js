@@ -20,7 +20,7 @@ const actions = {
   },
 
   activate({ state, commit }, id){
-    ApiService.post("/accounts/${id}/activate", id)
+    ApiService.post("/accounts/"+ id + "/activate")
       .then(resp => {
         commit('result', resp)
       })
