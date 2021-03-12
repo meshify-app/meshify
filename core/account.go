@@ -74,3 +74,23 @@ func DeleteAccount(id string) error {
 
 	return mongo.Delete(id, "id", "accounts")
 }
+
+// DeleteHost from disk
+func ActivateAccount(id string) (string, error) {
+
+	var a *model.Account
+
+	v, err := mongo.Deserialize(id, "id", "accounts", reflect.TypeOf(model.Account{}))
+	if err != nil {
+		return "Error", err
+	}
+	a = v.(*model.Account)
+	a.Status = "Active"
+
+	err = mongo.Serialize(id, "id", "accounts", reflect.TypeOf(model.Account{}))
+	if err != nil {
+		return "Error", err
+	}
+
+	return "Account activated.", nil
+}

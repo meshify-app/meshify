@@ -6,6 +6,7 @@ import server from "./modules/server";
 import mesh from "./modules/mesh";
 import user from "./modules/users"
 import account from "./modules/account"
+import join from "./modules/join"
 
 Vue.use(Vuex)
 
@@ -20,6 +21,7 @@ export default new Vuex.Store({
     host,
     mesh,
     user,
+    join,
     server
   }
 })

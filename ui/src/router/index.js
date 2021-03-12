@@ -36,6 +36,16 @@ const routes = [
     }
   },
   {
+    path: '/join',
+    name: 'join',
+    component: function () {
+      return import(/* webpackChunkName: "Join" */ '../views/Join.vue')
+    },
+    meta: {
+      requiresAuth: false
+    }
+  },
+  {
     path: '/server',
     name: 'server',
     component: function () {

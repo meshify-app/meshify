@@ -15,9 +15,25 @@ func ApplyRoutes(r *gin.RouterGroup) {
 	{
 
 		g.POST("/:id", createAccount)
+		g.POST("/:id/activate", activateAccount)
 		g.GET("/:id", readAllAccounts)
 		g.DELETE("/:id", deleteAccount)
 	}
+}
+
+func activateAccount(c *gin.Context) {
+	id := c.Param("id")
+
+	v, err := core.ActivateAccount(id)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to create account")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, v)
 }
 
 func createAccount(c *gin.Context) {
