@@ -456,7 +456,7 @@
 
     mounted () {
 //        this.ReadAllAccounts(this.user.email)
-//      this.readAllMeshes()
+      this.readAllMeshes()
 //      this.readServer()
     },
 

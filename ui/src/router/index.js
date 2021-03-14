@@ -36,7 +36,7 @@ const routes = [
     }
   },
   {
-    path: '/join',
+    path: '/join*',
     name: 'join',
     component: function () {
       return import(/* webpackChunkName: "Join" */ '../views/Join.vue')

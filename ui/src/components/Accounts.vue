@@ -440,36 +440,33 @@
     computed:{
       ...mapGetters({
         authuser: 'auth/user',
-        server: 'server/server',
-        users: 'account/users',
         accounts: 'account/accounts',
+        users: 'account/users',
       }),
     },
 
     mounted () {
       this.readAllAccounts(this.authuser.email)
-      this.readUsers(this.accounts[0].id)
-//      this.readAllUsers()
-//      this.readServer()
+    },
+
+    watch: {
+      // whenever accounts changes, this function will run
+      accounts(newAccounts, oldAccounts) {
+          for (let i=0; i<newAccounts.length; i++) {
+              this.readUsers(newAccounts[i].id);
+        }      
+      }
     },
 
     methods: {
-      ...mapActions('user', {
-        errorUser: 'error',
-        readAllUsers: 'readAll',
-        createUser: 'create',
-        updateUser: 'update',
-        deleteUser: 'delete',
-        emailUser: 'email',
-      }),
-
-    ...mapActions('server', {
-            readServer: 'read',
-        }),
-    ...mapActions('account', {
+        ...mapActions('account', {
             readAllAccounts: 'readAll',
             readUsers: 'readUsers',
-      }),
+            createUser: 'create',
+            updateUser: 'update',
+            deleteUser: 'delete',
+            emailUser: 'email',
+        }),
 
       startCreate() {
         this.user = {
@@ -502,7 +499,13 @@
           return
         }
 
-        this.emailUser(toAddress + "/" + this.accounts[0].id)
+        for (let i=0; i<this.accounts.length; i++) {
+            if (this.accounts[i].id == this.accounts[i].parent) {
+                this.emailUser(toAddress + "/" + this.accounts[i].id);
+                break;        
+            }
+        }
+
       },
 
       startUpdate(user) {
