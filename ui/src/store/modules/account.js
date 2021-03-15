@@ -74,6 +74,16 @@ const actions = {
       })
   },
 
+  email({ commit }, toAddress){
+    ApiService.get(`/users/${toAddress}/invite`)
+      .then(() => {
+      })
+      .catch(err => {
+        commit('error', err)
+      })
+  },
+
+
 }
 
 const mutations = {
