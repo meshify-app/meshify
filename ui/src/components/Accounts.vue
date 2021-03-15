@@ -453,7 +453,9 @@
       // whenever accounts changes, this function will run
       accounts(newAccounts, oldAccounts) {
           for (let i=0; i<newAccounts.length; i++) {
-              this.readUsers(newAccounts[i].id);
+            if (newAccounts[i].id == newAccounts[i].parent ) {
+                this.readUsers(newAccounts[i].id);
+            }
         }      
       }
     },
