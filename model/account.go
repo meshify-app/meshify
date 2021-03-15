@@ -15,6 +15,7 @@ type Account struct {
 	Role    string    `json:"role"         bson:"role"`
 	Status  string    `json:"status"       bson:"status"`
 	Key     string    `json:"key"          bson:"key"`
+	From    string    `json:"from"         bson:"from"`
 	Created time.Time `json:"created"      bson:"created"`
 }
 

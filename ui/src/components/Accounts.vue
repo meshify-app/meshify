@@ -380,6 +380,16 @@
                                         :rules="[ v => !!v || 'User name is required',]"
                                         required
                                 />
+                                <v-select
+                                    :items="roles"
+                                    v-model="user.role"
+                                    label="Role"
+                                ></v-select>
+                                <v-select
+                                    :items="statuses"
+                                    v-model="user.status"
+                                    label="Status"
+                                ></v-select>
                             </v-form>
                         </v-col>
                     </v-row>
@@ -422,6 +432,8 @@
       dialogCreate: false,
       dialogUpdate: false,
       toAddress: "",
+      roles : ["Admin", "User"],
+      statuses : ["Active", "Pending", "Suspended"],
       user: null,
       panel: 1,
       valid: false,
@@ -465,7 +477,7 @@
             readAllAccounts: 'readAll',
             readUsers: 'readUsers',
             createUser: 'create',
-            updateUser: 'update',
+            updateAccount: 'update',
             deleteUser: 'delete',
             emailUser: 'email',
         }),
@@ -518,8 +530,7 @@
       update(user) {
 
         this.dialogUpdate = false;
-        user.id = user.email
-        this.updateUser(user)
+        this.updateAccount(user)
       },
 
       forceFileDownload(user){

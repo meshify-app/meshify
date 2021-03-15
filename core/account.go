@@ -73,13 +73,52 @@ func ReadAllAccountsForUser(email string) ([]*model.Account, error) {
 	}
 }
 
-// DeleteHost from disk
+// UpdateUser preserve keys
+func UpdateAccount(Id string, user *model.Account) (*model.Account, error) {
+	v, err := mongo.Deserialize(Id, "id", "accounts", reflect.TypeOf(model.Account{}))
+	if err != nil {
+		return nil, err
+	}
+	current := v.(*model.Account)
+
+	if current != nil && user != nil &&
+		current.Email != user.Email {
+		return nil, errors.New("records Id mismatch")
+	}
+
+	// check if user is valid
+	errs := user.IsValid()
+	if len(errs) != 0 {
+		for _, err := range errs {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("user validation error")
+		}
+		return nil, errors.New("failed to validate user")
+	}
+
+	err = mongo.Serialize(Id, "id", "accounts", user)
+	if err != nil {
+		return nil, err
+	}
+
+	v, err = mongo.Deserialize(Id, "id", "accounts", reflect.TypeOf(model.Account{}))
+	if err != nil {
+		return nil, err
+	}
+	user = v.(*model.Account)
+
+	// data modified, dump new config
+	return user, nil
+}
+
+// DeleteAccount from mongo
 func DeleteAccount(id string) error {
 
 	return mongo.Delete(id, "id", "accounts")
 }
 
-// DeleteHost from disk
+// ActivateAccount when joining
 func ActivateAccount(id string) (string, error) {
 
 	var a *model.Account

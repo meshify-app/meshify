@@ -55,7 +55,7 @@ const actions = {
   },
 
   update({ commit, dispatch }, account){
-    ApiService.patch(`/accounts/${account.id}`)
+    ApiService.patch(`/accounts/${account.id}`,account)
       .then(resp => {
         commit('update', resp)
       })

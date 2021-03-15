@@ -17,6 +17,7 @@ func ApplyRoutes(r *gin.RouterGroup) {
 		g.POST("/:id", createAccount)
 		g.POST("/:id/activate", activateAccount)
 		g.GET("/:id", readAllAccounts)
+		g.PATCH("/:id", updateAccount)
 		g.DELETE("/:id", deleteAccount)
 	}
 }
@@ -70,7 +71,6 @@ func readAllAccounts(c *gin.Context) {
 	c.JSON(http.StatusOK, accounts)
 }
 
-/*
 func updateAccount(c *gin.Context) {
 	var data model.Account
 	id := c.Param("id")
@@ -93,7 +93,7 @@ func updateAccount(c *gin.Context) {
 
 	c.JSON(http.StatusOK, client)
 }
-*/
+
 func deleteAccount(c *gin.Context) {
 	id := c.Param("id")
 
