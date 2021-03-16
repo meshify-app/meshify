@@ -4,9 +4,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/meshify-app/meshify/auth"
 	core "github.com/meshify-app/meshify/core"
 	model "github.com/meshify-app/meshify/model"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
 )
 
 // ApplyRoutes applies router to gin Router
@@ -39,10 +41,23 @@ func activateAccount(c *gin.Context) {
 
 func createAccount(c *gin.Context) {
 	email := c.Param("id")
+	// get creation user from token and add to client infos
+	oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)
+	oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
+	user, err := oauth2Client.UserInfo(oauth2Token)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"oauth2Token": oauth2Token,
+			"err":         err,
+		}).Error("failed to get user with oauth token")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
 
 	var account model.Account
+	account.From = user.Email
 	account.Email = email
-	account.Name = "Meshify"
+	account.Name = ""
 
 	v, err := core.CreateAccount(&account)
 	if err != nil {

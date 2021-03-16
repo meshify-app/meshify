@@ -8,15 +8,16 @@ import (
 )
 
 type Account struct {
-	Id      string    `json:"id"           bson:"id"`
-	Parent  string    `json:"parent"       bson:"parent"`
-	Name    string    `json:"name"         bson:"name"`
-	Email   string    `json:"email"        bson:"email"`
-	Role    string    `json:"role"         bson:"role"`
-	Status  string    `json:"status"       bson:"status"`
-	Key     string    `json:"key"          bson:"key"`
-	From    string    `json:"from"         bson:"from"`
-	Created time.Time `json:"created"      bson:"created"`
+	Id          string    `json:"id"          bson:"id"`
+	Parent      string    `json:"parent"      bson:"parent"`
+	Name        string    `json:"name"        bson:"name"`
+	Email       string    `json:"email"       bson:"email"`
+	Role        string    `json:"role"        bson:"role"`
+	Status      string    `json:"status"      bson:"status"`
+	Key         string    `json:"key"         bson:"key"`
+	From        string    `json:"from"        bson:"from"`
+	AccountName string    `json:"accountName" bson:"accountName"`
+	Created     time.Time `json:"created"     bson:"created"`
 }
 
 // IsValid check if model is valid

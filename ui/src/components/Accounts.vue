@@ -170,7 +170,7 @@
             </v-card-title>
             <v-data-table
                     v-if="listView"
-                    :headers="headers"
+                    :headers="bottom_headers"
                     :items="users"
                     :search="search"
             >
@@ -369,6 +369,12 @@
                                     v-model="valid"
                             >
                                 <v-text-field
+                                        v-model="user.accountName"
+                                        label="Account Name"
+                                        :rules="[ v => !!v || 'Account name is required',]"
+                                        required
+                                />
+                                <v-text-field
                                         v-model="user.email"
                                         label="Email Address"
                                         :rules="[ v => !!v || 'Email address is required',]"
@@ -432,17 +438,27 @@
       dialogCreate: false,
       dialogUpdate: false,
       toAddress: "",
-      roles : ["Admin", "User"],
+      roles : ["Owner", "Admin", "User"],
       statuses : ["Active", "Pending", "Suspended"],
       user: null,
       panel: 1,
       valid: false,
       search: '',
       headers: [
+        { text: 'Account Name', value: 'accountName', },
+        { text: 'Name', value: 'name', },
+        { text: "Role", value: 'role', },
+        { text: 'From', value: 'from', },
+        { text: 'Status', value: 'status', },
+        { text: 'Actions', value: 'action', sortable: false, },
+
+      ],
+      bottom_headers: [
         { text: 'Email', value: 'email', },
         { text: 'Name', value: 'name', },
         { text: "Role", value: 'role', },
         { text: 'Account', value: 'id', },
+        { text: 'Account Name', value: 'accountName', },
         { text: 'Status', value: 'status', },
         { text: 'Actions', value: 'action', sortable: false, },
 
