@@ -63,8 +63,8 @@ func CreateAccount(account *model.Account) (*model.Account, error) {
 	return account, nil
 }
 
-// ReadHost host by id
-func ReadAllAccountsForUser(email string) ([]*model.Account, error) {
+// ReadAllAccounts account by id or email address
+func ReadAllAccounts(email string) ([]*model.Account, error) {
 
 	if strings.Contains(email, "@") {
 		return mongo.ReadAllAccounts(email)

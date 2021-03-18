@@ -74,7 +74,7 @@ func createAccount(c *gin.Context) {
 func readAllAccounts(c *gin.Context) {
 	email := c.Param("id")
 
-	accounts, err := core.ReadAllAccountsForUser(email)
+	accounts, err := core.ReadAllAccounts(email)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,

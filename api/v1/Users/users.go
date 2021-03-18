@@ -193,7 +193,7 @@ func emailUser(c *gin.Context) {
 	id := c.Param("id")
 	account := c.Param("account")
 
-	p, err := core.ReadAllAccountsForUser(account)
+	p, err := core.ReadAllAccounts(account)
 	if err != nil {
 		return
 	}

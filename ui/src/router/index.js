@@ -6,6 +6,16 @@ Vue.use(VueRouter);
 
 const routes = [
   {
+    path: '/join*',
+    name: 'join',
+    component: function () {
+      return import(/* webpackChunkName: "Join" */ '../views/Join.vue')
+    },
+    meta: {
+      requiresAuth: false
+    }
+  },
+  {
     path: '/hosts',
     name: 'hosts',
     component: function () {
@@ -33,16 +43,6 @@ const routes = [
     },
     meta: {
       requiresAuth: true
-    }
-  },
-  {
-    path: '/join*',
-    name: 'join',
-    component: function () {
-      return import(/* webpackChunkName: "Join" */ '../views/Join.vue')
-    },
-    meta: {
-      requiresAuth: false
     }
   },
   {

@@ -77,8 +77,8 @@
                         >
                             <v-list-item>
                                 <v-list-item-content>
-                                    <v-list-item-title class="headline">{{ user.name }}</v-list-item-title>
-                                    <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
+                                    <v-list-item-title class="headline">{{ user.email }}</v-list-item-title>
+                                    <v-list-item-subtitle>{{ user.name }}</v-list-item-subtitle>
                                 </v-list-item-content>
 
                                 <v-list-item-avatar
@@ -88,19 +88,6 @@
                                 </v-list-item-avatar>
                             </v-list-item>
                             <v-card-actions>
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                                text
-                                                v-on:click="forceFileDownload(user)"
-                                                v-on="on"
-                                        >
-                                            <span class="d-none d-lg-flex">Download</span>
-                                            <v-icon right dark>mdi-cloud-download-outline</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span>Download</span>
-                                </v-tooltip>
 
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on }">
@@ -137,26 +124,12 @@
                                                 @click="email(user)"
                                                 v-on="on"
                                         >
-                                            <span class="d-none d-lg-flex">Send Email</span>
+                                            <span class="d-none d-lg-flex">Re-send Email</span>
                                             <v-icon right dark>mdi-email-send-outline</v-icon>
                                         </v-btn>
                                     </template>
                                     <span>Send Email</span>
                                 </v-tooltip>
-                                <v-spacer/>
-                                <v-tooltip right>
-                                    <template v-slot:activator="{ on }">
-                                        <v-switch
-                                                dark
-                                                v-on="on"
-                                                color="success"
-                                                v-model="user.enable"
-                                                v-on:change="update(user)"
-                                        />
-                                    </template>
-                                    <span> {{user.enable ? 'Disable' : 'Enable'}} this user</span>
-                                </v-tooltip>
-
                             </v-card-actions>
                         </v-card>
                     </v-col>
@@ -400,30 +373,24 @@
                         </v-col>
                     </v-row>
                 </v-card-text>
+                    <v-card-actions>
+                        <v-btn
+                                :disabled="!valid"
+                                color="success"
+                                @click="update(user)"
+                        >
+                            Submit
+                            <v-icon right dark>mdi-check-outline</v-icon>
+                        </v-btn>
+                        <v-btn
+                                color="primary"
+                                @click="dialogUpdate = false"
+                        >
+                            Cancel
+                            <v-icon right dark>mdi-close-circle-outline</v-icon>
+                        </v-btn>
+                    </v-card-actions>
             </v-card>
-                    <v-spacer/>
-                    <v-row>
-                        <v-col cols="12">
-
-                    <v-btn
-                            :disabled="!valid"
-                            color="success"
-                            @click="update(user)"
-                    >
-                        Submit
-                        <v-icon right dark>mdi-check-outline</v-icon>
-                    </v-btn>
-                    <v-btn
-                            color="primary"
-                            @click="dialogUpdate = false"
-                    >
-                        Cancel
-                        <v-icon right dark>mdi-close-circle-outline</v-icon>
-                    </v-btn>
-                        </v-col>
-                    </v-row>
-
-
         </v-dialog>
     </v-container>
 </template>
