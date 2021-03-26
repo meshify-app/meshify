@@ -19,6 +19,7 @@ func ApplyRoutes(r *gin.RouterGroup) {
 	{
 		g.GET("/oauth2_url", oauth2URL)
 		g.POST("/oauth2_exchange", oauth2Exchange)
+		g.POST("/token", token)
 		g.GET("/user", user)
 		g.GET("/logout", logout)
 	}
@@ -72,6 +73,9 @@ func oauth2Exchange(c *gin.Context) {
 		c.AbortWithStatus(http.StatusUnprocessableEntity)
 		return
 	}
+	log.WithFields(log.Fields{
+		"loginVals": loginVals,
+	}).Info("loginVals")
 
 	cacheDb := c.MustGet("cache").(*cache.Cache)
 	savedState, exists := cacheDb.Get(loginVals.ClientId)
@@ -101,6 +105,56 @@ func oauth2Exchange(c *gin.Context) {
 	c.JSON(http.StatusOK, oauth2Token.AccessToken)
 }
 
+/*
+ * exchange code and get user infos, if OAuth2 is disable just send fake data
+ */
+func token(c *gin.Context) {
+	var loginVals model.Auth
+	if err := c.ShouldBindJSON(&loginVals); err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("code and state fields are missing")
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
+	}
+	log.WithFields(log.Fields{
+		"loginVals": loginVals,
+	}).Info("loginVals")
+
+	cacheDb := c.MustGet("cache").(*cache.Cache)
+	//	savedState, exists := cacheDb.Get(loginVals.ClientId)
+
+	//	if !exists || savedState != loginVals.State {
+	//		log.WithFields(log.Fields{
+	//			"state":      loginVals.State,
+	//			"savedState": savedState,
+	//		}).Error("saved state and client provided state mismatch")
+	//		c.AbortWithStatus(http.StatusBadRequest)
+	//		return
+	//	}
+	//oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
+
+	//	oauth2Token, err := oauth2Client.Exchange(loginVals.Code)
+	//	if err != nil {
+	//		log.WithFields(log.Fields{
+	//			"err": err,
+	//		}).Error("failed to exchange code for token")
+	//		c.AbortWithStatus(http.StatusBadRequest)
+	//		return
+	//	}
+
+	//	cacheDb.Delete(loginVals.ClientId)
+	var token oauth2.Token
+	token.AccessToken = loginVals.Code
+	var token_map = make(map[string]interface{}, 1)
+	token_map["id_token"] = loginVals.State
+	token2 := token.WithExtra(token_map)
+
+	cacheDb.Set(loginVals.Code, token2, cache.DefaultExpiration)
+
+	c.JSON(http.StatusOK, loginVals.Code)
+}
+
 func logout(c *gin.Context) {
 	cacheDb := c.MustGet("cache").(*cache.Cache)
 	cacheDb.Delete(c.Request.Header.Get(util.AuthTokenHeaderName))
@@ -109,9 +163,9 @@ func logout(c *gin.Context) {
 
 func user(c *gin.Context) {
 	cacheDb := c.MustGet("cache").(*cache.Cache)
-	oauth2Token, exists := cacheDb.Get(c.Request.Header.Get(util.AuthTokenHeaderName))
+	oauth2Token, exists := cacheDb.Get(util.GetCleanAuthToken(c))
 
-	if exists && oauth2Token.(*oauth2.Token).AccessToken == c.Request.Header.Get(util.AuthTokenHeaderName) {
+	if exists && oauth2Token.(*oauth2.Token).AccessToken == util.GetCleanAuthToken(c) {
 		oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
 		user, err := oauth2Client.UserInfo(oauth2Token.(*oauth2.Token))
 		if err != nil {
@@ -128,7 +182,7 @@ func user(c *gin.Context) {
 
 	log.WithFields(log.Fields{
 		"exists":                 exists,
-		util.AuthTokenHeaderName: c.Request.Header.Get(util.AuthTokenHeaderName),
+		util.AuthTokenHeaderName: util.GetCleanAuthToken(c),
 	}).Error("oauth2 AccessToken is not recognized")
 
 	c.AbortWithStatus(http.StatusUnauthorized)

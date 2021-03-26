@@ -72,15 +72,15 @@ func (o *Oauth2idc) Exchange(code string) (*oauth2.Token, error) {
 
 // UserInfo get token user
 func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
-	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
+	_, ok := oauth2Token.Extra("id_token").(string)
 	if !ok {
 		return nil, fmt.Errorf("no id_token field in oauth2 token")
 	}
 
-	iDToken, err := oidcIDTokenVerifier.Verify(context.TODO(), rawIDToken)
-	if err != nil {
-		return nil, err
-	}
+	//iDToken, err := oidcIDTokenVerifier.Verify(context.TODO(), rawIDToken)
+	//if err != nil {
+	//		return nil, err
+	//}
 
 	userInfo, err := oidcProvider.UserInfo(context.TODO(), oauth2.StaticTokenSource(oauth2Token))
 	if err != nil {
@@ -111,8 +111,8 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 		log.Error("name not found in user info claims")
 	}
 
-	user.Issuer = iDToken.Issuer
-	user.IssuedAt = iDToken.IssuedAt
+	//	user.Issuer = iDToken.Issuer
+	//	user.IssuedAt = iDToken.IssuedAt
 
 	domain := os.Getenv("OAUTH2_PROVIDER_URL")
 	id := os.Getenv("OAUTH2_CLIENT_ID")

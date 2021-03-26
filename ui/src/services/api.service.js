@@ -4,7 +4,7 @@ import TokenService from "./token.service";
 const ApiService = {
 
   setHeader() {
-    Vue.axios.defaults.headers['x-meshify-auth'] = `${TokenService.getToken()}`;
+    Vue.axios.defaults.headers['Authorization'] = `Bearer ${TokenService.getToken()}`;
   },
 
   get(resource) {

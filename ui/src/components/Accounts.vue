@@ -32,6 +32,7 @@
                     :headers="headers"
                     :items="accounts"
                     :search="search"
+                     @click:row="startUpdate"
             >
                 <template v-slot:item.updated="{ item }">
                     <v-row>
@@ -146,6 +147,7 @@
                     :headers="bottom_headers"
                     :items="users"
                     :search="search"
+                    @click:row="startUpdate"
             >
                 <template v-slot:item.updated="{ item }">
                     <v-row>
@@ -404,6 +406,7 @@
       listView: true,
       dialogCreate: false,
       dialogUpdate: false,
+      inDelete: false,
       toAddress: "",
       roles : ["Owner", "Admin", "User"],
       statuses : ["Active", "Pending", "Suspended"],
@@ -484,6 +487,7 @@
       },
 
       remove(user) {
+        this.inDelete = true;
         if(confirm(`Do you really want to delete ${user.name} ?`)){
           this.deleteUser(user)
         }
@@ -506,6 +510,10 @@
       },
 
       startUpdate(user) {
+        if (this.inDelete == true ) {
+            this.inDelete = false;
+            return
+        }
         this.user = user;
         this.dialogUpdate = true;
       },

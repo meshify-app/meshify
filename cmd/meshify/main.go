@@ -125,7 +125,7 @@ func main() {
 	app.Use(func(c *gin.Context) {
 		cacheDb := c.MustGet("cache").(*cache.Cache)
 
-		token := c.Request.Header.Get(util.AuthTokenHeaderName)
+		token := util.GetCleanAuthToken(c)
 
 		oauth2Token, exists := cacheDb.Get(token)
 		if exists && oauth2Token.(*oauth2.Token).AccessToken == token {

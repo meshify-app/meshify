@@ -39,7 +39,7 @@ func createHost(c *gin.Context) {
 		return
 	}
 
-	a := c.Request.Header.Get(util.AuthTokenHeaderName)
+	a := util.GetCleanAuthToken(c)
 	log.Infof("%v", a)
 	// get creation user from token and add to client infos
 	oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)

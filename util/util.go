@@ -9,14 +9,24 @@ import (
 	"net"
 	"os"
 	"regexp"
+
+	"github.com/gin-gonic/gin"
 )
 
 var (
 	// AuthTokenHeaderName http header for token transport
-	AuthTokenHeaderName = "x-meshify-auth"
+	AuthTokenHeaderName = "Authorization"
 	// RegexpEmail check valid email
 	RegexpEmail = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 )
+
+func GetCleanAuthToken(c *gin.Context) string {
+	token := c.Request.Header.Get(AuthTokenHeaderName)
+	if len(token) > 0 && token[:7] == "Bearer " {
+		token = token[7:]
+	}
+	return token
+}
 
 // ReadFile file content
 func ReadFile(path string) (bytes []byte, err error) {
