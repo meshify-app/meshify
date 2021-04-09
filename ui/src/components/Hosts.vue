@@ -407,6 +407,10 @@
                                         disabled
                                 />
                                 <v-text-field
+                                        v-model="host.hostGroup"
+                                        label="Host Group"
+                                />
+                                <v-text-field
                                         v-model="host.current.endpoint"
                                         label="Public endpoint for hosts to connect to"
                                 />

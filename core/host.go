@@ -26,6 +26,10 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	u := uuid.NewV4()
 	host.Id = u.String()
 
+	if host.HostGroup == "" {
+		host.HostGroup = host.Id
+	}
+
 	// read the meshes and configure the default values
 	meshes, err := ReadMeshes(host.CreatedBy)
 	if err != nil {

@@ -54,6 +54,9 @@ func createHost(c *gin.Context) {
 		return
 	}
 	data.CreatedBy = user.Email
+	if data.AccountId == "" {
+		data.AccountId = user.AccountId
+	}
 	data.APIKey, err = util.RandomString(32)
 
 	if err != nil {
@@ -186,7 +189,7 @@ func readHosts(c *gin.Context) {
 
 func statusHost(c *gin.Context) {
 
-	meshes, err := core.ReadHost2("id", c.Param("id"))
+	meshes, err := core.ReadHost2("hostGroup", c.Param("id"))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -196,8 +199,10 @@ func statusHost(c *gin.Context) {
 	}
 
 	var msg model.Message
+	hconfig := make([]model.HostConfig, len(meshes))
+
 	msg.Id = c.Param("id")
-	msg.Config = append(msg.Config, model.HostConfig{})
+	msg.Config = hconfig
 
 	for i, mesh := range meshes {
 		clients, err := core.ReadHost2("meshid", mesh.MeshId)
@@ -209,6 +214,7 @@ func statusHost(c *gin.Context) {
 			return
 		}
 
+		msg.Config[i] = model.HostConfig{}
 		msg.Config[i].MeshName = mesh.MeshName
 		msg.Config[i].MeshId = mesh.MeshId
 

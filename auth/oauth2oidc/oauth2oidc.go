@@ -172,18 +172,17 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 	accounts, err := mongodb.ReadAllAccounts(user.Email)
 	if err != nil {
 		log.Error(err)
-	}
-
-	if len(accounts) == 0 {
-
-		var account model.Account
-		account.Email = user.Email
-		a, err := core.CreateAccount(&account)
-		log.Infof("CREATE ACCOUNT = %v", a)
-		if err != nil {
-			log.Error(err)
+	} else {
+		//  If there's no error and no account, create one.
+		if len(accounts) == 0 {
+			var account model.Account
+			account.Email = user.Email
+			a, err := core.CreateAccount(&account)
+			log.Infof("CREATE ACCOUNT = %v", a)
+			if err != nil {
+				log.Error(err)
+			}
 		}
-
 	}
 
 	//res, err := collection.InsertOne(ctx, b)
