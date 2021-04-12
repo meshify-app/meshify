@@ -631,6 +631,7 @@
             this.host.meshid = this.meshList.selected.value
             changed = true;
         }
+        this.host.meshName = this.meshList.selected.text
 
         if (changed) {
             for (let i=0; i<this.meshes.length; i++) {

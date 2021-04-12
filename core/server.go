@@ -11,7 +11,6 @@ import (
 
 	model "github.com/meshify-app/meshify/model"
 	storage "github.com/meshify-app/meshify/storage"
-	template "github.com/meshify-app/meshify/template"
 	util "github.com/meshify-app/meshify/util"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
@@ -115,21 +114,21 @@ func UpdateServer(server *model.Server) (*model.Server, error) {
 
 // UpdateServerConfigWg in wg format
 func UpdateServerConfigWg() error {
-	clients, err := ReadHosts()
-	if err != nil {
-		return err
-	}
+	/*	clients, err := ReadHosts()
+		if err != nil {
+			return err
+		}
 
-	server, err := ReadServer()
-	if err != nil {
-		return err
-	}
+		server, err := ReadServer()
+		if err != nil {
+			return err
+		}
 
-	_, err = template.DumpServerWg(clients, server)
-	if err != nil {
-		return err
-	}
-
+		_, err = template.DumpServerWg(clients, server)
+		if err != nil {
+			return err
+		}
+	*/
 	return nil
 }
 

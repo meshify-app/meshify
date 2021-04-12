@@ -536,8 +536,8 @@
         this.mesh.default.listenPort = parseInt(this.mesh.default.listenPort, 10);
         this.mesh.default.persistentKeepalive = parseInt(this.mesh.default.persistentKeepalive, 10);
         this.mesh.default.mtu = parseInt(this.mesh.default.mtu, 10);
-//        this.mesh.id = this.server.id
-//        this.mesh.meshName = this.server.meshName
+        this.mesh.id = mesh.id
+        this.mesh.meshName = mesh.meshName
 
 
         // check allowed IPs

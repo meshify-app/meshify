@@ -189,6 +189,11 @@ func readHosts(c *gin.Context) {
 
 func statusHost(c *gin.Context) {
 
+	if c.Param("id") == "" {
+		log.Error("hostgroup cannot be empty")
+		c.AbortWithStatus(http.StatusInternalServerError)
+	}
+
 	meshes, err := core.ReadHost2("hostGroup", c.Param("id"))
 	if err != nil {
 		log.WithFields(log.Fields{
