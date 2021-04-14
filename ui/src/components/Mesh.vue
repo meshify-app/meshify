@@ -316,6 +316,10 @@
                     <v-expansion-panel-content>
                         <div class="d-flex flex-no-wrap justify-space-between">
                             <v-col cols="12">
+                                <v-text-field
+                                        v-model="mesh.default.presharedKey"
+                                        label="Preshared Key"
+                                />
                                 <v-combobox
                                     v-model="mesh.default.dns"
                                     chips

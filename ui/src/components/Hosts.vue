@@ -402,6 +402,10 @@
                                         disabled
                                 />
                                 <v-text-field
+                                        v-model="host.current.presharedKey"
+                                        label="Preshared Key"
+                                />
+                                <v-text-field
                                         v-model="host.id"
                                         label="Host ID"
                                         disabled
@@ -412,7 +416,7 @@
                                 />
                                 <v-text-field
                                         v-model="host.current.endpoint"
-                                        label="Public endpoint for hosts to connect to"
+                                        label="Public endpoint for clients"
                                 />
                                 <v-text-field
                                         v-model="host.current.listenPort"

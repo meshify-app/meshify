@@ -12,6 +12,7 @@ import (
 	util "github.com/meshify-app/meshify/util"
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
+	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
 
 // CreateMesh mesh with all necessary data
@@ -37,6 +38,14 @@ func CreateMesh(mesh *model.Mesh) (*model.Mesh, error) {
 	mesh.Default.AllowedIPs = ips
 	mesh.Created = time.Now().UTC()
 	mesh.Updated = mesh.Created
+
+	if mesh.Default.PresharedKey == "" {
+		presharedKey, err := wgtypes.GenerateKey()
+		if err != nil {
+			return nil, err
+		}
+		mesh.Default.PresharedKey = presharedKey.String()
+	}
 
 	// check if mesh is valid
 	errs := mesh.IsValid()

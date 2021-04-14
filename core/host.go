@@ -51,12 +51,6 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	host.Current.PrivateKey = key.String()
 	host.Current.PublicKey = key.PublicKey().String()
 
-	presharedKey, err := wgtypes.GenerateKey()
-	if err != nil {
-		return nil, err
-	}
-	host.Current.PresharedKey = presharedKey.String()
-
 	reserverIps, err := GetAllReservedMeshIps(host.MeshName)
 	if err != nil {
 		return nil, err
