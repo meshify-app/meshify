@@ -132,7 +132,11 @@ func deleteMesh(c *gin.Context) {
 }
 
 func readMeshes(c *gin.Context) {
-	oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)
+	value, exists := c.Get("oauth2Token")
+	if !exists {
+		c.AbortWithStatus(401)
+	}
+	oauth2Token := value.(*oauth2.Token)
 	oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
 	user, err := oauth2Client.UserInfo(oauth2Token)
 	if err != nil {

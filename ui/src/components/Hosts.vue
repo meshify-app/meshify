@@ -26,10 +26,12 @@
                     :headers="headers"
                     :items="hosts"
                     :search="search"
+                    :items-per-page="25"
+                    :footer-props="footerProps"
             >
+
                 <template v-slot:item.name="{ item }">
                         {{ item.name }}
-                    </v-chip>
                 </template>
                 <template v-slot:item.address="{ item }">
                     <v-chip
@@ -228,6 +230,16 @@
                                         multiple
                                         dark
                                 >
+                                <v-text-field
+                                        v-model="host.current.endpoint"
+                                        label="Public endpoint for clients"
+                                />
+                                <v-text-field
+                                        v-model="host.current.listenPort"
+                                        type="number"
+                                        label="Listen port"
+                                />
+
                                     <template v-slot:selection="{ attrs, item, select, selected }">
                                         <v-chip
                                                 v-bind="attrs"
@@ -325,6 +337,15 @@
                                         </v-chip>
                                     </template>
                                 </v-combobox>
+                                <v-text-field
+                                        v-model="host.current.endpoint"
+                                        label="Public endpoint for clients"
+                                />
+                                <v-text-field
+                                        v-model="host.current.listenPort"
+                                        type="number"
+                                        label="Listen port"
+                                />
                             </v-form>
                         </v-col>
                     </v-row>
@@ -379,7 +400,7 @@
                                 <v-combobox
                                     v-model="host.current.dns"
                                     chips
-                                    hint="Write IP address(es) and hit enter or leave empty.  If not empty, be sure to include your local resolver."
+                                    hint="Enter IP address(es) and hit enter or leave empty."
                                     label="DNS servers for this host"
                                     multiple
                                     dark
@@ -397,6 +418,11 @@
                                     </template>
                                 </v-combobox>
                                 <v-text-field
+                                        v-model="host.id"
+                                        label="Host ID"
+                                        disabled
+                                />
+                                <v-text-field
                                         v-model="host.current.publicKey"
                                         label="Public key"
                                         disabled
@@ -406,22 +432,8 @@
                                         label="Preshared Key"
                                 />
                                 <v-text-field
-                                        v-model="host.id"
-                                        label="Host ID"
-                                        disabled
-                                />
-                                <v-text-field
                                         v-model="host.hostGroup"
                                         label="Host Group"
-                                />
-                                <v-text-field
-                                        v-model="host.current.endpoint"
-                                        label="Public endpoint for clients"
-                                />
-                                <v-text-field
-                                        v-model="host.current.listenPort"
-                                        type="number"
-                                        label="Listen port"
                                 />
                                 <v-text-field
                                         type="number"
@@ -480,6 +492,8 @@
     name: 'Hosts',
 
     data: () => ({
+    
+      footerProps: {'items-per-page-options': [25, 50, 100, -1]},
       listView: true,
       dialogCreate: false,
       dialogUpdate: false,

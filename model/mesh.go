@@ -7,14 +7,15 @@ import (
 
 // Mesh structure
 type Mesh struct {
-	Id        string    `json:"id"          bson:"id"`
-	AccountId string    `json:"accountid"   bson:"accountid"`
-	MeshName  string    `json:"meshName"    bson:"meshName"`
-	CreatedBy string    `json:"createdBy"   bson:"createdBy"`
-	UpdatedBy string    `json:"updatedBy"   bson:"updatedBy"`
-	Created   time.Time `json:"created"     bson:"created"`
-	Updated   time.Time `json:"updated"     bson:"updated"`
-	Default   Settings  `json:"default"     bson:"default"`
+	Id          string    `json:"id"          bson:"id"`
+	AccountId   string    `json:"accountid"   bson:"accountid"`
+	MeshName    string    `json:"meshName"    bson:"meshName"`
+	Description string    `json:"description" bson:"description"`
+	CreatedBy   string    `json:"createdBy"   bson:"createdBy"`
+	UpdatedBy   string    `json:"updatedBy"   bson:"updatedBy"`
+	Created     time.Time `json:"created"     bson:"created"`
+	Updated     time.Time `json:"updated"     bson:"updated"`
+	Default     Settings  `json:"default"     bson:"default"`
 }
 
 // IsValid check if model is valid

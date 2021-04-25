@@ -265,6 +265,10 @@
                                         :rules="[ v => !!v || 'Mesh name is required',]"
                                         required
                                 />
+                                <v-text-field
+                                        v-model="mesh.description"
+                                        label="Description"
+                                />
                                 <v-combobox
                                         v-model="mesh.default.address"
                                         chips
@@ -437,9 +441,10 @@
       search: '',
       headers: [
         { text: 'Name', value: 'meshName', },
-        { text: 'ID', value:'id', },
+//        { text: 'ID', value:'id', },
 //        { text: 'Email', value: 'email', },
 //        { text: "Endpoint", value: 'endpoint', },
+        { text: 'Description', value:'description'},
         { text: 'IP address pool', value: 'default.address', },
         { text: 'Created', value: 'created', sortable: false, },
         { text: 'Tags', value: 'tags', },
