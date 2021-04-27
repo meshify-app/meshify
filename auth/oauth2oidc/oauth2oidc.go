@@ -11,6 +11,7 @@ import (
 	"github.com/meshify-app/meshify/core"
 	model "github.com/meshify-app/meshify/model"
 	mongodb "github.com/meshify-app/meshify/mongo"
+	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -29,11 +30,14 @@ var (
 	oauth2Config        *oauth2.Config
 	oidcProvider        *oidc.Provider
 	oidcIDTokenVerifier *oidc.IDTokenVerifier
+	userCache           *cache.Cache
 )
 
 // Setup validate provider
 func (o *Oauth2idc) Setup() error {
 	var err error
+
+	userCache = cache.New(60*time.Minute, 10*time.Minute)
 
 	oidcProvider, err = oidc.NewProvider(context.TODO(), os.Getenv("OAUTH2_PROVIDER"))
 	if err != nil {
@@ -81,6 +85,11 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 	//if err != nil {
 	//		return nil, err
 	//}
+
+	cacheUser, _ := userCache.Get(oauth2Token.AccessToken)
+	if cacheUser != nil {
+		return cacheUser.(*model.User), nil
+	}
 
 	userInfo, err := oidcProvider.UserInfo(context.TODO(), oauth2.StaticTokenSource(oauth2Token))
 	if err != nil {
@@ -188,6 +197,6 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 	//res, err := collection.InsertOne(ctx, b)
 
 	log.Infof("Res: %v", res)
-
+	userCache.Set(oauth2Token.AccessToken, user, 0)
 	return user, nil
 }

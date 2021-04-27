@@ -167,6 +167,7 @@ func user(c *gin.Context) {
 
 	if exists && oauth2Token.(*oauth2.Token).AccessToken == util.GetCleanAuthToken(c) {
 		oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
+
 		user, err := oauth2Client.UserInfo(oauth2Token.(*oauth2.Token))
 		if err != nil {
 			log.WithFields(log.Fields{
