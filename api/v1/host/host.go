@@ -163,7 +163,7 @@ func deleteHost(c *gin.Context) {
 
 func readHosts(c *gin.Context) {
 	value, exists := c.Get("oauth2Token")
-	if !exists {
+	if !exists || value == nil {
 		c.AbortWithStatus(401)
 	}
 	oauth2Token := value.(*oauth2.Token)
