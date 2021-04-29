@@ -207,6 +207,21 @@ func statusHost(c *gin.Context) {
 		return
 	}
 
+	apikey := c.Request.Header.Get("X-API-KEY")
+
+	authorized := false
+
+	for _, mesh := range meshes {
+		if mesh.APIKey == apikey {
+			authorized = true
+			break
+		}
+	}
+	if !authorized {
+		c.AbortWithStatus(http.StatusNetworkAuthenticationRequired)
+		return
+	}
+
 	var msg model.Message
 	hconfig := make([]model.HostConfig, len(meshes))
 
