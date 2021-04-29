@@ -218,7 +218,7 @@ func statusHost(c *gin.Context) {
 		}
 	}
 	if !authorized {
-		c.AbortWithStatus(http.StatusNetworkAuthenticationRequired)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
