@@ -436,6 +436,10 @@
                                         label="Host Group"
                                 />
                                 <v-text-field
+                                        v-model="host.apiKey"
+                                        label="API Key"
+                                />
+                                <v-text-field
                                         type="number"
                                         v-model="host.current.mtu"
                                         label="Define global MTU"
