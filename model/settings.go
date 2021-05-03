@@ -19,7 +19,7 @@ type Settings struct {
 	Endpoint            string   `json:"endpoint"                  bson:"endpoint"`
 	Mtu                 int      `json:"mtu"                       bson:"mtu"`
 	SubnetRouting       bool     `json:"subnetRouting"             bson:"subnetRouting"`
-	STUN                bool     `json:"stun"                      bson:"stun"`
+	UPnP                bool     `json:"upnp"                      bson:"upnp"`
 	PreUp               string   `json:"preUp"                     bson:"preUp"`
 	PostUp              string   `json:"postUp"                    bson:"postUp"`
 	PreDown             string   `json:"preDown"                   bson:"preDown"`
@@ -30,17 +30,7 @@ type Settings struct {
 func (a Settings) IsValid() []error {
 	errs := make([]error, 0)
 
-	/*	// check if the allowedIPs empty
-		if len(a.AllowedIPs) == 0 {
-			errs = append(errs, fmt.Errorf("allowedIPs field is required"))
-		}
-		// check if the allowedIPs are valid
-		for _, allowedIP := range a.AllowedIPs {
-			if !util.IsValidCidr(allowedIP) {
-				errs = append(errs, fmt.Errorf("allowedIP %s is invalid", allowedIP))
-			}
-		}
-	*/ // check if the address empty
+	// check if the address empty
 	if len(a.Address) == 0 {
 		errs = append(errs, fmt.Errorf("address field is required"))
 	}
