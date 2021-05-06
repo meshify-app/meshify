@@ -647,8 +647,6 @@
 
         this.host = host
 
-        this.host.accountid = this.accounts[0].id;
-
         this.host.current.listenPort = parseInt(this.host.current.listenPort, 10);
         this.host.current.persistentKeepalive = parseInt(this.host.current.persistentKeepalive, 10);
         this.host.current.mtu = parseInt(this.host.current.mtu, 10);

@@ -541,7 +541,6 @@
 
       update(mesh) {
 
-        mesh.accountid = this.accounts[0].id
         this.mesh.default.listenPort = parseInt(this.mesh.default.listenPort, 10);
         this.mesh.default.persistentKeepalive = parseInt(this.mesh.default.persistentKeepalive, 10);
         this.mesh.default.mtu = parseInt(this.mesh.default.mtu, 10);
