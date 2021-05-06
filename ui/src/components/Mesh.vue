@@ -388,10 +388,10 @@
                                         required
                                 />
                                     <v-switch
-                                        v-model="mesh.default.stun"
+                                        v-model="mesh.default.upnp"
                                         color="success"
                                         inset
-                                        label="All hosts must have STUN enabled for this mesh."
+                                        label="Enable UPnP where possible."
                                />
 
                             </v-col>

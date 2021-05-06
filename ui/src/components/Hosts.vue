@@ -457,6 +457,12 @@
                                         inset
                                         label="Enable subnet routing"
                                />
+                                <v-switch
+                                        v-model="host.current.upnp"
+                                        color="success"
+                                        inset
+                                        label="Enable UPnP"
+                               />
 
                             </v-col>
                         </div>
