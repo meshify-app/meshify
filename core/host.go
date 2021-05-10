@@ -41,6 +41,7 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 			host.Default = mesh.Default
 			host.Current = mesh.Default
 			host.MeshId = mesh.Id
+			host.AccountId = mesh.AccountId
 		}
 	}
 
@@ -71,6 +72,9 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	}
 	host.Current.Address = ips
 	host.Current.AllowedIPs = ips
+	if host.Current.EnableDns && len(host.Current.Dns) == 0 {
+		host.Current.Dns = ips
+	}
 	host.Created = time.Now().UTC()
 	host.Updated = host.Created
 
@@ -170,10 +174,9 @@ func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
 		}
 		host.Current.Address = ips
 		host.Current.AllowedIPs = ips
-	}
-
-	if host.Current.Dns == nil {
-		host.Current.Dns = host.Default.Dns
+		if host.Current.EnableDns && len(host.Current.Dns) == 0 {
+			host.Current.Dns = ips
+		}
 	}
 
 	// check if host is valid

@@ -166,7 +166,7 @@
                 max-width="550"
         >
             <v-card>
-                <v-card-title class="headline">Create new mesh</v-card-title>
+                <v-card-title class="headline">Create New Mesh</v-card-title>
                 <v-card-text>
                     <v-row>
                         <v-col
@@ -182,6 +182,11 @@
                                         :rules="[ v => !!v || 'Mesh name is required', ]"
                                         required
                                 />
+                                <v-text-field
+                                    v-model="mesh.description"
+                                    label="Description"
+                                />
+
                                 <v-combobox
                                         v-model="mesh.default.address"
                                         :items="mesh.default.address"
@@ -382,7 +387,7 @@
                                         v-model="mesh.default.listenPort"
                                         type="number"
                                         :rules="[
-                            v => !!v || 'Listen port is required',
+                                        v => !!v || 'Listen port is required',
                             ]"
                                         label="Listen port"
                                         required
@@ -391,7 +396,13 @@
                                         v-model="mesh.default.upnp"
                                         color="success"
                                         inset
-                                        label="Enable UPnP where possible."
+                                        label="Enable UPnP where possible"
+                               />
+                                    <v-switch
+                                        v-model="mesh.default.enableDns"
+                                        color="success"
+                                        inset
+                                        label="Enable Meshify DNS"
                                />
 
                             </v-col>
@@ -495,6 +506,8 @@
         this.mesh.default = {
           allowedIPs: [],
           address: [],
+          enableDns: true,
+          upnp : true,
         }
         this.dialogCreate = true;
       },

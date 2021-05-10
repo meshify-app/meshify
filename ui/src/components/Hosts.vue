@@ -463,6 +463,12 @@
                                         inset
                                         label="Enable UPnP"
                                />
+                                <v-switch
+                                        v-model="host.current.enableDns"
+                                        color="success"
+                                        inset
+                                        label="Enable Meshify DNS"
+                               />
 
                             </v-col>
                         </div>
@@ -594,10 +600,8 @@
       },
 
       create(host) {
-
         this.host.meshName = this.meshList.selected.text
         this.host.meshid = this.meshList.selected.value
-        this.host.accountid = this.accounts[0].id
         this.dialogCreate = false;
         this.createhost(host)
       },

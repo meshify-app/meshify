@@ -34,10 +34,20 @@ func CreateMesh(mesh *model.Mesh) (*model.Mesh, error) {
 		}
 		ips = append(ips, ip)
 	}
+
 	mesh.Default.Address = ips
-	mesh.Default.AllowedIPs = ips
+	if len(mesh.Default.AllowedIPs) == 0 {
+		mesh.Default.AllowedIPs = ips
+	}
+
 	mesh.Created = time.Now().UTC()
 	mesh.Updated = mesh.Created
+
+	if mesh.Default.EnableDns {
+		if len(mesh.Default.Dns) == 0 {
+			mesh.Default.Dns = ips
+		}
+	}
 
 	if mesh.Default.PresharedKey == "" {
 		presharedKey, err := wgtypes.GenerateKey()
@@ -114,6 +124,12 @@ func UpdateMesh(Id string, mesh *model.Mesh) (*model.Mesh, error) {
 	}
 
 	mesh.Updated = time.Now().UTC()
+
+	if mesh.Default.EnableDns {
+		if len(mesh.Default.Dns) == 0 {
+			mesh.Default.Dns = mesh.Default.Address
+		}
+	}
 
 	err = mongo.Serialize(mesh.Id, "id", "mesh", mesh)
 	if err != nil {
