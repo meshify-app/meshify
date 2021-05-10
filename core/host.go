@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -75,6 +76,14 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	if host.Current.EnableDns && len(host.Current.Dns) == 0 {
 		host.Current.Dns = ips
 	}
+
+	if host.Current.SubnetRouting && len(host.Current.PostUp) == 0 {
+		host.Current.PostUp = fmt.Sprintf("iptables -A FORWARD -i %s -j ACCEPT; iptables -A FORWARD -o %s -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE", host.MeshName, host.MeshName)
+	}
+	if host.Current.SubnetRouting && len(host.Current.PostDown) == 0 {
+		host.Current.PostDown = fmt.Sprintf("iptables -D FORWARD -i %s -j ACCEPT; iptables -D FORWARD -o %s -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE", host.MeshName, host.MeshName)
+	}
+
 	host.Created = time.Now().UTC()
 	host.Updated = host.Created
 
@@ -177,6 +186,13 @@ func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
 		if host.Current.EnableDns && len(host.Current.Dns) == 0 {
 			host.Current.Dns = ips
 		}
+	}
+
+	if host.Current.SubnetRouting && len(host.Current.PostUp) == 0 {
+		host.Current.PostUp = fmt.Sprintf("iptables -A FORWARD -i %s -j ACCEPT; iptables -A FORWARD -o %s -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE", host.MeshName, host.MeshName)
+	}
+	if host.Current.SubnetRouting && len(host.Current.PostDown) == 0 {
+		host.Current.PostDown = fmt.Sprintf("iptables -D FORWARD -i %s -j ACCEPT; iptables -D FORWARD -o %s -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE", host.MeshName, host.MeshName)
 	}
 
 	// check if host is valid

@@ -451,6 +451,16 @@
                                         label="Persistent keepalive"
                                         hint="To disable, set to 0.  Recommended value 29 (seconds)"
                                 />
+                                <v-text-field
+                                        v-model="host.current.postUp"
+                                        label="PostUp Script"
+                                        hint="Only applies to linux servers"
+                                />
+                                <v-text-field
+                                        v-model="host.current.postDown"
+                                        label="PostDown Script"
+                                        hint="Only applies to linux servers"
+                                />
                                 <v-switch
                                         v-model="host.current.subnetRouting"
                                         color="success"
