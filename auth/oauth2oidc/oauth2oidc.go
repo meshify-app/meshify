@@ -29,7 +29,7 @@ type Oauth2idc struct{}
 var (
 	oauth2Config        *oauth2.Config
 	oidcProvider        *oidc.Provider
-	oidcIDTokenVerifier *oidc.IDTokenVerifier
+	oidcIDTokenVerifier []*oidc.IDTokenVerifier
 	userCache           *cache.Cache
 )
 
@@ -44,9 +44,9 @@ func (o *Oauth2idc) Setup() error {
 		return err
 	}
 
-	oidcIDTokenVerifier = oidcProvider.Verifier(&oidc.Config{
-		ClientID: os.Getenv("OAUTH2_CLIENT_ID"),
-	})
+	oidcIDTokenVerifier = make([]*oidc.IDTokenVerifier, 0)
+	oidcIDTokenVerifier = append(oidcIDTokenVerifier, oidcProvider.Verifier(&oidc.Config{ClientID: os.Getenv("OAUTH2_CLIENT_ID")}))
+	oidcIDTokenVerifier = append(oidcIDTokenVerifier, oidcProvider.Verifier(&oidc.Config{ClientID: os.Getenv("OAUTH2_CLIENT_ID_WINDOWS")}))
 
 	oauth2Config = &oauth2.Config{
 		ClientID:     os.Getenv("OAUTH2_CLIENT_ID"),
@@ -76,15 +76,26 @@ func (o *Oauth2idc) Exchange(code string) (*oauth2.Token, error) {
 
 // UserInfo get token user
 func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
-	_, ok := oauth2Token.Extra("id_token").(string)
+	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
 	if !ok {
 		return nil, fmt.Errorf("no id_token field in oauth2 token")
 	}
 
-	//iDToken, err := oidcIDTokenVerifier.Verify(context.TODO(), rawIDToken)
-	//if err != nil {
-	//		return nil, err
-	//}
+	verified := false
+	var idToken *oidc.IDToken
+	var err error
+
+	for _, verifier := range oidcIDTokenVerifier {
+		idToken, err = verifier.Verify(context.TODO(), rawIDToken)
+		if err == nil {
+			verified = true
+			break
+		}
+	}
+
+	if !verified || err != nil {
+		return nil, err
+	}
 
 	cacheUser, _ := userCache.Get(oauth2Token.AccessToken)
 	if cacheUser != nil {
@@ -120,8 +131,8 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 		log.Error("name not found in user info claims")
 	}
 
-	//	user.Issuer = iDToken.Issuer
-	//	user.IssuedAt = iDToken.IssuedAt
+	user.Issuer = idToken.Issuer
+	user.IssuedAt = idToken.IssuedAt
 
 	domain := os.Getenv("OAUTH2_PROVIDER_URL")
 	id := os.Getenv("OAUTH2_CLIENT_ID")
