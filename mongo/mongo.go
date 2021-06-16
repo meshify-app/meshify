@@ -158,7 +158,7 @@ func Delete(id string, ident string, col string) error {
 }
 
 // ReadAllHosts from MongoDB
-func ReadAllHosts(param string, id string) []*model.Host {
+func ReadAllHosts(param string, id string) ([]*model.Host, error) {
 	hosts := make([]*model.Host, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -195,7 +195,7 @@ func ReadAllHosts(param string, id string) []*model.Host {
 
 	}
 
-	return hosts
+	return hosts, err
 
 }
 

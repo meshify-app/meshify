@@ -115,7 +115,11 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 
 // GetAllReservedIps the list of all reserved IPs, client and server
 func GetAllReservedMeshIps(meshName string) ([]string, error) {
-	clients := mongo.ReadAllHosts("meshName", meshName)
+	clients, err := mongo.ReadAllHosts("meshName", meshName)
+
+	if err != nil {
+		return nil, err
+	}
 	reserverIps := make([]string, 0)
 
 	for _, client := range clients {
@@ -242,16 +246,12 @@ func DeleteHost(id string) error {
 
 // ReadHost2 host by param and id
 func ReadHost2(param string, id string) ([]*model.Host, error) {
-	hosts := make([]*model.Host, 0)
-	hosts = mongo.ReadAllHosts(param, id)
-	return hosts, nil
+	return mongo.ReadAllHosts(param, id)
 }
 
 // ReadHosts all hosts
 func ReadHosts() ([]*model.Host, error) {
-	hosts := make([]*model.Host, 0)
-	hosts = mongo.ReadAllHosts("", "")
-	return hosts, nil
+	return mongo.ReadAllHosts("", "")
 }
 
 // ReadHosts all hosts
@@ -262,8 +262,10 @@ func ReadHostsForUser(email string) ([]*model.Host, error) {
 
 	for _, account := range accounts {
 		if account.Status != "Pending" {
-			hosts := make([]*model.Host, 0)
-			hosts = mongo.ReadAllHosts("accountid", account.Parent)
+			hosts, err := mongo.ReadAllHosts("accountid", account.Parent)
+			if err != nil {
+				return nil, err
+			}
 			for _, host := range hosts {
 				results = append(results, host)
 			}
