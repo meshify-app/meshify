@@ -2,15 +2,19 @@ package client
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	auth "github.com/meshify-app/meshify/auth"
 	core "github.com/meshify-app/meshify/core"
 	model "github.com/meshify-app/meshify/model"
 	util "github.com/meshify-app/meshify/util"
+	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 )
+
+var statusCache *cache.Cache
 
 // ApplyRoutes applies router to gin Router
 func ApplyRoutes(r *gin.RouterGroup) {
@@ -26,6 +30,8 @@ func ApplyRoutes(r *gin.RouterGroup) {
 		g.GET("/:id/status", statusHost)
 		g.GET("/:id/email", emailHost)
 	}
+
+	statusCache = cache.New(1*time.Minute, 10*time.Minute)
 }
 
 func createHost(c *gin.Context) {
@@ -193,6 +199,14 @@ func readHosts(c *gin.Context) {
 
 func statusHost(c *gin.Context) {
 
+	id := c.Param("id")
+
+	m, _ := statusCache.Get(id)
+	if m != nil {
+		c.JSON(http.StatusOK, m)
+		return
+	}
+
 	if c.Param("id") == "" {
 		log.Error("hostgroup cannot be empty")
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -251,6 +265,7 @@ func statusHost(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, msg)
+	statusCache.Set(id, msg, 0)
 }
 
 func configHost(c *gin.Context) {
