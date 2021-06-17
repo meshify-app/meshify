@@ -200,16 +200,33 @@ func readHosts(c *gin.Context) {
 func statusHost(c *gin.Context) {
 
 	id := c.Param("id")
-
-	m, _ := statusCache.Get(id)
-	if m != nil {
-		c.JSON(http.StatusOK, m)
-		return
-	}
-
 	if c.Param("id") == "" {
 		log.Error("hostgroup cannot be empty")
 		c.AbortWithStatus(http.StatusInternalServerError)
+	}
+
+	apikey := c.Request.Header.Get("X-API-KEY")
+
+	m, _ := statusCache.Get(id)
+	if m != nil {
+		msg := m.(model.Message)
+		authorized := false
+
+		for _, config := range msg.Config {
+			for _, mesh := range config.Hosts {
+				if mesh.HostGroup == id && mesh.APIKey == apikey {
+					authorized = true
+					break
+				}
+			}
+		}
+		if !authorized {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		c.JSON(http.StatusOK, m)
+		return
 	}
 
 	meshes, err := core.ReadHost2("hostGroup", c.Param("id"))
@@ -220,8 +237,6 @@ func statusHost(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-
-	apikey := c.Request.Header.Get("X-API-KEY")
 
 	authorized := false
 
