@@ -26,6 +26,7 @@
                     :headers="headers"
                     :items="meshes"
                     :search="search"
+                     @click:row="startUpdate"
             >
                 <template v-slot:item.default.address="{ item }">
                     <v-chip
@@ -446,6 +447,7 @@
       listView: true,
       dialogCreate: false,
       dialogUpdate: false,
+      noEdit : false,
       mesh: null,
       panel: 1,
       valid: false,
@@ -530,6 +532,7 @@
       },
 
       remove(mesh) {
+        this.noEdit = true
         if(confirm(`Do you really want to delete ${mesh.meshName}?`)){
             mesh.id = mesh.id
             this.deleteMesh(mesh)
@@ -548,6 +551,11 @@
       },
 
       startUpdate(mesh) {
+        if (this.noEdit == true ) {
+            this.noEdit = false;
+            return
+        }
+
         this.mesh = mesh;
         this.dialogUpdate = true;
       },
