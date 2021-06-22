@@ -432,7 +432,7 @@
                                 <v-text-field
                                         v-model="host.current.presharedKey"
                                         label="Preshared Key"
-                                />
+                                />                           
                                 <v-text-field
                                         v-model="host.hostGroup"
                                         label="Host Group"
@@ -483,33 +483,29 @@
                                />
 
                             </v-col>
-                        </div>
+                         </div>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
-                    <v-spacer/>
-                    <v-row>
-                        <v-col cols="12">
-
-                    <v-btn
-                            :disabled="!valid"
-                            color="success"
-                            @click="update(host)"
-                    >
-                        Submit
-                        <v-icon right dark>mdi-check-outline</v-icon>
-                    </v-btn>
-                    <v-btn
-                            color="primary"
-                            @click="dialogUpdate = false"
-                    >
-                        Cancel
-                        <v-icon right dark>mdi-close-circle-outline</v-icon>
-                    </v-btn>
-                        </v-col>
-                    </v-row>
-
-
+            <v-card>
+                <v-card-actions>
+                        <v-btn
+                                :disabled="!valid"
+                                color="success"
+                                @click="update(host)"
+                        >
+                            Submit
+                            <v-icon right dark>mdi-check-outline</v-icon>
+                        </v-btn>
+                        <v-btn
+                                color="primary"
+                                @click="dialogUpdate = false"
+                        >
+                            Cancel
+                            <v-icon right dark>mdi-close-circle-outline</v-icon>
+                        </v-btn>
+                </v-card-actions>
+            </v-card>
         </v-dialog>
     </v-container>
 </template>

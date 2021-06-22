@@ -411,29 +411,25 @@
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
-                    <v-spacer/>
-                    <v-row>
-                        <v-col cols="12">
-
-                    <v-btn
-                            :disabled="!valid"
-                            color="success"
-                            @click="update(mesh)"
-                    >
-                        Submit
-                        <v-icon right dark>mdi-check-outline</v-icon>
-                    </v-btn>
-                    <v-btn
-                            color="primary"
-                            @click="dialogUpdate = false"
-                    >
-                        Cancel
-                        <v-icon right dark>mdi-close-circle-outline</v-icon>
-                    </v-btn>
-                        </v-col>
-                    </v-row>
-
-
+            <v-card>
+                <v-card-actions>
+                        <v-btn
+                                :disabled="!valid"
+                                color="success"
+                                @click="update(mesh)"
+                        >
+                            Submit
+                            <v-icon right dark>mdi-check-outline</v-icon>
+                        </v-btn>
+                        <v-btn
+                                color="primary"
+                                @click="dialogUpdate = false"
+                        >
+                            Cancel
+                            <v-icon right dark>mdi-close-circle-outline</v-icon>
+                        </v-btn>
+                </v-card-actions>
+            </v-card>
         </v-dialog>
     </v-container>
 </template>
@@ -494,6 +490,17 @@
       ...mapActions('server', {
         readServer: 'read',
       }),
+
+
+      doCopy() {
+            this.$copyText(this.mesh.default.presharedKey).then(function (e) {
+                alert('Copied')
+                console.log(e)
+            }, function (e) {
+                alert('Can not copy')
+                console.log(e)
+            })
+      },
 
       startCreate() {
         this.mesh = {
