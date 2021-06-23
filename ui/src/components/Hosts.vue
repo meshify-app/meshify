@@ -28,8 +28,6 @@
                     :search="search"
                     :items-per-page="25"
                     :footer-props="footerProps"
-                     @click:row="startUpdate"
-
             >
 
                 <template v-slot:item.name="{ item }">
@@ -521,7 +519,6 @@
       listView: true,
       dialogCreate: false,
       dialogUpdate: false,
-      noEdit: false,
       host: null,
       mesh: null,
       panel: 1,
@@ -616,7 +613,6 @@
       },
 
       remove(host) {
-          this.noEdit = true
         if(confirm(`Do you really want to delete ${host.name} ?`)){
           this.deletehost(host)
         }
@@ -634,10 +630,6 @@
       },
 
       startUpdate(host) {
-        if (this.noEdit == true ) {
-            this.noEdit = false;
-            return
-        }
 
         this.host = host;
 
