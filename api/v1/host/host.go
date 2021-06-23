@@ -275,6 +275,8 @@ func statusHost(c *gin.Context) {
 			// They should all match
 			if client.MeshId == msg.Config[i].MeshId {
 				msg.Config[i].Hosts = append(msg.Config[i].Hosts, *client)
+			} else {
+				log.Errorf("internal error")
 			}
 		}
 	}
