@@ -156,7 +156,7 @@ func ReadMeshes(email string) ([]*model.Mesh, error) {
 	results := make([]*model.Mesh, 0)
 
 	for _, account := range accounts {
-		if account.Status != "Pending" {
+		if account.Status == "Active" {
 			meshes := make([]*model.Mesh, 0)
 			meshes = mongo.ReadAllMeshes("accountid", account.Parent)
 			for _, mesh := range meshes {

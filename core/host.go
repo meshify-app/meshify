@@ -261,7 +261,7 @@ func ReadHostsForUser(email string) ([]*model.Host, error) {
 	results := make([]*model.Host, 0)
 
 	for _, account := range accounts {
-		if account.Status != "Pending" {
+		if account.Status == "Active" {
 			hosts, err := mongo.ReadAllHosts("accountid", account.Parent)
 			if err != nil {
 				return nil, err
