@@ -197,6 +197,8 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 		if len(accounts) == 0 {
 			var account model.Account
 			account.Email = user.Email
+			account.Role = "Owner"
+			account.Status = "Active"
 			a, err := core.CreateAccount(&account)
 			log.Infof("CREATE ACCOUNT = %v", a)
 			if err != nil {
