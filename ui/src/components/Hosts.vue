@@ -222,14 +222,6 @@
                                         persistent-hint
                                         required
                                 />
-                                <v-combobox
-                                        v-model="host.tags"
-                                        chips
-                                        hint="Enter a tag, hit tab, hit enter."
-                                        label="Tags"
-                                        multiple
-                                        dark
-                                >
                                 <v-text-field
                                         v-model="host.current.endpoint"
                                         label="Public endpoint for clients"
@@ -240,6 +232,14 @@
                                         label="Listen port"
                                 />
 
+                                <v-combobox
+                                        v-model="host.tags"
+                                        chips
+                                        hint="Enter a tag, hit tab, hit enter."
+                                        label="Tags"
+                                        multiple
+                                        dark
+                                >
                                     <template v-slot:selection="{ attrs, item, select, selected }">
                                         <v-chip
                                                 v-bind="attrs"
@@ -317,6 +317,15 @@
                                         persistent-hint
                                         required
                                 />
+                                <v-text-field
+                                        v-model="host.current.endpoint"
+                                        label="Public endpoint for clients"
+                                />
+                                <v-text-field
+                                        v-model="host.current.listenPort"
+                                        type="number"
+                                        label="Listen port"
+                                />
                                 <v-combobox
                                         v-model="host.tags"
                                         chips
@@ -337,15 +346,6 @@
                                         </v-chip>
                                     </template>
                                 </v-combobox>
-                                <v-text-field
-                                        v-model="host.current.endpoint"
-                                        label="Public endpoint for clients"
-                                />
-                                <v-text-field
-                                        v-model="host.current.listenPort"
-                                        type="number"
-                                        label="Listen port"
-                                />
                             </v-form>
                         </v-col>
                     </v-row>
@@ -357,6 +357,16 @@
                     <v-expansion-panel-content>
                         <div class="d-flex flex-no-wrap justify-space-between">
                             <v-col cols="12">
+                                <v-select return-object
+                                        v-model="platforms.selected"
+                                        :items="platforms.items"
+                                        item-text = "text"
+                                        item-value = "value"
+                                        label="Platform of this host"
+                                        single
+                                        persistent-hint
+                                />
+
                                 <v-combobox
                                         v-model="host.current.address"
                                         chips
@@ -406,6 +416,7 @@
                                     dark
                                 >
                                     <template v-slot:selection="{ attrs, item, select, selected }">
+      
                                         <v-chip
                                                 v-bind="attrs"
                                                 :input-value="selected"
@@ -425,6 +436,11 @@
                                 <v-text-field
                                         v-model="host.current.publicKey"
                                         label="Public key"
+                                        disabled
+                                />
+                                <v-text-field
+                                        v-model="host.current.privateKey"
+                                        label="Private key"
                                         disabled
                                 />
                                 <v-text-field
@@ -524,6 +540,14 @@
       panel: 1,
       valid: false,
       meshList: {},
+      platList: {},
+      platforms: { selected: { text:"", value:"" },
+                   items: [
+                        { text: "Windows", value:"Windows",},
+                        { text: "Linux",  value: "Linux", },
+                        { text: "MacOS" , value:"MacOS", },
+                   ],
+        },
       selected: '',
       search: '',
       headers: [
@@ -608,6 +632,7 @@
       create(host) {
         this.host.meshName = this.meshList.selected.text
         this.host.meshid = this.meshList.selected.value
+        this.host.platform = this.platforms.selected.text
         this.dialogCreate = false;
         this.createhost(host)
       },
@@ -646,6 +671,14 @@
 
         this.meshList.selected = this.meshList.items[selected];
 
+        for (let i=0; i<this.platforms.items.length; i++) {
+            if (this.platforms.items[i].text == this.host.platform) {
+                this.platforms.selected = this.platforms.items[i]
+                break
+            }
+        }
+
+        
         this.dialogUpdate = true;
 
       },
@@ -671,6 +704,7 @@
             changed = true;
         }
         this.host.meshName = this.meshList.selected.text
+        this.host.platform = this.platforms.selected.text
 
         if (changed) {
             for (let i=0; i<this.meshes.length; i++) {
