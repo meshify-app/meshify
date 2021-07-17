@@ -115,7 +115,13 @@
                                         tile
                                         size="150"
                                 >
-<!--                                    <v-img :src="'data:image/png;base64, ' + gethostQrcode(host.id)"/> -->
+                                <v-btn
+                                        color="success"
+                                        @click="forceFileDownload(host)"
+                                >
+                                    Download Config
+                                    <v-icon right dark>mdi-cloud-download-outline</v-icon>
+                                </v-btn>
                                 </v-list-item-avatar>
                             </v-list-item>
 
@@ -155,7 +161,6 @@
                                     </template>
                                     <span>Edit</span>
                                 </v-tooltip>
-
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on }">
                                         <v-btn
@@ -346,6 +351,14 @@
                                         </v-chip>
                                     </template>
                                 </v-combobox>
+                                <v-btn
+                                        color="success"
+                                        @click="forceFileDownload(host)"
+                                >
+                                    Download Config
+                                    <v-icon right dark>mdi-cloud-download-outline</v-icon>
+                                </v-btn>
+<!--                                <v-img :src="'data:image/png;base64, ' + gethostQrcode(host.id)"/> -->
                             </v-form>
                         </v-col>
                     </v-row>
@@ -586,6 +599,8 @@
       ...mapActions('host', {
         errorhost: 'error',
         readAllHosts: 'readAll',
+        readQrCode: 'readQrcode',
+        readConfig: 'readConfig',
         createhost: 'create',
         updatehost: 'update',
         deletehost: 'delete',
@@ -657,6 +672,8 @@
       startUpdate(host) {
 
         this.host = host;
+//        this.readQrCode(this.host);
+        this.readConfig(host);
 
         this.meshList = { selected: { "text": this.host.meshName,  "value": this.host.meshid },
                           items: [] }
@@ -778,7 +795,7 @@
         const url = window.URL.createObjectURL(new Blob([config]))
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', host.name.split(' ').join('-') + '.conf') //or any other extension
+        link.setAttribute('download', host.name.split(' ').join('-') + '-' + host.meshName.split(' ').join('-') + '.conf') //or any other extension
         document.body.appendChild(link)
         link.click()
       },

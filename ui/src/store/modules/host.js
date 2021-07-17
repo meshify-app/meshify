@@ -15,10 +15,10 @@ const getters = {
     return state.hosts;
   },
   gethostQrcode: (state) => (id) => {
-//    let item = state.hostQrcodes.find(item => item.id === id)
+    let item = state.hostQrcodes.find(item => item.id === id)
     // initial load fails, must wait promise and stuff...
-//    return item ? item.qrcode : "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
-    return "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    return item ? item.qrcode : "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFhAJ/wlseKgAAAABJRU5ErkJggg=="
+//    return "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
   },
   gethostConfig: (state) => (id) => {
     let item = state.hostConfigs.find(item => item.id === id)
@@ -59,7 +59,7 @@ const actions = {
     ApiService.patch(`/host/${host.id}`, host)
       .then(resp => {
 //        dispatch('readQrcode', resp)
-//        dispatch('readConfig', resp)
+//        dispatch('readConfig', host.id)
         commit('update', resp)
       })
       .catch(err => {
@@ -87,14 +87,14 @@ const actions = {
   },
 
   readQrcode({ state, commit }, host){
-/*    ApiService.getWithConfig(`/host/${host.id}/config?qrcode=true&alan=false`, {responseType: 'arraybuffer'})
+    ApiService.getWithConfig(`/host/${host.id}/config?qrcode=true`, {responseType: 'arraybuffer'})
       .then(resp => {
         let image = Buffer.from(resp, 'binary').toString('base64')
         commit('hostQrcodes', { host, image })
       })
       .catch(err => {
         commit('error', err)
-      })*/
+      })
   },
 
   readConfig({ state, commit }, host){
@@ -109,7 +109,7 @@ const actions = {
 
   readQrcodes({ state, dispatch }){
     state.hosts.forEach(host => {
-//      dispatch('readQrcode', host)
+      dispatch('readQrcode', host)
     })
   },
 

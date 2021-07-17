@@ -4,8 +4,9 @@
             <v-card-title>
                 Join
             </v-card-title>
-            <p>Joining {{ $route.params.id }}</p>
-            <p>{{ this.result }}</p>
+        </v-card>
+        <v-card>
+            <p>Joining {{ $id }}</p>
         </v-card>
     </v-container>
 </template>
@@ -18,6 +19,7 @@
     data: () => ({
       result : "",
       panel: 1,
+      id: "",
       valid: false,
       search: '',
     }),
@@ -31,7 +33,8 @@
     },
 
     mounted () {
-        this.result = this.activate(this.$route.query.id)
+      this.id = this.$route.query.id
+      this.result = this.activate(this.$route.query.id)
     },
 
     methods: {

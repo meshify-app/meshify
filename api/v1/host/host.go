@@ -2,19 +2,18 @@ package client
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	auth "github.com/meshify-app/meshify/auth"
 	core "github.com/meshify-app/meshify/core"
 	model "github.com/meshify-app/meshify/model"
 	util "github.com/meshify-app/meshify/util"
-	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
+	"github.com/skip2/go-qrcode"
 	"golang.org/x/oauth2"
 )
 
-var statusCache *cache.Cache
+//var statusCache *cache.Cache
 
 // ApplyRoutes applies router to gin Router
 func ApplyRoutes(r *gin.RouterGroup) {
@@ -31,7 +30,7 @@ func ApplyRoutes(r *gin.RouterGroup) {
 		g.GET("/:id/email", emailHost)
 	}
 
-	statusCache = cache.New(1*time.Minute, 10*time.Minute)
+	//	statusCache = cache.New(1*time.Minute, 10*time.Minute)
 }
 
 func createHost(c *gin.Context) {
@@ -199,7 +198,7 @@ func readHosts(c *gin.Context) {
 
 func statusHost(c *gin.Context) {
 
-	id := c.Param("id")
+	//	id := c.Param("id")
 	if c.Param("id") == "" {
 		log.Error("hostgroup cannot be empty")
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -207,27 +206,29 @@ func statusHost(c *gin.Context) {
 
 	apikey := c.Request.Header.Get("X-API-KEY")
 
-	m, _ := statusCache.Get(id)
-	if m != nil {
-		msg := m.(model.Message)
-		authorized := false
+	/*
+		m, _ := statusCache.Get(id)
+		if m != nil {
+			msg := m.(model.Message)
+			authorized := false
 
-		for _, config := range msg.Config {
-			for _, mesh := range config.Hosts {
-				if mesh.HostGroup == id && mesh.APIKey == apikey {
-					authorized = true
-					break
+			for _, config := range msg.Config {
+				for _, mesh := range config.Hosts {
+					if mesh.HostGroup == id && mesh.APIKey == apikey {
+						authorized = true
+						break
+					}
 				}
 			}
-		}
-		if !authorized {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			if !authorized {
+				c.AbortWithStatus(http.StatusUnauthorized)
+				return
+			}
+
+			c.JSON(http.StatusOK, m)
 			return
 		}
-
-		c.JSON(http.StatusOK, m)
-		return
-	}
+	*/
 
 	meshes, err := core.ReadHost2("hostGroup", c.Param("id"))
 	if err != nil {
@@ -282,38 +283,38 @@ func statusHost(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, msg)
-	statusCache.Set(id, msg, 0)
+	//	statusCache.Set(id, msg, 0)
 }
 
 func configHost(c *gin.Context) {
-	configData, err := core.ReadHost2("id", c.Param("id"))
+
+	formatQr := c.DefaultQuery("qrcode", "false")
+	data, err := core.ReadHostConfig(c.Param("id"))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
-		}).Error("failed to read client config")
+		}).Error("failed to read host config")
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+	sdata := string(data)
+
+	if formatQr == "false" {
+		// return config as txt file
+		c.Header("Content-Disposition", "attachment; filename=meshify.conf")
+		c.Data(http.StatusOK, "application/config", data)
+		return
+	}
+	// return config as png qrcode
+	png, err := qrcode.Encode(sdata, qrcode.Medium, 250)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to create qrcode")
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-
-	c.JSON(http.StatusOK, configData)
-
-	/*	formatQr := c.DefaultQuery("qrcode", "false")
-		if formatQr == "false" {
-			// return config as txt file
-			c.Header("Content-Disposition", "attachment; filename=wg0.conf")
-			c.Data(http.StatusOK, "application/config", configData)
-			return
-		}
-		// return config as png qrcode
-		png, err := qrcode.Encode(string(configData), qrcode.Medium, 250)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"err": err,
-			}).Error("failed to create qrcode")
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
-		c.Data(http.StatusOK, "image/png", png)*/
+	c.Data(http.StatusOK, "image/png", png)
 
 	return
 }

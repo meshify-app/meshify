@@ -234,8 +234,6 @@ func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
 func DeleteHost(id string) error {
 
 	err := mongo.DeleteHost(id, "hosts")
-	//	path := filepath.Join(os.Getenv("WG_CONF_DIR"), id)
-	//	err := os.Remove(path)
 	if err != nil {
 		return err
 	}
@@ -277,22 +275,48 @@ func ReadHostsForUser(email string) ([]*model.Host, error) {
 
 // ReadHostConfig in wg format
 func ReadHostConfig(id string) ([]byte, error) {
+
 	host, err := ReadHost(id)
 	if err != nil {
 		return nil, err
 	}
-
-	server, err := ReadServer()
+	hosts, err := ReadHost2("meshid", host.MeshId)
 	if err != nil {
 		return nil, err
 	}
 
-	configDataWg, err := template.DumpClientWg(host, server)
-	if err != nil {
-		return nil, err
+	index := 0
+	for j := 0; j < len(hosts); j++ {
+		if hosts[j].Id == id {
+			index = j
+			break
+		}
 	}
 
-	return configDataWg, nil
+	if index == -1 {
+		log.Errorf("Error reading Mesh: %v", hosts)
+	} else {
+		host := hosts[index]
+		hosts = append(hosts[:index], hosts[index+1:]...)
+
+		for i := 0; i < len(hosts); i++ {
+			// if the current host doesn't have an endpoint specified it is a client, so it does not
+			// need the public keys of other clients since they can't connect to each other.  If there
+			// is an endpoint specified, keep all the clients in the config.
+			if host.Current.Endpoint == "" && hosts[i].Current.Endpoint == "" {
+				hosts = append(hosts[:i], hosts[i+1:]...)
+				i--
+			}
+		}
+
+		config, err := template.DumpWireguardConfig(host, hosts)
+		if err != nil {
+			return nil, err
+		}
+
+		return config, nil
+	}
+	return nil, err
 }
 
 // EmailHost send email to host
