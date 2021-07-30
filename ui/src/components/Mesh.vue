@@ -187,6 +187,18 @@
                                     v-model="mesh.description"
                                     label="Description"
                                 />
+                                <v-select return-object
+                                        v-model="acntList.selected"
+                                        :items="acntList.items"
+                                        item-text = "text"
+                                        item-value = "value"
+                                        label="For this account"
+                                        :rules="[ v => !!v || 'Account is required', ]"
+                                        single
+                                        persistent-hint
+                                        required
+                                />
+
 
                                 <v-combobox
                                         v-model="mesh.default.address"
@@ -330,6 +342,8 @@
                                         v-model="mesh.default.presharedKey"
                                         label="Preshared Key"
                                 />
+
+
                                 <v-combobox
                                     v-model="mesh.default.dns"
                                     chips
@@ -440,6 +454,7 @@
     name: 'Meshes',
 
     data: () => ({
+      acntList : {},
       listView: true,
       dialogCreate: false,
       dialogUpdate: false,
@@ -473,7 +488,7 @@
     },
 
     mounted () {
-//        this.ReadAllAccounts(this.user.email)
+      this.readAllAccounts(this.user.email)
       this.readAllMeshes()
 //      this.readServer()
     },
@@ -490,6 +505,10 @@
       ...mapActions('server', {
         readServer: 'read',
       }),
+      ...mapActions('account', {
+          readAllAccounts: 'readAll',
+      }),
+
 
 
       doCopy() {
@@ -510,6 +529,7 @@
           meshName: "",
           id: "",
           tags: [],
+          accountid : ""
 
         }
         this.mesh.default = {
@@ -518,6 +538,19 @@
           enableDns: true,
           upnp : true,
         }
+        this.acntList = { selected: { "text": "",  "value": ""},
+                          items: [] }
+
+        var selected = 0;
+        for (let i=0; i<this.accounts.length; i++) {
+            this.acntList.items[i]= { "text": this.accounts[i].accountName + " - " + this.accounts[i].parent, "value": this.accounts[i].parent }
+            if (this.acntList.items[i].value == this.mesh.accountid) {
+                selected = i
+            }
+        }
+
+        this.acntList.selected = this.acntList.items[selected];
+
         this.dialogCreate = true;
       },
 
@@ -533,7 +566,7 @@
             return
           }
         }
-        mesh.accountid = this.accounts[0].id
+        this.mesh.accountid = this.acntList.selected.value
         this.dialogCreate = false;
         this.createMesh(mesh)
       },
