@@ -6,7 +6,7 @@
             </v-card-title>
         </v-card>
         <v-card>
-            <p>Joining {{ $id }}</p>
+            <p>Joining {{ $route.query.id }}</p>
         </v-card>
     </v-container>
 </template>
