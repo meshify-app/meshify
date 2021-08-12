@@ -645,6 +645,7 @@
       },
 
       create(host) {
+        this.host.current.listenPort = parseInt(this.host.current.listenPort, 10); 
         this.host.meshName = this.meshList.selected.text
         this.host.meshid = this.meshList.selected.value
         this.host.platform = this.platforms.selected.text

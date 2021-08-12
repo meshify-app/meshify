@@ -41,12 +41,14 @@
                 </template>
                 <template v-slot:item.action="{ item }">
                     <v-row>
+<!--
                         <v-icon
                                 class="pr-1 pl-1"
                                 @click.stop="startUpdate(item)"
                         >
                             mdi-account-switch
                         </v-icon>
+-->
                         <v-icon
                                 class="pr-1 pl-1"
                                 @click.stop="startUpdate(item)"
@@ -156,12 +158,13 @@
                 </template>
                 <template v-slot:item.action="{ item }">
                     <v-row>
-                        <v-icon
+<!--                        <v-icon
                                 class="pr-1 pl-1"
                                 @click.stop="startUpdate(item)"
                         >
                             mdi-account-switch
                         </v-icon>
+-->
                         <v-icon
                                 class="pr-1 pl-1"
                                 @click.stop="startUpdate(item)"
