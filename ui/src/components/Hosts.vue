@@ -755,6 +755,7 @@
                     }
                     this.host.default = this.meshes[i].default
                 } 
+            host.current.preshareKey = this.host.default.preshareKey
             }
         }
 
