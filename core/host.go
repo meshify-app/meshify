@@ -40,7 +40,10 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	for _, mesh := range meshes {
 		if mesh.MeshName == host.MeshName {
 			host.Default = mesh.Default
+			current := host.Current
 			host.Current = mesh.Default
+			host.Current.ListenPort = current.ListenPort
+			host.Current.Endpoint = current.Endpoint
 			host.MeshId = mesh.Id
 			host.AccountId = mesh.AccountId
 		}

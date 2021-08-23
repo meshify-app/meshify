@@ -559,6 +559,8 @@
                         { text: "Windows", value:"Windows",},
                         { text: "Linux",  value: "Linux", },
                         { text: "MacOS" , value:"MacOS", },
+                        { text: "Apple iOS" , value:"Apple iOS", },
+                        { text: "Android" , value:"Android", },
                    ],
         },
       selected: '',
