@@ -412,7 +412,7 @@
       inDelete: false,
       toAddress: "",
       roles : ["Owner", "Admin", "User"],
-      statuses : ["Active", "Pending", "Suspended"],
+      statuses : ["Active", "Pending", "Suspended", "Hidden"],
       user: null,
       panel: 1,
       valid: false,
