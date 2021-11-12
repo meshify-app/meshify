@@ -276,10 +276,11 @@ func statusHost(c *gin.Context) {
 		for _, client := range clients {
 			// They should all match
 			if client.MeshId == msg.Config[i].MeshId {
-				// If this config isn't explicitly for this host, remove the private
-				// key from the results
+				// If this config isn't explicitly for this host, remove the private key
+				// and api key from the results
 				if client.HostGroup != hostGroup {
 					client.Current.PrivateKey = ""
+					client.APIKey = ""
 				}
 				msg.Config[i].Hosts = append(msg.Config[i].Hosts, *client)
 			} else {
