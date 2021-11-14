@@ -101,6 +101,10 @@ func readHost(c *gin.Context) {
 func updateHost(c *gin.Context) {
 	var data model.Host
 	id := c.Param("id")
+	if id == "" {
+		log.Error("hostid cannot be empty")
+		c.AbortWithStatus(http.StatusInternalServerError)
+	}
 
 	if err := c.ShouldBindJSON(&data); err != nil {
 		log.WithFields(log.Fields{
@@ -110,25 +114,50 @@ func updateHost(c *gin.Context) {
 		return
 	}
 
-	// get update user from token and add to client infos
-	oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)
-	oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
-	user, err := oauth2Client.UserInfo(oauth2Token)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"oauth2Token": oauth2Token,
-			"err":         err,
-		}).Error("failed to get user with oauth token")
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
+	apikey := c.Request.Header.Get("X-API-KEY")
+
+	if apikey != "" {
+
+		host, err := core.ReadHost(id)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("failed to read client config")
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		authorized := false
+
+		if host.APIKey == apikey {
+			authorized = true
+		}
+
+		if !authorized {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+	} else {
+		// get update user from token and add to client infos
+		oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)
+		oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
+		user, err := oauth2Client.UserInfo(oauth2Token)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"oauth2Token": oauth2Token,
+				"err":         err,
+			}).Error("failed to get user with oauth token")
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		data.UpdatedBy = user.Name
 	}
-	data.UpdatedBy = user.Name
 
 	client, err := core.UpdateHost(id, &data)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
-		}).Error("failed to update client")
+		}).Error("failed to update host")
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
