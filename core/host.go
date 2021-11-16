@@ -215,9 +215,6 @@ func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
 		return nil, errors.New("failed to validate host")
 	}
 
-	// keep keys
-	host.Current.PrivateKey = current.Current.PrivateKey
-	host.Current.PublicKey = current.Current.PublicKey
 	host.Updated = time.Now().UTC()
 
 	err = mongo.Serialize(host.Id, "id", "hosts", host)
@@ -269,9 +266,8 @@ func ReadHostsForUser(email string) ([]*model.Host, error) {
 			if err != nil {
 				return nil, err
 			}
-			for _, host := range hosts {
-				results = append(results, host)
-			}
+
+			results = append(results, hosts...)
 		}
 	}
 

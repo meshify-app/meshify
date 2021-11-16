@@ -454,11 +454,18 @@
                                 <v-text-field
                                         v-model="host.current.privateKey"
                                         label="Private key"
-                                        disabled
+                                        :append-icon="showPrivate ? 'mdi-eye' : 'mdi-eye-off'"
+                                        :type="showPrivate ? 'text' : 'password'"
+                                        hint="Clear this field to have the client manage its private key"
+                                        @click:append="showPrivate = !showPrivate"
+
                                 />
                                 <v-text-field
                                         v-model="host.current.presharedKey"
                                         label="Preshared Key"
+                                        :append-icon="showPreshared ? 'mdi-eye' : 'mdi-eye-off'"
+                                        :type="showPreshared ? 'text' : 'password'"
+                                        @click:append="showPreshared = !showPreshared"
                                 />                           
                                 <v-text-field
                                         v-model="host.hostGroup"
@@ -544,6 +551,8 @@
 
     data: () => ({
     
+      showPrivate: false,
+      showPreshared: false,
       footerProps: {'items-per-page-options': [25, 50, 100, -1]},
       listView: true,
       dialogCreate: false,
