@@ -552,8 +552,8 @@
 
     data: () => ({
     
-      showPrivate: false,
-      showPreshared: false,
+      showPrivate: true,
+      showPreshared: true,
       footerProps: {'items-per-page-options': [25, 50, 100, -1]},
       listView: true,
       dialogCreate: false,
