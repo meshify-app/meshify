@@ -449,11 +449,11 @@
                                 <v-text-field
                                         v-model="host.current.publicKey"
                                         label="Public key"
-                                        disabled
                                 />
                                 <v-text-field
                                         v-model="host.current.privateKey"
                                         label="Private key"
+                                        autocomplete="off"
                                         :append-icon="showPrivate ? 'mdi-eye' : 'mdi-eye-off'"
                                         :type="showPrivate ? 'text' : 'password'"
                                         hint="Clear this field to have the client manage its private key"
@@ -463,6 +463,7 @@
                                 <v-text-field
                                         v-model="host.current.presharedKey"
                                         label="Preshared Key"
+                                        autocomplete="off"
                                         :append-icon="showPreshared ? 'mdi-eye' : 'mdi-eye-off'"
                                         :type="showPreshared ? 'text' : 'password'"
                                         @click:append="showPreshared = !showPreshared"
