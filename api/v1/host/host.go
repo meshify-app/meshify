@@ -1,6 +1,9 @@
 package client
 
 import (
+	"crypto/md5"
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -235,6 +238,7 @@ func statusHost(c *gin.Context) {
 	hostGroup := c.Param("id")
 
 	apikey := c.Request.Header.Get("X-API-KEY")
+	etag := c.Request.Header.Get("If-None-Match")
 
 	/*
 		m, _ := statusCache.Get(id)
@@ -317,8 +321,18 @@ func statusHost(c *gin.Context) {
 			}
 		}
 	}
+	bytes, err := json.Marshal(msg)
+	if err != nil {
+		log.Errorf("cannot marshal msg %v", err)
+	}
+	md5 := fmt.Sprintf("%x", md5.Sum(bytes))
+	if md5 == etag {
+		c.AbortWithStatus(http.StatusNotModified)
+	} else {
+		c.Header("ETag", md5)
+		c.JSON(http.StatusOK, msg)
+	}
 
-	c.JSON(http.StatusOK, msg)
 	//	statusCache.Set(id, msg, 0)
 }
 
