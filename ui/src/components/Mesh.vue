@@ -21,12 +21,13 @@
                     <img class="ml-1" :src="require('../assets/meshify-bw.png')" height="32" width="32" alt="meshify"/>
                 </v-btn>
             </v-card-title>
+            <d3-network class="network" :net-nodes="nodes" :net-links="links" :options="options" />
             <v-data-table
                     v-if="listView"
                     :headers="headers"
                     :items="meshes"
                     :search="search"
-                     @click:row="startUpdate"
+                     @click:row="loadNetwork"
             >
                 <template v-slot:item.default.address="{ item }">
                     <v-chip
@@ -447,7 +448,21 @@
         </v-dialog>
     </v-container>
 </template>
+
+<!-- <style src="vue-d3-network/dist/vue-d3-network.css"></style> -->
+<style>
+text { font-size:12px; color:white; fill:white; }
+.node { fill:gray; stroke:darkgray }
+.link { color: white;}
+.net-svg { margin: 0 auto; }
+.network { display: flex; justify-content: center;}
+</style>
 <script>
+
+
+var D3Network = window['vue-d3-network']
+
+
   import { mapActions, mapGetters } from 'vuex'
 
   export default {
@@ -465,9 +480,6 @@
       search: '',
       headers: [
         { text: 'Name', value: 'meshName', },
-//        { text: 'ID', value:'id', },
-//        { text: 'Email', value: 'email', },
-//        { text: "Endpoint", value: 'endpoint', },
         { text: 'Description', value:'description'},
         { text: 'IP address pool', value: 'default.address', },
         { text: 'Created', value: 'created', sortable: false, },
@@ -475,6 +487,14 @@
         { text: 'Actions', value: 'action', sortable: false, },
 
       ],
+      nodes: [
+      ],
+      links: [
+      ],
+      nodeSize:50,
+      canvas:false,
+
+
     }),
 
     computed:{
@@ -482,18 +502,33 @@
         user: 'auth/user',
         server: 'server/server',
         meshes: 'mesh/meshes',
+        hosts: 'host/hosts',
         accounts: 'account/accounts',
 
       }),
+      options(){
+      return{
+        force: 4000,
+        size:{ w:800, h:400},
+        nodeSize: this.nodeSize,
+        nodeLabels: true,
+        linkLabels:true,
+        canvas: this.canvas
+      }
+    }
+
     },
 
     mounted () {
       this.readAllAccounts(this.user.email)
       this.readAllMeshes()
-//      this.readServer()
+      this.readAllHosts()
     },
 
     methods: {
+        ...mapActions('host', {
+        readAllHosts: 'readAll',
+      }),
       ...mapActions('mesh', {
         errorMesh: 'error',
         readAllMeshes: 'readAll',
@@ -510,6 +545,29 @@
       }),
 
 
+      loadNetwork(mesh) {
+          let name = mesh.meshName
+          let x = 0
+          let l = 0
+          this.links = []
+          this.nodes = []
+          let mesh_hosts = []
+          for (let i=0; i<this.hosts.length; i++) {
+              if (this.hosts[i].meshName == name) {
+                    mesh_hosts[x] = this.hosts[i]
+                    this.nodes[x] = { id: x, name: this.hosts[i].name, /* _color:'gray'*/}
+                    x++
+              }
+          }
+          for (let i=0; i<mesh_hosts.length; i++) {
+              for (let j=0; j<mesh_hosts.length; j++) {
+                  if (i != j && mesh_hosts[j].current.endpoint != "") {
+                      this.links[l] = { sid: i, tid: j, _color: "white"}
+                      l++
+                  }
+              }
+          }
+        },
 
       doCopy() {
             this.$copyText(this.mesh.default.presharedKey).then(function (e) {
