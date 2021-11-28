@@ -509,7 +509,7 @@ var D3Network = window['vue-d3-network']
       options(){
       return{
         force: 4000,
-        size:{ w:800, h:400},
+        size:{ w:400, h:400},
         nodeSize: this.nodeSize,
         nodeLabels: true,
         linkLabels:true,
