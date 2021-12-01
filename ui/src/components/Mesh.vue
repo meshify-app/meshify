@@ -452,7 +452,7 @@
 <!-- <style src="vue-d3-network/dist/vue-d3-network.css"></style> -->
 <style>
 text { font-size:12px; color:white; fill:white; }
-.node { fill:gray; stroke:darkgray }
+.node { fill:#336699; stroke:#5b81a7; }
 .link { color: white;}
 .net-svg { margin: 0 auto; }
 .network { display: flex; justify-content: center;}
