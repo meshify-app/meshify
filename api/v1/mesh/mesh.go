@@ -149,6 +149,11 @@ func readMeshes(c *gin.Context) {
 		return
 	}
 
+	if user.Email == "" {
+		log.Error("security alert: Email empty on authenticated token")
+		c.AbortWithStatus(http.StatusForbidden)
+	}
+
 	meshes, err := core.ReadMeshes(user.Email)
 	if err != nil {
 		log.WithFields(log.Fields{

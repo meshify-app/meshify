@@ -216,6 +216,10 @@ func readHosts(c *gin.Context) {
 		return
 	}
 
+	if user.Email == "" {
+		log.Error("security alert: Email empty on authenticated token")
+		c.AbortWithStatus(http.StatusForbidden)
+	}
 	clients, err := core.ReadHostsForUser(user.Email)
 	if err != nil {
 		log.WithFields(log.Fields{
