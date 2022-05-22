@@ -1,7 +1,6 @@
 <template>
   <v-app id="inspire">
     <Notification v-bind:notification="notification"/>
-    <div v-if="this.isAuthenticated">
       <Header/>
 
         <v-container>
@@ -9,7 +8,6 @@
         </v-container>
 
       <Footer/>
-    </div>
   </v-app>
 </template>
 
@@ -58,7 +56,10 @@
           state: this.$route.query.state
         })
       } else {
-        this.oauth2_url()
+        console.log("this.$route.path = %s", this.$route.path);
+        if (this.$route.path != "/join") {
+          this.oauth2_url()
+        }
       }
     },
 

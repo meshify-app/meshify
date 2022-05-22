@@ -7,6 +7,7 @@
         </v-card>
         <v-card>
             <p>Joining {{ $route.query.id }}</p>
+            <p>Click <a href="/hosts">here</a> to manage your meshes</p>
         </v-card>
     </v-container>
 </template>
@@ -26,7 +27,6 @@
 
     computed:{
       ...mapGetters({
-        user: 'auth/user',
         accounts: 'account/accounts',
 
       }),

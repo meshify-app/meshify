@@ -135,5 +135,7 @@ func ActivateAccount(id string) (string, error) {
 		return "Error", err
 	}
 
+	log.Infof("Account Activated: %s %s", a.Email, id)
+
 	return "Account activated.", nil
 }

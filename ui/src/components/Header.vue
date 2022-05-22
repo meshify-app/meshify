@@ -5,7 +5,6 @@
             <v-toolbar-title to="/">meshify.app</v-toolbar-title>
 
             <v-spacer />
-
             <v-toolbar-items>
                 <v-btn to="/mesh" right>
                     Meshes
@@ -19,25 +18,19 @@
                     Account
                     <v-icon right dark>mdi-account-group</v-icon>
                 </v-btn>
-<!--                <v-btn to="/server">
-                    Server
-                    <v-icon right dark>mdi-vpn</v-icon>
-                </v-btn> -->
             </v-toolbar-items>
 
             <v-menu
                     left
                     bottom
             >
-
                 <template v-slot:activator="{ on }">
                     <v-btn icon v-on="on">
                         <v-avatar size="36">
-                            <img alt="user.name" :src="user.picture"/>
+                            <img :src="user.picture"/>
                         </v-avatar>
                     </v-btn>
                 </template>
-
                 <v-card
                         class="mx-auto"
                         max-width="344"
@@ -59,7 +52,7 @@
                     </v-list-item>
                     <v-card-actions>
                         <v-btn small
-                                v-on:click="logout()"
+                                v-on:click="mylogout"
                         >
                             logout
                             <v-icon small right dark>mdi-logout</v-icon>
@@ -81,6 +74,7 @@
     computed:{
       ...mapGetters({
         user: 'auth/user',
+        isAuthenticated: 'auth/isAuthenticated',
       }),
     },
 
@@ -88,6 +82,10 @@
       ...mapActions('auth', {
         logout: 'logout',
       }),
-    }
+      mylogout() {
+        this.logout();
+        window.location.href = "https://auth.meshify.app/v2/logout?client_id=Boc4FHUn6armCu7O5PCQxRwXV13Ebqae&returnTo=https:/my.meshify.app";
+      }
+    },
   }
 </script>
