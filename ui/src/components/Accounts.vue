@@ -621,7 +621,9 @@
 
       remove(user) {
         this.inDelete = true;
-        if(confirm(`Do you really want to delete ${user.name} ?`)){
+        if (user.role == "Owner") {
+            alert("You cannot delete owners")
+        } else if (confirm(`Do you really want to delete ${user.name} ?`)){
           this.deleteUser(user)
         }
       },
