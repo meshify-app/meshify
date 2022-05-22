@@ -47,7 +47,6 @@
                             <v-list-item-subtitle>Email: {{user.email}}</v-list-item-subtitle>
                             <v-list-item-subtitle>Issuer: {{user.issuer}}</v-list-item-subtitle>
                             <v-list-item-subtitle>Issued at: {{ user.issuedAt | formatDate }}</v-list-item-subtitle>
-                            <v-list-item-subtitle>Plan: {{user.plan}}</v-list-item-subtitle>
                         </v-list-item-content>
                     </v-list-item>
                     <v-card-actions>
