@@ -99,8 +99,10 @@ func oauth2Exchange(c *gin.Context) {
 		return
 	}
 
-	cacheDb.Delete(loginVals.ClientId)
-	cacheDb.Set(oauth2Token.AccessToken, oauth2Token, cache.DefaultExpiration)
+	// normally we should delete this, but frankly it causes more errors on the website to do that.
+	// Let it be expired out of the cache instead of deleting it.
+	// cacheDb.Delete(loginVals.ClientId)
+	cacheDb.Set(oauth2Token.AccessToken, oauth2Token, 4*time.Hour)
 
 	c.JSON(http.StatusOK, oauth2Token.AccessToken)
 }

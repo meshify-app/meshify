@@ -771,7 +771,6 @@
             }
         }
 
-/*
         // check allowed IPs
         if (host.current.allowedIPs.length < 1) {
           this.errorhost('Please provide at least one valid CIDR address for host allowed IPs');
@@ -794,7 +793,6 @@
             return
           }
         }
-        */
         // all good, submit
         this.dialogUpdate = false;
         this.updatehost(host)

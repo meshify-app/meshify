@@ -18,6 +18,7 @@ func ApplyRoutes(r *gin.RouterGroup) {
 
 		g.POST("/:id", createAccount)
 		g.POST("/:id/activate", activateAccount)
+		g.PATCH("/:id/activate", activateAccount)
 		g.GET("/:id", readAllAccounts)
 		g.PATCH("/:id", updateAccount)
 		g.DELETE("/:id", deleteAccount)
