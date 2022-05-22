@@ -84,7 +84,7 @@
       }),
       mylogout() {
         this.logout();
-        window.location.href = "https://auth.meshify.app/v2/logout?client_id=Boc4FHUn6armCu7O5PCQxRwXV13Ebqae&returnTo=https:/my.meshify.app";
+        window.location.href = "https://auth.meshify.app/v2/logout?client_id=Boc4FHUn6armCu7O5PCQxRwXV13Ebqae&returnTo=https://my.meshify.app";
       }
     },
   }
