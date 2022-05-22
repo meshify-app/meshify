@@ -311,6 +311,12 @@
                                         required
                                 />
                                 <v-text-field
+                                        v-model="account.name"
+                                        label="Name"
+                                        :rules="[ v => !!v || 'Name is required',]"
+                                        required
+                                />
+                                <v-text-field
                                         v-model="toAddress"
                                         label="Enter the email address of user you'd like to invite"
                                         :rules="[ v => !!v || 'Email address is required', ]"
@@ -440,7 +446,7 @@
                                 <v-text-field
                                         v-model="member.name"
                                         label="Name"
-                                        :rules="[ v => !!v || 'User name is required',]"
+                                        :rules="[ v => !!v || 'Name is required',]"
                                         required
                                 />
                                 <v-select return-object
@@ -653,6 +659,9 @@
       updateMember(member) {
 
         this.dialogMember = false;
+        this.member.meshName = this.meshList.selected.text;
+        this.member.meshId = this.meshList.selected.value;
+
         this.updateAccount(member)
       },      
 
