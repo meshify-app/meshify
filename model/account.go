@@ -10,6 +10,8 @@ import (
 type Account struct {
 	Id          string    `json:"id"          bson:"id"`
 	Parent      string    `json:"parent"      bson:"parent"`
+	MeshId      string    `json:"meshId"      bson:"meshId"`
+	MeshName    string    `json:"meshName"    bson:"meshName"`
 	Name        string    `json:"name"        bson:"name"`
 	Email       string    `json:"email"       bson:"email"`
 	Role        string    `json:"role"        bson:"role"`

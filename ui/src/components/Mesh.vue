@@ -204,7 +204,7 @@
                                 <v-combobox
                                         v-model="mesh.default.address"
                                         :items="mesh.default.address"
-                                        label="IP subnet for this mesh"
+                                        label="IP subnet for this mesh (ex. 10.10.10.0/24)"
                                         :rules="[ v => !!v || 'Network is required', ]"
                                         multiple
                                         chips

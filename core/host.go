@@ -262,12 +262,22 @@ func ReadHostsForUser(email string) ([]*model.Host, error) {
 
 	for _, account := range accounts {
 		if account.Status == "Active" {
-			hosts, err := mongo.ReadAllHosts("accountid", account.Parent)
-			if err != nil {
-				return nil, err
+
+			if account.MeshId != "" {
+				hosts, err := mongo.ReadAllHosts("meshid", account.MeshId)
+				if err != nil {
+					return nil, err
+				}
+				results = append(results, hosts...)
+
+			} else {
+				hosts, err := mongo.ReadAllHosts("accountid", account.Parent)
+				if err != nil {
+					return nil, err
+				}
+				results = append(results, hosts...)
 			}
 
-			results = append(results, hosts...)
 		}
 	}
 

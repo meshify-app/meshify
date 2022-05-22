@@ -192,6 +192,7 @@ func emailUser(c *gin.Context) {
 
 	id := c.Param("id")
 	account := c.Param("account")
+	mesh := c.Param("meshId")
 
 	p, err := core.ReadAllAccounts(account)
 	if err != nil {
@@ -208,6 +209,7 @@ func emailUser(c *gin.Context) {
 	var a model.Account
 	a.Email = id
 	a.Parent = account
+	a.MeshId = mesh
 	a.Role = "User"
 	a.Status = "Pending"
 	a.Created = time.Now()
@@ -216,9 +218,9 @@ func emailUser(c *gin.Context) {
 
 	pa, err := core.CreateAccount(&a)
 
-	log.Infof("emailUser account = %v", pa)
+	log.Infof("emailUser account = %v %v %v", pa, a.MeshId, err)
 
-	err = core.EmailUser(id, pa.Id)
+	err = core.EmailUser(id, pa.Id, a.MeshId)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,

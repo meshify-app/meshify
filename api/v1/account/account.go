@@ -1,6 +1,8 @@
 package account
 
 import (
+	"bytes"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +18,7 @@ func ApplyRoutes(r *gin.RouterGroup) {
 	g := r.Group("/accounts")
 	{
 
-		g.POST("/:id", createAccount)
+		g.POST("/", createAccount)
 		g.POST("/:id/activate", activateAccount)
 		g.PATCH("/:id/activate", activateAccount)
 		g.GET("/:id", readAllAccounts)
@@ -41,7 +43,16 @@ func activateAccount(c *gin.Context) {
 }
 
 func createAccount(c *gin.Context) {
-	email := c.Param("id")
+	var account model.Account
+
+	if err := c.ShouldBindJSON(&account); err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to bind")
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
+	}
+
 	// get creation user from token and add to client infos
 	oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)
 	oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
@@ -55,16 +66,24 @@ func createAccount(c *gin.Context) {
 		return
 	}
 
-	var account model.Account
 	account.From = user.Email
-	account.Email = email
-	account.Name = ""
 
 	v, err := core.CreateAccount(&account)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
 		}).Error("failed to create account")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	log.Infof("emailUser account = %v %v %v", account.Email, account.Id, account.MeshId)
+
+	err = core.EmailUser(account.Email, account.Id, account.MeshId)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to send email to client")
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -90,6 +109,17 @@ func readAllAccounts(c *gin.Context) {
 func updateAccount(c *gin.Context) {
 	var data model.Account
 	id := c.Param("id")
+
+	var bodyBytes []byte
+	if c.Request.Body != nil {
+		bodyBytes, _ = ioutil.ReadAll(c.Request.Body)
+		log.Info("updateAccount - %s", string(bodyBytes))
+	}
+
+	// Restore the io.ReadCloser to its original state
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	log.Info("updateAccount - %s", string(bodyBytes))
 
 	if err := c.ShouldBindJSON(&data); err != nil {
 		log.WithFields(log.Fields{

@@ -4,6 +4,7 @@ const state = {
   error: null,
   accounts: [],
   users: [],
+  members: [],
 }
 
 const getters = {
@@ -15,6 +16,9 @@ const getters = {
   },
   users(state) {
     return state.users;
+  },
+  members(state) {
+    return state.members;
   },
 }
 
@@ -42,10 +46,19 @@ const actions = {
         commit('error', err)
       })
   },
-  
 
-  create({ commit, dispatch }, account){
-    ApiService.post(`/accounts/${account.id}`)
+  readMembers({ commit, dispatch }, id){
+    ApiService.get(`/accounts/${id}`)
+      .then(resp => {
+        commit('members', resp)
+      })
+      .catch(err => {
+        commit('error', err)
+      })
+  },
+
+  create({ commit }, account){
+    ApiService.post(`/accounts`, account)
       .then(resp => {
         commit('create', resp)
       })
@@ -96,6 +109,9 @@ const mutations = {
   users(state, users) {
     state.users = users
   },
+  members(state, members) {
+    state.members = members
+  },
   create(state, account){
     state.accounts.push(account)
   },
@@ -132,6 +148,23 @@ const mutations = {
     let index = state.users.findIndex(x => x.id === user.id);
     if (index !== -1) {
       state.users.splice(index, 1);
+    } else {
+      state.error = "delete user failed, not in list"
+    }
+  },
+  update(state, member){
+    let index = state.users.findIndex(x => x.id === member.id);
+    if (index !== -1) {
+      state.members.splice(index, 1);
+      state.members.push(member);
+    } else {
+      state.error = "update account (member) failed, not in list"
+    }
+  },
+  delete(state, member){
+    let index = state.users.findIndex(x => x.id === member.id);
+    if (index !== -1) {
+      state.members.splice(index, 1);
     } else {
       state.error = "delete user failed, not in list"
     }

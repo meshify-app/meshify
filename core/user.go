@@ -169,9 +169,9 @@ func ReadUserConfig(id string) ([]byte, error) {
 }
 
 // EmailHost send email to host
-func EmailUser(id string, account string) error {
+func EmailUser(id string, account string, mesh string) error {
 	// get email body
-	emailBody, err := template.DumpUserEmail(account)
+	emailBody, err := template.DumpUserEmail(account, mesh)
 	if err != nil {
 		return err
 	}

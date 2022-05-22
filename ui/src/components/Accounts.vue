@@ -15,7 +15,7 @@
                 <v-spacer></v-spacer>
                 <v-btn
                         color="success"
-                        @click="startCreate"
+                        @click="startInvite"
                 >
                     Invite member
                     <v-icon right dark>mdi-account-group</v-icon>
@@ -147,9 +147,9 @@
             <v-data-table
                     v-if="listView"
                     :headers="bottom_headers"
-                    :items="users"
+                    :items="members"
                     :search="search"
-                    @click:row="startUpdate"
+                    @click:row="startUpdateMember"
             >
                 <template v-slot:item.updated="{ item }">
                     <v-row>
@@ -167,7 +167,7 @@
 -->
                         <v-icon
                                 class="pr-1 pl-1"
-                                @click.stop="startUpdate(item)"
+                                @click.stop="startUpdateMember(item)"
                         >
                             mdi-square-edit-outline
                         </v-icon>
@@ -184,20 +184,20 @@
             <v-card-text v-else>
                 <v-row>
                     <v-col
-                            v-for="(user, i) in users "
+                            v-for="(member, i) in members "
                             :key="i"
                             sm12 lg6
                     >
                         <v-card
-                                :color="user.enable ? '#1F7087' : 'warning'"
+                                :color="member.enable ? '#1F7087' : 'warning'"
                                 class="mx-auto"
                                 raised
                                 shaped
                         >
                             <v-list-item>
                                 <v-list-item-content>
-                                    <v-list-item-title class="headline">{{ user.name }}</v-list-item-title>
-                                    <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
+                                    <v-list-item-title class="headline">{{ member.name }}</v-list-item-title>
+                                    <v-list-item-subtitle>{{ member.email }}</v-list-item-subtitle>
                                 </v-list-item-content>
 
                                 <v-list-item-avatar
@@ -211,7 +211,7 @@
                                     <template v-slot:activator="{ on }">
                                         <v-btn
                                                 text
-                                                v-on:click="forceFileDownload(user)"
+                                                v-on:click="forceFileDownload(member)"
                                                 v-on="on"
                                         >
                                             <span class="d-none d-lg-flex">Download</span>
@@ -225,7 +225,7 @@
                                     <template v-slot:activator="{ on }">
                                         <v-btn
                                                 text
-                                                @click.stop="startUpdate(user)"
+                                                @click.stop="startUpdateMember(member)"
                                                 v-on="on"
                                         >
                                             <span class="d-none d-lg-flex">Edit</span>
@@ -239,7 +239,7 @@
                                     <template v-slot:activator="{ on }">
                                         <v-btn
                                                 text
-                                                @click="remove(user)"
+                                                @click="remove(member)"
                                                 v-on="on"
                                         >
                                             <span class="d-none d-lg-flex">Delete</span>
@@ -253,7 +253,7 @@
                                     <template v-slot:activator="{ on }">
                                         <v-btn
                                                 text
-                                                @click="email(user)"
+                                                @click="email(member)"
                                                 v-on="on"
                                         >
                                             <span class="d-none d-lg-flex">Send Email</span>
@@ -269,11 +269,11 @@
                                                 dark
                                                 v-on="on"
                                                 color="success"
-                                                v-model="user.enable"
-                                                v-on:change="update(user)"
+                                                v-model="member.enable"
+                                                v-on:change="update(member)"
                                         />
                                     </template>
-                                    <span> {{user.enable ? 'Disable' : 'Enable'}} this user</span>
+                                    <span> {{member.enable ? 'Disable' : 'Enable'}} this member</span>
                                 </v-tooltip>
 
                             </v-card-actions>
@@ -284,12 +284,12 @@
             </v-card-text>
         </v-card>
         <v-dialog
-                v-if="user"
+                v-if="account"
                 v-model="dialogCreate"
                 max-width="550"
         >
             <v-card>
-                <v-card-title class="headline">Invite new user</v-card-title>
+                <v-card-title class="headline">Invite new member</v-card-title>
                 <v-card-text>
                     <v-row>
                         <v-col
@@ -299,6 +299,17 @@
                                     ref="form"
                                     v-model="valid"
                             >
+                                <v-select return-object
+                                        v-model="meshList.selected"
+                                        :items="meshList.items"
+                                        item-text = "text"
+                                        item-value = "value"
+                                        label="To this mesh"
+                                        :rules="[ v => !!v || 'Mesh is required', ]"
+                                        single
+                                        persistent-hint
+                                        required
+                                />
                                 <v-text-field
                                         v-model="toAddress"
                                         label="Enter the email address of user you'd like to invite"
@@ -314,7 +325,7 @@
                     <v-btn
                             :disabled="!valid"
                             color="success"
-                            @click="email(toAddress)"
+                            @click="create(toAddress, meshList.selected)"
                     >
                         Submit
                         <v-icon right dark>mdi-check-outline</v-icon>
@@ -397,6 +408,85 @@
                     </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog
+                v-if="member"
+                v-model="dialogMember"
+                max-width="550"
+        >
+            <v-card>
+                <v-card-title class="headline">Edit Member</v-card-title>
+                <v-card-text>
+
+                    <v-row>
+                        <v-col
+                                cols="12"
+                        >
+                            <v-form
+                                    ref="form"
+                                    v-model="valid"
+                            >
+                                <v-text-field
+                                        v-model="member.accountName"
+                                        label="Account Name"
+                                        :rules="[ v => !!v || 'Account name is required',]"
+                                        required
+                                />
+                                <v-text-field
+                                        v-model="member.email"
+                                        label="Email Address"
+                                        :rules="[ v => !!v || 'Email address is required',]"
+                                        required
+                                />
+                                <v-text-field
+                                        v-model="member.name"
+                                        label="Name"
+                                        :rules="[ v => !!v || 'User name is required',]"
+                                        required
+                                />
+                                <v-select return-object
+                                        v-model="meshList.selected"
+                                        :items="meshList.items"
+                                        item-text = "text"
+                                        item-value = "value"
+                                        label="To this mesh"
+                                        :rules="[ v => !!v || 'Mesh is required', ]"
+                                        single
+                                        persistent-hint
+                                        required
+                                />
+                                <v-select
+                                    :items="roles"
+                                    v-model="member.role"
+                                    label="Role"
+                                ></v-select>
+                                <v-select
+                                    :items="statuses"
+                                    v-model="member.status"
+                                    label="Status"
+                                ></v-select>
+                            </v-form>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                    <v-card-actions>
+                        <v-btn
+                                :disabled="!valid"
+                                color="success"
+                                @click="updateMember(member)"
+                        >
+                            Submit
+                            <v-icon right dark>mdi-check-outline</v-icon>
+                        </v-btn>
+                        <v-btn
+                                color="primary"
+                                @click="dialogMember = false"
+                        >
+                            Cancel
+                            <v-icon right dark>mdi-close-circle-outline</v-icon>
+                        </v-btn>
+                    </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 <script>
@@ -409,11 +499,15 @@
       listView: true,
       dialogCreate: false,
       dialogUpdate: false,
+      dialogMember : false,
       inDelete: false,
+      meshList: {},
       toAddress: "",
       roles : ["Owner", "Admin", "User"],
       statuses : ["Active", "Pending", "Suspended", "Hidden"],
       user: null,
+      member: null,
+      account: null,
       panel: 1,
       valid: false,
       search: '',
@@ -430,7 +524,7 @@
         { text: 'Email', value: 'email', },
         { text: 'Name', value: 'name', },
         { text: "Role", value: 'role', },
-        { text: 'Account', value: 'id', },
+        { text: 'Mesh', value: 'meshName', },
         { text: 'Account Name', value: 'accountName', },
         { text: 'Status', value: 'status', },
         { text: 'Actions', value: 'action', sortable: false, },
@@ -442,12 +536,14 @@
       ...mapGetters({
         authuser: 'auth/user',
         accounts: 'account/accounts',
-        users: 'account/users',
+        members: 'account/users',
+        meshes: 'mesh/meshes',
       }),
     },
 
     mounted () {
       this.readAllAccounts(this.authuser.email)
+      this.readAllMeshes()
     },
 
     watch: {
@@ -465,28 +561,56 @@
         ...mapActions('account', {
             readAllAccounts: 'readAll',
             readUsers: 'readUsers',
-            createUser: 'create',
+            createAccount: 'create',
             updateAccount: 'update',
             deleteUser: 'delete',
             emailUser: 'email',
         }),
 
-      startCreate() {
-        this.user = {
-          name: "",
-          email: this.authuser.email,
-          toAddress: "",
-          enable: true,
-          userName: "",
-          userid: "",
-          tags: [],
-        }
+        ...mapActions('mesh', {
+            readAllMeshes: 'readAll',
+        }),
+
+      startInvite() {
         this.dialogCreate = true;
+        this.account = {
+          name: "",
+          from: this.authuser.email,
+          email: "",
+        }
+        this.meshList = { selected: { "text": "",  "value": ""},
+                          items: [] }
+
+        var selected = 0;
+        this.meshList.items[0] = { "text": "All Meshes", "value": ""}
+        for (let i=0; i<this.meshes.length; i++) {
+            this.meshList.items[i+1]= { "text": this.meshes[i].meshName, "value": this.meshes[i].id }
+        }
+
+        this.meshList.selected = this.meshList.items[selected];
+
       },
 
-      create(user) {
+      create(toAddress, mesh) {
+        this.account.email = toAddress;
+        this.account.meshId = mesh.value;
+        this.account.meshName = mesh.text;
+        this.account.from = this.authuser.email;
+        this.account.role = "User"
+        this.account.status = "Pending"
+
+        for (let i=0; i<this.accounts.length; i++) {
+            if (this.accounts[i].id == this.accounts[i].parent) {
+                this.account.parent = this.accounts[i].id;
+                this.account.accountName = this.accounts[i].accountName;
+                break;        
+            }
+        }
+
+        var result = this.createAccount(this.account)
+        console.log( "result = %s", result)
         this.dialogCreate = false;
-        this.createUser(user)
+
       },
 
       remove(user) {
@@ -495,8 +619,7 @@
           this.deleteUser(user)
         }
       },
-
-      email(toAddress) {
+      email(toAddress, mesh) {
         this.dialogCreate = false;
         if (!toAddress) {
           this.errorUser('email address is not defined')
@@ -525,6 +648,34 @@
 
         this.dialogUpdate = false;
         this.updateAccount(user)
+      },
+
+      updateMember(member) {
+
+        this.dialogMember = false;
+        this.updateAccount(member)
+      },      
+
+      startUpdateMember(member) {
+        if (this.inDelete == true ) {
+            this.inDelete = false;
+            return
+        }
+
+        var selected = 0;
+        this.meshList.items = [];
+        this.meshList.items[0] = { "text": "All Meshes", "value": ""};
+        for (let i=0; i<this.meshes.length; i++) {
+            this.meshList.items[i+1]= { "text": this.meshes[i].meshName, "value": this.meshes[i].id }
+            if (this.meshes[i].id == member.meshId) {
+                selected = i+1;
+            }
+        }
+        this.meshList.selected = this.meshList.items[selected];
+
+        this.member = member;
+        this.dialogMember = true;
+
       },
 
       forceFileDownload(user){
