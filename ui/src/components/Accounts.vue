@@ -569,7 +569,7 @@
             readUsers: 'readUsers',
             createAccount: 'create',
             updateAccount: 'update',
-            deleteUser: 'delete',
+            delete: 'delete',
             emailUser: 'email',
         }),
 
@@ -619,14 +619,18 @@
 
       },
 
-      remove(user) {
+      remove(item) {
         this.inDelete = true;
-        if (user.role == "Owner") {
+        if (item.role == "Owner") {
             alert("You cannot delete owners")
-        } else if (confirm(`Do you really want to delete ${user.name} ?`)){
-          this.deleteUser(user)
+        } else if (confirm(`Do you really want to delete ${item.name} ?`)){
+          this.delete(item)
         }
+        this.readAllAccounts(this.authuser.email)
+        this.readAllMeshes()
+
       },
+
       email(toAddress, mesh) {
         this.dialogCreate = false;
         if (!toAddress) {
