@@ -521,6 +521,7 @@
         { text: 'Account Name', value: 'accountName', },
         { text: 'Name', value: 'name', },
         { text: "Role", value: 'role', },
+        { text: 'Mesh', value: 'meshName', },
         { text: 'From', value: 'from', },
         { text: 'Status', value: 'status', },
         { text: 'Actions', value: 'action', sortable: false, },
