@@ -30,8 +30,11 @@ yarn-error.log*
 
 node_modules/
 
+# output
+meshify
+__debug_bin
+
 # Editor directories and files
-.vscode
 *.suo
 *.ntvs*
 *.njsproj
