@@ -27,6 +27,8 @@
                     :items="hosts"
                     :search="search"
                     :items-per-page="25"
+                    no-data-text="No Hosts.  Click above to create your first host, or use Meshify Agent on the host."
+                    no-results-text="No results matching your search"
                     :footer-props="footerProps"
             >
 

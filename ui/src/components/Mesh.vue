@@ -27,6 +27,8 @@
                     :headers="headers"
                     :items="meshes"
                     :search="search"
+                    no-data-text="Welcome to Meshify!  Click 'Create New Mesh' above to create one."
+                    no-results-text="No results matching your search"
                      @click:row="loadNetwork"
             >
                 <template v-slot:item.default.address="{ item }">
