@@ -27,7 +27,7 @@
                     :headers="headers"
                     :items="meshes"
                     :search="search"
-                    no-data-text="Welcome to Meshify!  Click 'Create New Mesh' above to create one."
+                    no-data-text="Welcome to Meshify!  Click 'Create New Mesh' above to get started."
                     no-results-text="No results matching your search"
                      @click:row="loadNetwork"
             >
