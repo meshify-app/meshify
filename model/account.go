@@ -36,7 +36,7 @@ func (a Account) IsValid() []error {
 			errs = append(errs, fmt.Errorf("email %s is invalid", a.Email))
 		}
 	} else {
-		errs = append(errs, fmt.Errorf("email is required."))
+		errs = append(errs, fmt.Errorf("email is required"))
 	}
 
 	return errs

@@ -41,6 +41,7 @@
         authRedirectUrl: 'auth/authRedirectUrl',
         authError: 'auth/error',
         clientError: 'host/error',
+        meshError: 'mesh/error',
         serverError: 'server/error',
       })
     },
@@ -74,6 +75,12 @@
         this.notify('error', newValue);
       },
 
+      meshError(newValue, oldValue) {
+        console.log(newValue)
+        this.notify('error', newValue);
+      },
+
+
       serverError(newValue, oldValue) {
         console.log(newValue)
         this.notify('error', newValue);
@@ -104,6 +111,7 @@
         this.notification.show = true;
         this.notification.color = color;
         this.notification.text = msg;
+        this.notification.timeout = 5;
       }
     }
   };

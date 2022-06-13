@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 )
 
@@ -23,7 +24,7 @@ func (a Mesh) IsValid() []error {
 	errs := make([]error, 0)
 
 	if a.Id == "" {
-		errs = append(errs, fmt.Errorf("Id is required"))
+		errs = append(errs, fmt.Errorf("id is required"))
 	}
 
 	// check if the name empty
@@ -33,6 +34,15 @@ func (a Mesh) IsValid() []error {
 	// check the name field is between 3 to 40 chars
 	if len(a.MeshName) < 2 || len(a.MeshName) > 12 {
 		errs = append(errs, fmt.Errorf("name field must be between 2-12 chars"))
+	}
+
+	match, err := regexp.MatchString(`^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`, a.MeshName)
+
+	if !match {
+		if err != nil {
+			errs = append(errs, err)
+		}
+		errs = append(errs, fmt.Errorf("name field can only contain ascii chars a-z, 0-9"))
 	}
 
 	return errs

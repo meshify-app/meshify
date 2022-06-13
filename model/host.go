@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/meshify-app/meshify/util"
@@ -41,6 +42,15 @@ func (a Host) IsValid() []error {
 	if len(a.Name) < 2 || len(a.Name) > 40 {
 		errs = append(errs, fmt.Errorf("name field must be between 2-40 chars"))
 	}
+	match, err := regexp.MatchString(`^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`, a.Name)
+
+	if !match {
+		if err != nil {
+			errs = append(errs, err)
+		}
+		errs = append(errs, fmt.Errorf("name field can only contain ascii chars a-z,-,0-9"))
+	}
+
 	// email is not required, but if provided must match regex
 	if a.Email != "" {
 		if !util.RegexpEmail.MatchString(a.Email) {
