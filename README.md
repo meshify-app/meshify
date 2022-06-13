@@ -1,39 +1,10 @@
-# Wg Gen Web
+# Meshify
 
-<h1 align="center"><img height="420" src="./ui/src/assets/meshify.png" alt="A WireGuard control plane"></h1>
+<h1 align="center"><img height="300" src="./ui/src/assets/meshify.png" alt="A WireGuard control plane"></h1>
 
 A control plane for [WireGuard](https://wireguard.com).
 
-[![pipeline status](https://github.com/meshify-app/meshify/badges/master/pipeline.svg)](https://github.com/meshify-app/meshify/commits/master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/vx3r/wg-gen-web)](https://goreportcard.com/report/github.com/vx3r/wg-gen-web)
-[![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
-![Discord](https://img.shields.io/discord/681699554189377567)
-![Build multi-arch Docker Images via buildx](https://github.com/vx3r/wg-gen-web/workflows/Build%20multi-arch%20Docker%20Images%20via%20buildx/badge.svg)
-![GitHub last commit](https://img.shields.io/github/last-commit/vx3r/wg-gen-web)
-![Docker Pulls](https://img.shields.io/docker/pulls/vx3r/wg-gen-web)
-![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/vx3r/wg-gen-web)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/vx3r/wg-gen-web)
-
 ## Why another one ?
-```
-                  @@@
-                 @@@@@
- @@@              @@@              @@@
-@@@@@                             @@@@@
- @@@ @@                         @@ @@@
-  @     @@                   @@     @
-  @         @@    @@@    @@         @
-  @             @@@@@@@             @
-  @               @@@               @
-  @                                 @
-  @                                 @
- @@@                               @@@
-@@@@@                             @@@@@
- @@@                               @@@
-                 @@@@@
-                @@@@@@@
-                 @@@@@
-```
 
 
 
@@ -41,66 +12,22 @@ All WireGuard UI implementations are trying to manage the service by applying co
 This implementation only generates configuration and its up to you to create network rules and apply configuration to WireGuard.
 For example by monitoring generated directory with [inotifywait](https://github.com/inotify-tools/inotify-tools/wiki). 
 
-The goal is to run Wg Gen Web in a container and WireGuard on host system.
-
 ## Features
 
  * Self-hosted and web based
  * Automatically select IP from the netowrk pool assigned to client
- * QR-Code for convenient mobile client configuration
- * Sent email to client with QR-code and client config
  * Enable / Disable client
- * Generation of `wg0.conf` after any modification
+ * Generation of configuration files on demand
  * IPv6 ready
  * User authentication (Oauth2 OIDC)
  * Dockerized
  * Pretty cool look
 
-![Screenshot](wg-gen-web_screenshot.png)
-
+![Screenshot](meshify-screenshot.png)
 ## Running
 
-### Docker
 
-The easiest way to run Wg Gen Web is using the container image
-```
-docker run --rm -it -v /tmp/wireguard:/data -p 8080:8080 -e "WG_CONF_DIR=/data" vx3r/wg-gen-web:latest
-```
-Docker compose snippet, used for demo server
-```
-version: '3.6'
-  wg-gen-web-demo:
-    image: vx3r/wg-gen-web:latest
-    container_name: wg-gen-web-demo
-    restart: unless-stopped
-    expose:
-      - "8080/tcp"
-    environment:
-      - WG_CONF_DIR=/data
-      - WG_INTERFACE_NAME=wg0.conf
-      - SMTP_HOST=smtp.gmail.com
-      - SMTP_PORT=587
-      - SMTP_USERNAME=no-reply@gmail.com
-      - SMTP_PASSWORD=******************
-      - SMTP_FROM=Wg Gen Web <no-reply@gmail.com>
-      - OAUTH2_PROVIDER_NAME=github
-      - OAUTH2_PROVIDER=https://github.com
-      - OAUTH2_CLIENT_ID=******************
-      - OAUTH2_CLIENT_SECRET=******************
-      - OAUTH2_REDIRECT_URL=https://wg-gen-web-demo.127-0-0-1.fr
-    volumes:
-      - /etc/wireguard:/data
-```
-Please note that mapping ```/etc/wireguard``` to ```/data``` inside the docker, will erase your host's current configuration.
-If needed, please make sure to backup your files from ```/etc/wireguard```.
-
-A workaround would be to change the ```WG_INTERFACE_NAME``` to something different, as it will create a new interface (```wg-auto.conf``` for example), note that if you do so, you will have to adapt your daemon accordingly.
-
-### Directly without docker
-
-Fill free to download latest artifacts from my GitLab server:
-* [Backend](https://github.com/meshify-app/meshify/-/jobs/artifacts/master/download?job=build-back)
-* [Frontend](https://github.com/meshify-app/meshify/-/jobs/artifacts/master/download?job=build-front)
+### Directly
 
 Put everything in one directory, create `.env` file with all configurations and run the backend.
 
@@ -153,8 +80,7 @@ Feel free to modify this file in order to use your existing keys
 
 ## What is out of scope
 
- * Generation or application of any `iptables` or `nftables` rules
- * Application of configuration to WireGuard by Wg Gen Web itself
+ * Currently out of scope is setting firewall marks (FwMark)
 
 ## Authentication
 
@@ -202,8 +128,7 @@ Wg Gen Web will only access your profile to get email address and your name, no 
 
 ## Need Help
 
- * Join us on [Discord](https://discord.gg/fjx7gGJ)
- * Create an issue
+mailto:support@meshify.app
 
 ## Development
 
