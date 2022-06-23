@@ -149,7 +149,7 @@ func token(c *gin.Context) {
 	var token oauth2.Token
 	token.AccessToken = loginVals.Code
 	var token_map = make(map[string]interface{}, 1)
-	token_map["id_token"] = loginVals.State
+	token_map["id_token"] = loginVals.Code
 	token2 := token.WithExtra(token_map)
 
 	cacheDb.Set(loginVals.Code, token2, cache.DefaultExpiration)
