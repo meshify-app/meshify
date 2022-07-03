@@ -44,17 +44,27 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 			host.Current = mesh.Default
 			host.Current.ListenPort = current.ListenPort
 			host.Current.Endpoint = current.Endpoint
+			host.Current.PrivateKey = current.PrivateKey
+			host.Current.PublicKey = current.PublicKey
 			host.MeshId = mesh.Id
 			host.AccountId = mesh.AccountId
 		}
 	}
 
-	key, err := wgtypes.GeneratePrivateKey()
-	if err != nil {
-		return nil, err
+	// if the host data already has a public key and empty private key,
+	// we know the client has already generated a key pair
+	if host.Current.PublicKey != "" && host.Current.PrivateKey == "" {
+		log.Info("client has already generated a key pair")
+	} else {
+		// generate a new key pair
+		log.Info("generating a new key pair")
+		key, err := wgtypes.GeneratePrivateKey()
+		if err != nil {
+			return nil, err
+		}
+		host.Current.PrivateKey = key.String()
+		host.Current.PublicKey = key.PublicKey().String()
 	}
-	host.Current.PrivateKey = key.String()
-	host.Current.PublicKey = key.PublicKey().String()
 
 	reserverIps, err := GetAllReservedMeshIps(host.MeshName)
 	if err != nil {
