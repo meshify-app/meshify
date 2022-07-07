@@ -6,6 +6,7 @@ import (
 
 	"github.com/meshify-app/meshify/auth/fake"
 	"github.com/meshify-app/meshify/auth/github"
+	"github.com/meshify-app/meshify/auth/microsoft"
 	"github.com/meshify-app/meshify/auth/oauth2oidc"
 	model "github.com/meshify-app/meshify/model"
 	log "github.com/sirupsen/logrus"
@@ -33,6 +34,10 @@ func GetAuthProvider() (Auth, error) {
 	case "oauth2oidc":
 		log.Warn("Oauth is set to oauth2oidc, must be RFC implementation on server side")
 		oauth2Client = &oauth2oidc.Oauth2idc{}
+
+	case "microsoft":
+		log.Warn("Oauth is set to Microsoft")
+		oauth2Client = &microsoft.Oauth2Msft{}
 
 	case "github":
 		log.Warn("Oauth is set to github, no openid will be used")

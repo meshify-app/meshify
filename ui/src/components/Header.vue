@@ -6,6 +6,10 @@
 
             <v-spacer />
             <v-toolbar-items>
+                <!-- <v-btn to="/services">
+                    Services
+                    <v-icon right dark>mdi-weather-cloudy</v-icon>
+                </v-btn> -->
                 <v-btn to="/mesh" right>
                     Meshes
                     <img class="ml-1" :src="require('../assets/meshify-bw.png')" height="32" width="32" alt="meshify"/>

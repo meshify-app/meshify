@@ -43,6 +43,8 @@
         clientError: 'host/error',
         meshError: 'mesh/error',
         serverError: 'server/error',
+        serviceError: 'service/error',
+        subscriptionError: 'subscription/error',
       })
     },
 
@@ -80,6 +82,15 @@
         this.notify('error', newValue);
       },
 
+      serviceError(newValue, oldValue) {
+        console.log(newValue)
+        this.notify('error', newValue);
+      },
+
+      subscriptionError(newValue, oldValue) {
+        console.log(newValue)
+        this.notify('error', newValue);
+      },
 
       serverError(newValue, oldValue) {
         console.log(newValue)
@@ -111,7 +122,7 @@
         this.notification.show = true;
         this.notification.color = color;
         this.notification.text = msg;
-        this.notification.timeout = 5;
+        this.notification.timeout = 10;
       }
     }
   };

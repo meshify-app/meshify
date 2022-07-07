@@ -102,8 +102,17 @@ func Deserialize(id string, parm string, col string, t reflect.Type) (interface{
 		var c *model.Mesh
 		err = collection.FindOne(ctx, filter).Decode(&c)
 		return c, err
-	}
 
+	case "model.Subscription":
+		var c *model.Subscription
+		err = collection.FindOne(ctx, filter).Decode(&c)
+		return c, err
+
+	case "model.Service":
+		var c *model.Service
+		err = collection.FindOne(ctx, filter).Decode(&c)
+		return c, err
+	}
 	log.Infof("reflect.TypeOf(t) = %v", t.String())
 
 	return nil, nil
@@ -356,5 +365,89 @@ func ReadAllAccountsForID(id string) ([]*model.Account, error) {
 	}
 
 	return accounts, err
+
+}
+
+// ReadAllSubscriptions from MongoDB
+func ReadAllSubscriptions(email string) ([]*model.Subscription, error) {
+	subscriptions := make([]*model.Subscription, 0)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION_STRING")))
+
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			log.Error(err)
+		}
+	}()
+
+	collection := client.Database("meshify").Collection("subscriptions")
+
+	filter := bson.D{}
+	if email != "" {
+		findstr := fmt.Sprintf("{\"%s\":\"%s\"}", "email", email)
+		err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
+
+	}
+
+	cursor, err := collection.Find(ctx, filter)
+
+	if err == nil {
+
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var subscription *model.Subscription
+			err = cursor.Decode(&subscription)
+			if err == nil {
+				subscriptions = append(subscriptions, subscription)
+			}
+		}
+
+	}
+
+	return subscriptions, err
+
+}
+
+// ReadAllServices from MongoDB
+func ReadAllServices(email string) ([]*model.Service, error) {
+	services := make([]*model.Service, 0)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION_STRING")))
+
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			log.Error(err)
+		}
+	}()
+
+	collection := client.Database("meshify").Collection("services")
+
+	filter := bson.D{}
+	if email != "" {
+		findstr := fmt.Sprintf("{\"%s\":\"%s\"}", "email", email)
+		err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
+
+	}
+
+	cursor, err := collection.Find(ctx, filter)
+
+	if err == nil {
+
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var service *model.Service
+			err = cursor.Decode(&service)
+			if err == nil {
+				services = append(services, service)
+			}
+		}
+
+	}
+
+	return services, err
 
 }

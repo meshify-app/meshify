@@ -8,6 +8,8 @@ import (
 	host "github.com/meshify-app/meshify/api/v1/host"
 	"github.com/meshify-app/meshify/api/v1/mesh"
 	"github.com/meshify-app/meshify/api/v1/server"
+	"github.com/meshify-app/meshify/api/v1/service"
+	"github.com/meshify-app/meshify/api/v1/subscription"
 )
 
 // ApplyRoutes apply routes to gin router
@@ -20,6 +22,8 @@ func ApplyRoutes(r *gin.RouterGroup, private bool) {
 			server.ApplyRoutes(v1)
 			user.ApplyRoutes(v1)
 			mesh.ApplyRoutes(v1)
+			service.ApplyRoutes(v1)
+			subscription.ApplyRoutes(v1)
 		} else {
 			auth.ApplyRoutes(v1)
 

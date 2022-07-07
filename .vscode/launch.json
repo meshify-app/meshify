@@ -9,8 +9,8 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "cwd":"/home/alangrah/go/src/meshify",
-            "program": "/home/alangrah/go/src/meshify/cmd/meshify/main.go"
+            "cwd":"/home/ubuntu/go/src/meshify",
+            "program": "/home/ubuntu/go/src/meshify/cmd/meshify/main.go"
         },
         {
             "type": "firefox",
@@ -23,7 +23,7 @@
         {
             "name": "Launch via NPM",
             "request": "launch",
-            "cwd":"/home/alangrah/go/src/meshify/ui",
+            "cwd":"/home/ubuntu/go/src/meshify/ui",
             "env" : { "VUE_APP_API_BASE_URL" : "https://dev.meshify.app/api/v1.0/"},
             "runtimeArgs": [
                 "run",

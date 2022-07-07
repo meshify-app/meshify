@@ -7,6 +7,8 @@ import mesh from "./modules/mesh";
 import user from "./modules/users"
 import account from "./modules/account"
 import join from "./modules/join"
+import subscription from "./modules/subscription"
+import service from "./modules/service"
 
 Vue.use(Vuex)
 
@@ -22,6 +24,8 @@ export default new Vuex.Store({
     mesh,
     user,
     join,
+    subscription,
+    service,
     server
   }
 })
