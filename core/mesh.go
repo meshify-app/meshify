@@ -97,7 +97,7 @@ func UpdateMesh(Id string, mesh *model.Mesh) (*model.Mesh, error) {
 	//	current := v.(*model.Mesh)
 
 	if v == nil {
-		return nil, errors.New("Mesh is nil")
+		return nil, errors.New("mesh is nil")
 		//		x: = fmt.Sprintf("could not retrieve mesh %s", Id)
 		//		return nil, errors.New(x)
 	}

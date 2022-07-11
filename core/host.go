@@ -102,6 +102,15 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	host.Created = time.Now().UTC()
 	host.Updated = host.Created
 
+	// Consider rethinking this
+	if host.Type == "" {
+		if host.Current.Endpoint != "" {
+			host.Type = "Server"
+		} else {
+			host.Type = "Client"
+		}
+	}
+
 	// check if host is valid
 	errs := host.IsValid()
 	if len(errs) != 0 {

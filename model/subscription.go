@@ -12,10 +12,13 @@ type Subscription struct {
 	Email       string    `json:"email"       bson:"email"`
 	Name        string    `json:"name"        bson:"name"`
 	Description string    `json:"description" bson:"description"`
-	Created     time.Time `json:"created"     bson:"created"`
-	Updated     time.Time `json:"updated"     bson:"updated"`
+	Issued      time.Time `json:"issued"      bson:"issued"`
+	Expires     time.Time `json:"expires"     bson:"expires"`
+	LastUpdated time.Time `json:"lastUpdated" bson:"lastUpdated"`
 	CreatedBy   string    `json:"createdBy"   bson:"createdBy"`
 	UpdatedBy   string    `json:"updatedBy"   bson:"updatedBy"`
+	Status      string    `json:"status"      bson:"status"`
+	AutoRenew   bool      `json:"autoRenew"   bson:"autoRenew"`
 }
 
 // IsValid check if model is valid

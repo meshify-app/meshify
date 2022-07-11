@@ -692,9 +692,15 @@ func DumpEmail(host *model.Host, qrcodePngName string) ([]byte, error) {
 	})
 }
 
-// DumpEmail dump server wg config with go template
+// DumpEmail invites a user to join the network
 func DumpUserEmail(accountId string, meshId string) ([]byte, error) {
-	t, err := template.New("email").Parse(userEmailTemplate)
+	file := "invite.html"
+	bytes, err := os.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+
+	t, err := template.New("email").Parse(string(bytes))
 	if err != nil {
 		return nil, err
 	}

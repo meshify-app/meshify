@@ -38,9 +38,15 @@
                     Welcome to Meshify!  Order a subscription on the <a href="https://meshify.app">Meshify website</a> to get started.
                 </template>
 
-                <template v-slot:item.updated="{ item }">
+                <template v-slot:item.issued="{ item }">
+                    {{ item.issued | formatDate }}
+                </template>
+                <template v-slot:item.expires="{ item }">
+                    {{ item.expires | formatDate }}
+                </template>
+                <template v-slot:item.lastUpdated="{ item }">
                     <v-row>
-                        <p>At {{ item.updated | formatDate }} by {{ item.updatedBy }}</p>
+                        <p>At {{ item.lastUpdated | formatDate }} by {{ item.updatedBy }}</p>
                     </v-row>
                 </template>
                 <template v-slot:item.action="{ item }">
@@ -441,7 +447,8 @@
       headers: [
         { text: 'Name', value: 'name', },
         { text: "Description", value: 'description', },
-        { text: 'Created', value: 'created', },
+        { text: 'Issued', value: 'issued', },
+        { text: 'Expires', value: 'expires', },
         { text: 'Status', value: 'status', },
         { text: 'Actions', value: 'action', sortable: false, },
 
@@ -468,7 +475,6 @@
     },
 
     mounted () {
-      this.readAllAccounts(this.authuser.email)
       this.readAllMeshes()
       this.readSubscriptions(this.authuser.email)
 

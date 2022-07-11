@@ -126,10 +126,10 @@ func createSubscription(c *gin.Context) {
 
 		// construct a subscription object
 		subscription := model.Subscription{
-			Id:      id,
-			Email:   email,
-			Created: time.Now(),
-			Updated: time.Now(),
+			Id:          id,
+			Email:       email,
+			Issued:      time.Now(),
+			LastUpdated: time.Now(),
 		}
 
 		errs := subscription.IsValid()

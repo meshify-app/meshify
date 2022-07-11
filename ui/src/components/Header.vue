@@ -1,15 +1,16 @@
 <template>
     <v-container>
         <v-app-bar app>
-            <a href="https://meshify.app"><img class="mr-3" :src="require('../assets/meshify.png')" height="50" alt="meshify"/></a>
-            <v-toolbar-title to="/">meshify.app</v-toolbar-title>
+            <a href="https://meshify.app"><img class="mr-3" src="/logo.png" height="50" /></a>
+            <v-toolbar-title to="/">
+                {{ title }}</v-toolbar-title>
 
             <v-spacer />
             <v-toolbar-items>
-                <!-- <v-btn to="/services">
+                <v-btn to="/services" v-show="showServices">
                     Services
                     <v-icon right dark>mdi-weather-cloudy</v-icon>
-                </v-btn> -->
+                </v-btn>
                 <v-btn to="/mesh" right>
                     Meshes
                     <img class="ml-1" :src="require('../assets/meshify-bw.png')" height="32" width="32" alt="meshify"/>
@@ -70,9 +71,14 @@
 
 <script>
   import {mapActions, mapGetters} from "vuex";
+  import { showServicesTab, title } from "../../env"
 
   export default {
     name: 'Header',
+      data: () => ({
+            showServices: showServicesTab,
+            title: title,
+        }),
 
     computed:{
       ...mapGetters({

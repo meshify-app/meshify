@@ -44,7 +44,7 @@ func (o *Oauth2Msft) Setup() error {
 
 	oidcIDTokenVerifier = make([]*oidc.IDTokenVerifier, 0)
 	oidcIDTokenVerifier = append(oidcIDTokenVerifier, oidcProvider.Verifier(&oidc.Config{ClientID: os.Getenv("OAUTH2_CLIENT_ID")}))
-	oidcIDTokenVerifier = append(oidcIDTokenVerifier, oidcProvider.Verifier(&oidc.Config{ClientID: os.Getenv("OAUTH2_CLIENT_ID_WINDOWS")}))
+	//oidcIDTokenVerifier = append(oidcIDTokenVerifier, oidcProvider.Verifier(&oidc.Config{ClientID: os.Getenv("OAUTH2_CLIENT_ID_WINDOWS")}))
 
 	oauth2Config = &oauth2.Config{
 		ClientID:     os.Getenv("OAUTH2_CLIENT_ID"),

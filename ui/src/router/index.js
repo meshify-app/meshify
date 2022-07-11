@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from "../store";
+import env from "../../env";
 
 Vue.use(VueRouter);
 
@@ -36,13 +37,6 @@ const routes = [
     }
   },
   {
-    path: '/services',
-    name: 'services',
-    component: function () {
-      return import(/* webpackChunkName: "Services" */ '../views/Services.vue')
-    }
-  },
-  {
     path: '/accounts',
     name: 'accounts',
     component: function () {
@@ -52,14 +46,11 @@ const routes = [
       requiresAuth: true
     }
   },
-  {
-    path: '/server',
-    name: 'server',
+  { 
+    path: '/services',
+    name: 'services',
     component: function () {
-      return import(/* webpackChunkName: "Server" */ '../views/Server.vue')
-    },
-    meta: {
-      requiresAuth: true
+      return import(/* webpackChunkName: "Services" */ '../views/Services.vue')
     }
   },
   {

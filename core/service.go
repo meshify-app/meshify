@@ -96,7 +96,7 @@ func UpdateService(Id string, service *model.Service) (*model.Service, error) {
 	//	current := v.(*model.Service)
 
 	if v == nil {
-		return nil, errors.New("Service is nil")
+		return nil, errors.New("service is nil")
 		//		x: = fmt.Sprintf("could not retrieve service %s", Id)
 		//		return nil, errors.New(x)
 	}
