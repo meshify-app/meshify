@@ -2,6 +2,7 @@ package template
 
 import (
 	"bytes"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -695,7 +696,7 @@ func DumpEmail(host *model.Host, qrcodePngName string) ([]byte, error) {
 // DumpEmail invites a user to join the network
 func DumpUserEmail(accountId string, meshId string) ([]byte, error) {
 	file := "invite.html"
-	bytes, err := os.ReadFile(file)
+	bytes, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
