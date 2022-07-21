@@ -133,6 +133,7 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 
 	user.Issuer = idToken.Issuer
 	user.IssuedAt = idToken.IssuedAt
+	log.Infof("user %s token expires %v", user.Email, idToken.Expiry)
 
 	domain := os.Getenv("OAUTH2_PROVIDER_URL")
 	id := os.Getenv("OAUTH2_CLIENT_ID")

@@ -46,7 +46,7 @@ func createMesh(c *gin.Context) {
 			"oauth2Token": oauth2Token,
 			"err":         err,
 		}).Error("failed to get user with oauth token")
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	data.CreatedBy = user.Email
@@ -99,7 +99,7 @@ func updateMesh(c *gin.Context) {
 			"oauth2Token": oauth2Token,
 			"err":         err,
 		}).Error("failed to get user with oauth token")
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	data.UpdatedBy = user.Name
@@ -134,7 +134,7 @@ func deleteMesh(c *gin.Context) {
 func readMeshes(c *gin.Context) {
 	value, exists := c.Get("oauth2Token")
 	if !exists {
-		c.AbortWithStatus(401)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	oauth2Token := value.(*oauth2.Token)
@@ -145,7 +145,7 @@ func readMeshes(c *gin.Context) {
 			"oauth2Token": oauth2Token,
 			"err":         err,
 		}).Error("failed to get user with oauth token")
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 

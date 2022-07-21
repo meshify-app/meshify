@@ -127,6 +127,7 @@ func (o *Oauth2Msft) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 
 	user.Issuer = idToken.Issuer
 	user.IssuedAt = idToken.IssuedAt
+	log.Infof("user %s token expires %v", user.Email, idToken.Expiry)
 
 	// save to mongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

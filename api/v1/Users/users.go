@@ -47,7 +47,7 @@ func inviteUser(c *gin.Context) {
 			"oauth2Token": oauth2Token,
 			"err":         err,
 		}).Error("failed to get user with oauth token")
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	data.Created = time.Now()
@@ -101,7 +101,7 @@ func updateUser(c *gin.Context) {
 			"oauth2Token": oauth2Token,
 			"err":         err,
 		}).Error("failed to get user with oauth token")
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	data.UpdatedBy = user.Name
@@ -186,7 +186,7 @@ func emailUser(c *gin.Context) {
 			"oauth2Token": oauth2Token,
 			"err":         err,
 		}).Error("failed to get user with oauth token")
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 

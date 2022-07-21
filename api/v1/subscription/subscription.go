@@ -186,7 +186,7 @@ func updateSubscription(c *gin.Context) {
 			"oauth2Token": oauth2Token,
 			"err":         err,
 		}).Error("failed to get user with oauth token")
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	data.UpdatedBy = user.Name
@@ -232,7 +232,7 @@ func readSubscriptions(c *gin.Context) {
 			"oauth2Token": oauth2Token,
 			"err":         err,
 		}).Error("failed to get user with oauth token")
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
