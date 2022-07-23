@@ -12,3 +12,8 @@ type Message struct {
 	Id     string       `json:"id"       bson:"id"`
 	Config []HostConfig `json:"config"   bson:"config"`
 }
+
+type ServiceMessage struct {
+	Id     string    `json:"id"       bson:"id"`
+	Config []Service `json:"config"   bson:"config"`
+}
