@@ -131,7 +131,7 @@
         </v-card>
         <v-card>
             <v-card-title>
-                Service Hosts
+                Services
                 <v-spacer></v-spacer>
             </v-card-title>
             <v-data-table
