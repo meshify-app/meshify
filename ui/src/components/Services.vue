@@ -32,7 +32,6 @@
                     :headers="headers"
                     :items="subscriptions"
                     :search="search"
-                     @click:row="startUpdate"
             >
                 <template slot="no-data">
                     Welcome to Meshify!  Order a subscription on the <a href="https://meshify.app">Meshify website</a> to get started.
@@ -51,20 +50,6 @@
                 </template>
                 <template v-slot:item.action="{ item }">
                     <v-row>
-<!--
-                        <v-icon
-                                class="pr-1 pl-1"
-                                @click.stop="startUpdate(item)"
-                        >
-                            mdi-account-switch
-                        </v-icon>
--->
-                        <v-icon
-                                class="pr-1 pl-1"
-                                @click.stop="startUpdate(item)"
-                        >
-                            mdi-square-edit-outline
-                        </v-icon>
                         <v-icon
                                 class="pr-1 pl-1"
                                 @click="remove(item)"
@@ -125,20 +110,6 @@
                                 </v-chip>
                             </v-card-text>
                             <v-card-actions>
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                                text
-                                                @click.stop="startUpdate(subscription)"
-                                                v-on="on"
-                                        >
-                                            <span class="d-none d-lg-flex">Edit</span>
-                                            <v-icon right dark>mdi-square-edit-outline</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span>Edit</span>
-                                </v-tooltip>
-
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on }">
                                         <v-btn
