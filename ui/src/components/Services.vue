@@ -263,6 +263,13 @@
                                         persistent-hint
                                         required
                                 />
+                                <template>
+                                    <input type="radio" id="relay" value="Relay" v-model="picked" />
+                                    <label for="relay"> Relay Service</label>
+                                    <br/><br/>
+                                    <input type="radio" id="tunnel" value="Tunnel" v-model="picked" />
+                                    <label for="tunnel"> Tunnel Service</label>
+                                </template>                                
                             </v-form>
                         </v-col>
                     </v-row>
@@ -400,6 +407,7 @@
     name: 'Services',
 
     data: () => ({
+      picked: 'Relay',
       listView: true,
       dialogCreateService: false,
       dialogUpdate: false,
@@ -429,7 +437,8 @@
       ],
       bottom_headers: [
         { text: 'Name', value: 'name', },
-        { text: "Description", value: 'description', },
+        { text: "Location", value: 'description', },
+        { text: 'Service', value: 'serviceType'},
         { text: 'Created', value: 'created', },
         { text: 'Status', value: 'status', },
         { text: 'Actions', value: 'action', sortable: false, },
@@ -538,7 +547,7 @@
         this.service.serviceGroup = this.server.serviceGroup
         this.service.apiKey = this.server.serviceApiKey
 
-        this.service.serviceType = "relay"
+        this.service.serviceType = this.picked;
 
         if (this.service.relayHost.meshName != "") {
             this.service.relayHost.meshId = this.meshList.selected.value;

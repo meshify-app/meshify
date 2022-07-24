@@ -60,6 +60,9 @@ func CreateService(service *model.Service) (*model.Service, error) {
 		if len(mesh.Default.Address) == 0 {
 			mesh.Default.Address = []string{"10.10.10.0/24"}
 		}
+		mesh.Default.Dns = append(mesh.Default.Dns, "8.8.8.8")
+		mesh.Default.EnableDns = true
+
 		mesh2, err := CreateMesh(&mesh)
 		if err != nil {
 			return nil, err
@@ -101,15 +104,14 @@ func CreateService(service *model.Service) (*model.Service, error) {
 		host.Current.PersistentKeepalive = 23
 
 		switch service.ServiceType {
-		case "relay":
+		case "Relay":
 			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Current.Address...)
 			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Default.Address...)
 
-		case "egress":
+		case "Tunnel":
 			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Current.Address...)
 			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Default.Address...)
-			host.Current.AllowedIPs = append(host.Current.AllowedIPs, "0.0.0/0")
-			host.Current.AllowedIPs = append(host.Current.AllowedIPs, ":::/0")
+			host.Current.AllowedIPs = append(host.Current.AllowedIPs, "0.0.0.0/0")
 
 		}
 
