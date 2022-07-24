@@ -173,6 +173,9 @@
                 <template slot="no-data">
                     Creating a service host requires a subscription.  Order a subscription on the <a href="https://meshify.app">Meshify website</a> to get started.
                 </template>
+                <template v-slot:item.created="{ item }">
+                    {{ item.created | formatDate }}
+                </template>
 
                 <template v-slot:item.updated="{ item }">
                     <v-row>
@@ -181,19 +184,7 @@
                 </template>
                 <template v-slot:item.action="{ item }">
                     <v-row>
-<!--                        <v-icon
-                                class="pr-1 pl-1"
-                                @click.stop="startUpdate(item)"
-                        >
-                            mdi-account-switch
-                        </v-icon>
--->
-                        <v-icon
-                                class="pr-1 pl-1"
-                                @click.stop="startUpdateService(item)"
-                        >
-                            mdi-square-edit-outline
-                        </v-icon>
+
                         <v-icon
                                 class="pr-1 pl-1"
                                 @click="remove(item)"
@@ -468,7 +459,7 @@
       bottom_headers: [
         { text: 'Name', value: 'name', },
         { text: "Description", value: 'description', },
-        { text: 'Mesh', value: 'meshName', },
+        { text: 'Created', value: 'created', },
         { text: 'Status', value: 'status', },
         { text: 'Actions', value: 'action', sortable: false, },
 
