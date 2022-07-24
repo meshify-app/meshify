@@ -128,6 +128,8 @@ func createSubscription(c *gin.Context) {
 		subscription := model.Subscription{
 			Id:          id,
 			Email:       email,
+			Name:        "Relay Service",
+			Description: "One relay running in the region of your choice",
 			Issued:      time.Now(),
 			LastUpdated: time.Now(),
 		}
