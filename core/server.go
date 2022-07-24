@@ -21,6 +21,15 @@ func ReadServer() ([]*model.Server, error) {
 	return servers, nil
 }
 
+// ReadServer2
+func ReadServer2(id string) (*model.Server, error) {
+	server, err := mongo.Deserialize(id, "serviceGroup", "servers", reflect.TypeOf(model.Server{}))
+	if err != nil {
+		return nil, err
+	}
+	return server.(*model.Server), nil
+}
+
 // UpdateServer keep private values from existing one
 func UpdateServer(server *model.Server) (*model.Server, error) {
 	_, err := mongo.Deserialize(server.Id, "id", "servers", reflect.TypeOf(model.Server{}))

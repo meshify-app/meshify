@@ -39,28 +39,34 @@ func statusService(c *gin.Context) {
 	apikey := c.Request.Header.Get("X-API-KEY")
 	etag := c.Request.Header.Get("If-None-Match")
 
-	services, err := core.ReadServiceHost(c.Param("id"))
+	server, err := core.ReadServer2(serviceGroup)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
-		}).Error("failed to read client config")
+		}).Error("failed to read server config")
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
 	authorized := false
 
-	for _, s := range services {
-		if s.ApiKey == apikey {
-			authorized = true
-			break
-		}
+	if server.ServiceApiKey == apikey {
+		authorized = true
 	}
+
 	if !authorized {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
+	services, err := core.ReadServiceHost(serviceGroup)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to read services config")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
 	var msg model.ServiceMessage
 	sConfig := make([]model.Service, len(services))
 
@@ -150,20 +156,44 @@ func updateService(c *gin.Context) {
 		return
 	}
 
-	// get update user from token and add to client infos
-	oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)
-	oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
-	user, err := oauth2Client.UserInfo(oauth2Token)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"oauth2Token": oauth2Token,
-			"err":         err,
-		}).Error("failed to get user with oauth token")
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-	data.UpdatedBy = user.Name
+	apikey := c.Request.Header.Get("X-API-KEY")
 
+	if apikey != "" {
+
+		service, err := core.ReadService(id)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("failed to read client config")
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		authorized := false
+
+		if service.ApiKey == apikey {
+			authorized = true
+		}
+
+		if !authorized {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+	} else {
+		// get update user from token and add to client infos
+		oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)
+		oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
+		user, err := oauth2Client.UserInfo(oauth2Token)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"oauth2Token": oauth2Token,
+				"err":         err,
+			}).Error("failed to get user with oauth token")
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		data.UpdatedBy = user.Name
+	}
 	client, err := core.UpdateService(id, &data)
 	if err != nil {
 		log.WithFields(log.Fields{
