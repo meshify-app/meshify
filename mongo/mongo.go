@@ -429,7 +429,7 @@ func ReadAllServices(email string) ([]*model.Service, error) {
 		}
 	}()
 
-	collection := client.Database("meshify").Collection("services")
+	collection := client.Database("meshify").Collection("service")
 
 	filter := bson.D{}
 	if email != "" {
@@ -500,7 +500,7 @@ func ReadServiceHost(id string) ([]*model.Service, error) {
 		}
 	}()
 
-	collection := client.Database("meshify").Collection("services")
+	collection := client.Database("meshify").Collection("service")
 
 	filter := bson.D{}
 	if id != "" {

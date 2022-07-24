@@ -31,6 +31,14 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 		host.HostGroup = host.Id
 	}
 
+	var err error
+	if host.APIKey == "" {
+		host.APIKey, err = util.RandomString(32)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// read the meshes and configure the default values
 	meshes, err := ReadMeshes(host.CreatedBy)
 	if err != nil {
@@ -46,8 +54,13 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 			host.Current.Endpoint = current.Endpoint
 			host.Current.PrivateKey = current.PrivateKey
 			host.Current.PublicKey = current.PublicKey
+			host.Current.PostUp = current.PostUp
+			host.Current.PostDown = current.PostDown
+			host.Current.PersistentKeepalive = current.PersistentKeepalive
 			host.MeshId = mesh.Id
 			host.AccountId = mesh.AccountId
+			host.Current.AllowedIPs = current.AllowedIPs
+			host.Current.Dns = current.Dns
 		}
 	}
 
@@ -87,7 +100,7 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 		ips = append(ips, ip)
 	}
 	host.Current.Address = ips
-	host.Current.AllowedIPs = ips
+	host.Current.AllowedIPs = append(host.Current.AllowedIPs, ips...)
 	if host.Current.EnableDns && len(host.Current.Dns) == 0 {
 		host.Current.Dns = ipsDns
 	}
@@ -101,15 +114,6 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 
 	host.Created = time.Now().UTC()
 	host.Updated = host.Created
-
-	// Consider rethinking this
-	if host.Type == "" {
-		if host.Current.Endpoint != "" {
-			host.Type = "Server"
-		} else {
-			host.Type = "Client"
-		}
-	}
 
 	// check if host is valid
 	errs := host.IsValid()

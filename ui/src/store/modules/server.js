@@ -2,7 +2,7 @@ import ApiService from "../../services/api.service";
 
 const state = {
   error: null,
-  server: null,
+  servers: [],
   config: '',
   version: '1.0',
 }
@@ -12,8 +12,8 @@ const getters = {
     return state.error;
   },
 
-  server(state) {
-    return state.server;
+  servers(state) {
+    return state.servers;
   },
 
   version(state) {
@@ -33,8 +33,7 @@ const actions = {
   read({ commit, dispatch }){
     ApiService.get("/server")
       .then(resp => {
-        commit('server', resp)
-        dispatch('config')
+        commit('servers', resp)
       })
       .catch(err => {
         commit('error', err)
@@ -42,24 +41,15 @@ const actions = {
   },
 
   update({ commit }, server){
-    ApiService.patch(`/server`, server)
+    ApiService.patch(`/server/${server.id}`, server)
       .then(resp => {
-        commit('server', resp)
+        // commit('servers', resp)
       })
       .catch(err => {
         commit('error', err)
       })
   },
 
-  config({ commit }){
-    ApiService.getWithConfig("/server/config", {responseType: 'arraybuffer'})
-      .then(resp => {
-        commit('config', resp)
-      })
-      .catch(err => {
-        commit('error', err)
-      })
-  },
 
   version({ commit }){
     ApiService.get("/server/version")
@@ -78,8 +68,8 @@ const mutations = {
     state.error = error;
   },
 
-  server(state, server){
-    state.server = server
+  servers(state, servers){
+    state.servers = servers
   },
 
   config(state, config){

@@ -595,7 +595,7 @@
         gethostQrcode: 'host/gethostQrcode',
         gethostConfig: 'host/gethostConfig',
         user: 'auth/user',
-        server: 'server/server',
+        servers: 'server/servers',
         accounts: 'account/accounts',
         hosts: 'host/hosts',
         meshes: 'mesh/meshes',

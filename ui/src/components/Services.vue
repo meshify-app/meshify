@@ -280,6 +280,17 @@
                                     v-model="valid"
                             >
                                 <v-select return-object
+                                        v-model="serverList.selected"
+                                        :items="serverList.items"
+                                        item-text = "text"
+                                        item-value = "value"
+                                        label="Pick region"
+                                        :rules="[ v => !!v || 'Server is required', ]"
+                                        single
+                                        persistent-hint
+                                        required
+                                />
+                                <v-select return-object
                                         v-model="meshList.selected"
                                         :items="meshList.items"
                                         item-text = "text"
@@ -299,7 +310,7 @@
                     <v-btn
                             :disabled="!valid"
                             color="success"
-                            @click="create(toAddress, meshList.selected)"
+                            @click="create()"
                     >
                         Submit
                         <v-icon right dark>mdi-check-outline</v-icon>
@@ -433,7 +444,8 @@
       dialogMember : false,
       inDelete: false,
       meshList: {},
-      toAddress: "",
+      serverList: {},
+      server: null,
       roles : ["Owner", "Admin", "User"],
       statuses : ["Active", "Pending", "Suspended", "Hidden"],
       user: null,
@@ -470,6 +482,7 @@
         members: 'account/users',
         subscriptions: 'subscription/subscriptions',
         services: 'service/services',
+        servers: 'server/servers',
         meshes: 'mesh/meshes',
       }),
     },
@@ -477,6 +490,8 @@
     mounted () {
       this.readAllMeshes()
       this.readSubscriptions(this.authuser.email)
+      this.readServices(this.authuser.email)
+      this.readServers()
 
     },
 
@@ -493,7 +508,6 @@
             readUsers: 'readUsers',
             createAccount: 'create',
             updateAccount: 'update',
-            delete: 'delete',
             emailUser: 'email',
         }),
 
@@ -503,6 +517,13 @@
 
         ...mapActions('service', {
             readServices: 'read',
+            createService: 'create',
+            updateService: 'update',
+            deleteService: 'delete',
+        }),
+
+        ...mapActions('server', {
+            readServers: 'read',
         }),
 
         ...mapActions('mesh', {
@@ -511,55 +532,73 @@
 
       startCreateService() {
         this.dialogCreateService = true;
-        this.account = {
+        this.service = {
           name: "",
-          from: this.authuser.email,
-          email: "",
+          email: this.authuser.email,
         }
         this.meshList = { selected: { "text": "",  "value": ""},
                           items: [] }
 
         var selected = 0;
-        this.meshList.items[0] = { "text": "All Meshes", "value": ""}
+        this.meshList.items[0] = { "text": "New Mesh", "value": ""}
         for (let i=0; i<this.meshes.length; i++) {
             this.meshList.items[i+1]= { "text": this.meshes[i].meshName, "value": this.meshes[i].id }
         }
 
         this.meshList.selected = this.meshList.items[selected];
 
+        this.serverList = { selected: { "text": "",  "value": ""},
+                          items: [] }
+        for (let i=0; i<this.servers.length; i++) {
+            this.serverList.items[i]= { "text": this.servers[i].description, "value": this.servers[i].name }
+        }
       },
 
-      create(toAddress, mesh) {
-        this.account.email = toAddress;
-        this.account.meshId = mesh.value;
-        this.account.meshName = mesh.text;
-        this.account.from = this.authuser.email;
-        this.account.role = "User"
-        this.account.status = "Pending"
+      create() {
 
-        for (let i=0; i<this.accounts.length; i++) {
-            if (this.accounts[i].id == this.accounts[i].parent) {
-                this.account.parent = this.accounts[i].id;
-                this.account.accountName = this.accounts[i].accountName;
-                break;        
+        for (let i=0; i<this.serverList.items.length; i++) {
+            if (this.serverList.items[i].value == this.serverList.selected.value) {
+                this.server = this.servers[i];
             }
         }
 
-        var result = this.createAccount(this.account)
-        console.log( "result = %s", result)
+        var range = this.server.portMax - this.server.portMin + 1;
+        var port = this.server.portMin + Math.floor(Math.random() * range);
+
+        this.service.servicePort = port;
+        this.service.relayHost = {}
+        this.service.relayHost.meshName = this.serverList.selected.value;
+        this.service.relayHost.current = {}
+        this.service.relayHost.current.endpoint = this.server.ipAddress + ":" + port;
+        this.service.relayHost.current.listenPort = port;
+        this.service.description = this.server.description
+        this.service.name = this.server.name
+        this.service.serviceGroup = this.server.serviceGroup
+        this.service.apiKey = this.server.serviceApiKey
+
+        this.service.serviceType = "relay"
+
+        if (this.service.relayHost.meshName != "") {
+            this.service.relayHost.meshId = this.meshList.selected.value;
+        }
+        else {
+            this.service.relayHost.meshId = "";
+        }
+
+        this.createService(this.service);
+
         this.dialogCreateService = false;
 
       },
 
       remove(item) {
         this.inDelete = true;
-        if (item.role == "Owner") {
-            alert("You cannot delete owners")
-        } else if (confirm(`Do you really want to delete ${item.name} ?`)){
-          this.delete(item)
+        if (confirm(`Do you really want to delete ${item.name} ?`)){
+          this.deleteService(item)
         }
         this.readAllAccounts(this.authuser.email)
         this.readAllMeshes()
+        this.readServices(this.authuser.email)
 
       },
 

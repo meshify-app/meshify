@@ -21,6 +21,7 @@ type Service struct {
 	ContainerId    string    `json:"containerId"  bson:"containerId"`
 	Status         string    `json:"status"       bson:"status"`
 	ServiceHost    string    `json:"serviceHost"  bson:"serviceHost"`
+	Name           string    `json:"name"         bson:"name"`
 	Description    string    `json:"description"  bson:"description"`
 	ServiceType    string    `json:"serviceType"  bson:"serviceType"`
 	ServicePort    int       `json:"servicePort"  bson:"servicePort"`

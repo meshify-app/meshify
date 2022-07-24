@@ -62,13 +62,14 @@ func statusService(c *gin.Context) {
 	}
 
 	var msg model.ServiceMessage
+	sConfig := make([]model.Service, len(services))
 
 	msg.Id = serviceGroup
 
-	for i, service := range services {
-		msg.Config[i] = *service
-
+	for i, s := range services {
+		sConfig[i] = *s
 	}
+	msg.Config = sConfig
 
 	bytes, err := json.Marshal(msg)
 	if err != nil {
@@ -178,7 +179,7 @@ func updateService(c *gin.Context) {
 func deleteService(c *gin.Context) {
 	id := c.Param("id")
 
-	err := core.DeleteMesh(id)
+	err := core.DeleteService(id)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,

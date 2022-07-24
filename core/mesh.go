@@ -21,6 +21,7 @@ func CreateMesh(mesh *model.Mesh) (*model.Mesh, error) {
 	mesh.Id = u.String()
 
 	ips := make([]string, 0)
+	// normalize ip addresses given
 	for _, network := range mesh.Default.Address {
 		ip, err := util.GetNetworkAddress(network)
 		if err != nil {

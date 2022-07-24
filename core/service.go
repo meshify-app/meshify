@@ -9,49 +9,64 @@ import (
 
 	model "github.com/meshify-app/meshify/model"
 	mongo "github.com/meshify-app/meshify/mongo"
+	util "github.com/meshify-app/meshify/util"
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
-	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
 
 // CreateService service with all necessary data
 func CreateService(service *model.Service) (*model.Service, error) {
+	var err error
 	u := uuid.NewV4()
 	service.Id = u.String()
 	service.Created = time.Now().UTC()
 	service.Updated = time.Now().UTC()
 
+	if service.ApiKey == "" {
+		service.ApiKey, err = util.RandomString(32)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// TODO: validate the subscription
+
+	// find the account id for this user
+	accounts, err := ReadAllAccounts(service.CreatedBy)
+	if err != nil {
+		return nil, err
+	}
+	for _, account := range accounts {
+		if account.Parent == account.Id {
+			service.AccountId = account.Id
+			break
+		}
+	}
 
 	if service.ServicePort == 0 {
 		service.ServicePort = 30000
 	}
 
-	if service.RelayHost.MeshName == "" {
+	if service.RelayHost.MeshId == "" {
 		// create a default mesh
 		mesh := model.Mesh{
-			Id:       uuid.NewV4().String(),
-			MeshName: "meshify",
-			Created:  time.Now().UTC(),
-			Updated:  time.Now().UTC(),
-		}
-		if mesh.Default.PresharedKey == "" {
-			presharedKey, err := wgtypes.GenerateKey()
-			if err != nil {
-				return nil, err
-			}
-			mesh.Default.PresharedKey = presharedKey.String()
+			AccountId:   service.AccountId,
+			MeshName:    service.RelayHost.MeshName,
+			Description: service.Description,
+			Created:     time.Now().UTC(),
+			Updated:     time.Now().UTC(),
+			CreatedBy:   service.CreatedBy,
 		}
 		if len(mesh.Default.Address) == 0 {
 			mesh.Default.Address = []string{"10.10.10.0/24"}
 		}
-
-		err := mongo.Serialize(mesh.Id, "id", "mesh", mesh)
+		mesh2, err := CreateMesh(&mesh)
 		if err != nil {
 			return nil, err
 		}
-		service.RelayHost.MeshName = mesh.MeshName
-		service.RelayHost.MeshId = mesh.Id
+		service.RelayHost.MeshName = mesh2.MeshName
+		service.RelayHost.MeshId = mesh2.Id
+		service.RelayHost.Default = mesh2.Default
 	}
 
 	if service.RelayHost.Id == "" {
@@ -59,10 +74,12 @@ func CreateService(service *model.Service) (*model.Service, error) {
 		host := model.Host{
 			Id:        uuid.NewV4().String(),
 			Name:      "relay" + "." + service.RelayHost.MeshName,
+			Enable:    true,
 			MeshId:    service.RelayHost.MeshId,
 			MeshName:  service.RelayHost.MeshName,
 			HostGroup: service.RelayHost.HostGroup,
 			Current:   service.RelayHost.Current,
+			Default:   service.RelayHost.Default,
 			Type:      "ServiceHost",
 			Created:   time.Now().UTC(),
 			Updated:   time.Now().UTC(),
@@ -80,6 +97,8 @@ func CreateService(service *model.Service) (*model.Service, error) {
 		if host.Current.PostDown == "" {
 			host.Current.PostDown = fmt.Sprintf("iptables -D FORWARD -i %s -j ACCEPT; iptables -D FORWARD -o %s -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE", host.MeshName, host.MeshName)
 		}
+
+		host.Current.PersistentKeepalive = 23
 
 		switch service.ServiceType {
 		case "relay":
@@ -111,7 +130,7 @@ func CreateService(service *model.Service) (*model.Service, error) {
 	}
 
 	// create the service
-	err := mongo.Serialize(service.Id, "id", "service", service)
+	err = mongo.Serialize(service.Id, "id", "service", service)
 	if err != nil {
 		return nil, err
 	}
@@ -236,9 +255,9 @@ func ReadServices(email string) ([]*model.Service, error) {
 
 	for _, account := range accounts {
 		if account.Id == account.Parent && account.Status == "Active" {
-			servicees, err := mongo.ReadAllServices(account.Email)
-			if err != nil {
-				results = append(results, servicees...)
+			services, err := mongo.ReadAllServices(email)
+			if err == nil {
+				results = append(results, services...)
 			}
 		}
 	}
@@ -252,6 +271,6 @@ func ReadServices(email string) ([]*model.Service, error) {
 
 // ReadServiceHost returns all services configured for a host
 func ReadServiceHost(serviceGroup string) ([]*model.Service, error) {
-	services, err := mongo.ReadAllServices(serviceGroup)
+	services, err := mongo.ReadServiceHost(serviceGroup)
 	return services, err
 }
