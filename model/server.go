@@ -6,11 +6,12 @@ import (
 
 // Server structure
 type Server struct {
-	Id        string `json:"id" bson:"id"`
-	Name      string `json:"name" bson:"name"`
-	IpAddress string `json:"ipAddress" bson:"ipAddress"`
-	PortMin   int    `json:"portMin" bson:"portMin"`
-	PortMax   int    `json:"portMax" bson:"portMax"`
+	Id          string `json:"id" bson:"id"`
+	Name        string `json:"name" bson:"name"`
+	Description string `json:"description" bson:"description"`
+	IpAddress   string `json:"ipAddress" bson:"ipAddress"`
+	PortMin     int    `json:"portMin" bson:"portMin"`
+	PortMax     int    `json:"portMax" bson:"portMax"`
 }
 
 // IsValid check if model is valid
