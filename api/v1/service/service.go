@@ -1,6 +1,9 @@
 package service
 
 import (
+	"crypto/md5"
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,8 +23,66 @@ func ApplyRoutes(r *gin.RouterGroup) {
 		g.GET("/:id", readService)
 		g.PATCH("/:id", updateService)
 		g.DELETE("/:id", deleteService)
+		g.GET("/:id/status", statusService)
 		g.GET("", readServices)
 	}
+}
+
+func statusService(c *gin.Context) {
+
+	if c.Param("id") == "" {
+		log.Error("servicegroup cannot be empty")
+		c.AbortWithStatus(http.StatusForbidden)
+	}
+	serviceGroup := c.Param("id")
+
+	apikey := c.Request.Header.Get("X-API-KEY")
+	etag := c.Request.Header.Get("If-None-Match")
+
+	services, err := core.ReadServiceHost(c.Param("id"))
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to read client config")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	authorized := false
+
+	for _, s := range services {
+		if s.ApiKey == apikey {
+			authorized = true
+			break
+		}
+	}
+	if !authorized {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	var msg model.ServiceMessage
+
+	msg.Id = serviceGroup
+
+	for i, service := range services {
+		msg.Config[i] = *service
+
+	}
+
+	bytes, err := json.Marshal(msg)
+	if err != nil {
+		log.Errorf("cannot marshal msg %v", err)
+	}
+	md5 := fmt.Sprintf("%x", md5.Sum(bytes))
+	if md5 == etag {
+		c.AbortWithStatus(http.StatusNotModified)
+	} else {
+		c.Header("ETag", md5)
+		c.JSON(http.StatusOK, msg)
+	}
+
+	//	statusCache.Set(id, msg, 0)
 }
 
 func createService(c *gin.Context) {
@@ -64,7 +125,7 @@ func createService(c *gin.Context) {
 func readService(c *gin.Context) {
 	id := c.Param("id")
 
-	client, err := core.ReadMesh(id)
+	service, err := core.ReadService(id)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -73,7 +134,7 @@ func readService(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, client)
+	c.JSON(http.StatusOK, service)
 }
 
 func updateService(c *gin.Context) {
@@ -152,7 +213,7 @@ func readServices(c *gin.Context) {
 		c.AbortWithStatus(http.StatusForbidden)
 	}
 
-	meshes, err := core.ReadMeshes(user.Email)
+	services, err := core.ReadServices(user.Email)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -161,5 +222,5 @@ func readServices(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, meshes)
+	c.JSON(http.StatusOK, services)
 }

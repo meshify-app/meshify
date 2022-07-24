@@ -9,7 +9,6 @@ import (
 	core "github.com/meshify-app/meshify/core"
 	model "github.com/meshify-app/meshify/model"
 	log "github.com/sirupsen/logrus"
-	"github.com/skip2/go-qrcode"
 	"golang.org/x/oauth2"
 )
 
@@ -144,36 +143,6 @@ func readUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, meshes)
-}
-
-func configUsers(c *gin.Context) {
-	configData, err := core.ReadUserConfig(c.Param("id"))
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error("failed to read client config")
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-
-	formatQr := c.DefaultQuery("qrcode", "false")
-	if formatQr == "false" {
-		// return config as txt file
-		c.Header("Content-Disposition", "attachment; filename=wg0.conf")
-		c.Data(http.StatusOK, "application/config", configData)
-		return
-	}
-	// return config as png qrcode
-	png, err := qrcode.Encode(string(configData), qrcode.Medium, 250)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error("failed to create qrcode")
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-	c.Data(http.StatusOK, "image/png", png)
-	return
 }
 
 func emailUser(c *gin.Context) {

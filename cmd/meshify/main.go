@@ -76,14 +76,6 @@ func main() {
 		log.SetLevel(log.InfoLevel)
 	}
 
-	// dump wg config file
-	err = core.UpdateServerConfigWg()
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Fatal("failed to dump wg config file")
-	}
-
 	// creates a gin router with default middleware: logger and recovery (crash-free) middleware
 	app := gin.Default()
 

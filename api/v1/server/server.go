@@ -18,7 +18,6 @@ func ApplyRoutes(r *gin.RouterGroup) {
 	{
 		g.GET("", readServer)
 		g.PATCH("", updateServer)
-		g.GET("/config", configServer)
 		g.GET("/version", versionStr)
 	}
 }
@@ -59,7 +58,13 @@ func updateServer(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	data.UpdatedBy = user.Name
+	if user.Email == "" {
+		log.WithFields(log.Fields{
+			"user": user,
+		}).Error("user has no email")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
 
 	server, err := core.UpdateServer(&data)
 	if err != nil {
@@ -71,21 +76,6 @@ func updateServer(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, server)
-}
-
-func configServer(c *gin.Context) {
-	configData, err := core.ReadWgConfigFile()
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error("failed to read wg config file")
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-
-	// return config as txt file
-	c.Header("Content-Disposition", "attachment; filename=wg0.conf")
-	c.Data(http.StatusOK, "application/config", configData)
 }
 
 func versionStr(c *gin.Context) {

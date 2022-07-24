@@ -112,6 +112,11 @@ func Deserialize(id string, parm string, col string, t reflect.Type) (interface{
 		var c *model.Service
 		err = collection.FindOne(ctx, filter).Decode(&c)
 		return c, err
+
+	case "model.Server":
+		var c *model.Server
+		err = collection.FindOne(ctx, filter).Decode(&c)
+		return c, err
 	}
 	log.Infof("reflect.TypeOf(t) = %v", t.String())
 
@@ -429,6 +434,77 @@ func ReadAllServices(email string) ([]*model.Service, error) {
 	filter := bson.D{}
 	if email != "" {
 		findstr := fmt.Sprintf("{\"%s\":\"%s\"}", "email", email)
+		err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
+
+	}
+
+	cursor, err := collection.Find(ctx, filter)
+
+	if err == nil {
+
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var service *model.Service
+			err = cursor.Decode(&service)
+			if err == nil {
+				services = append(services, service)
+			}
+		}
+
+	}
+
+	return services, err
+
+}
+
+// ReadAllServers from MongoDB
+func ReadAllServers() ([]*model.Server, error) {
+	servers := make([]*model.Server, 0)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION_STRING")))
+
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			log.Error(err)
+		}
+	}()
+
+	collection := client.Database("meshify").Collection("servers")
+	cursor, err := collection.Find(ctx, bson.D{})
+	if err == nil {
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var server *model.Server
+			err = cursor.Decode(&server)
+			if err == nil {
+				servers = append(servers, server)
+			}
+		}
+	}
+	return servers, err
+}
+
+// ReadServiceHost from MongoDB
+func ReadServiceHost(id string) ([]*model.Service, error) {
+	services := make([]*model.Service, 0)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION_STRING")))
+
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			log.Error(err)
+		}
+	}()
+
+	collection := client.Database("meshify").Collection("services")
+
+	filter := bson.D{}
+	if id != "" {
+		findstr := fmt.Sprintf("{\"%s\":\"%s\"}", "serviceGroup", id)
 		err = bson.UnmarshalExtJSON([]byte(findstr), true, &filter)
 
 	}

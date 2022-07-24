@@ -134,7 +134,7 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	host = v.(*model.Host)
 
 	// data modified, dump new config
-	return host, UpdateServerConfigWg()
+	return host, nil
 }
 
 // GetAllReservedIps the list of all reserved IPs, client and server
@@ -248,19 +248,13 @@ func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
 	host = v.(*model.Host)
 
 	// data modified, dump new config
-	return host, UpdateServerConfigWg()
+	return host, nil
 }
 
-// DeleteHost from disk
+// DeleteHost from database
 func DeleteHost(id string) error {
 
-	err := mongo.DeleteHost(id, "hosts")
-	if err != nil {
-		return err
-	}
-
-	// data modified, dump new config
-	return UpdateServerConfigWg()
+	return mongo.DeleteHost(id, "hosts")
 }
 
 // ReadHost2 host by param and id

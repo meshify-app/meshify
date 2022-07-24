@@ -9,6 +9,7 @@ import (
 type Service struct {
 	Id             string    `json:"id"           bson:"id"`
 	ServiceGroup   string    `json:"serviceGroup" bson:"serviceGroup"`
+	ApiKey         string    `json:"apikey"       bson:"apikey"`
 	AccountId      string    `json:"accountid"    bson:"accountid"`
 	Email          string    `json:"email"        bson:"email"`
 	SubscriptionId string    `json:"subscriptionid" bson:"subscriptionid"`
@@ -16,8 +17,6 @@ type Service struct {
 	Updated        time.Time `json:"updated"      bson:"updated"`
 	CreatedBy      string    `json:"createdBy"    bson:"createdBy"`
 	UpdatedBy      string    `json:"updatedBy"    bson:"updatedBy"`
-	MeshName       string    `json:"meshName"     bson:"meshName"`
-	MeshId         string    `json:"meshId"       bson:"meshId"`
 	RelayHost      Host      `json:"relayHost"    bson:"relayHost"`
 	ContainerId    string    `json:"containerId"  bson:"containerId"`
 	Status         string    `json:"status"       bson:"status"`

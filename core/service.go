@@ -2,78 +2,128 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"sort"
 	"time"
 
 	model "github.com/meshify-app/meshify/model"
 	mongo "github.com/meshify-app/meshify/mongo"
-	template "github.com/meshify-app/meshify/template"
+	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
+	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
 
 // CreateService service with all necessary data
 func CreateService(service *model.Service) (*model.Service, error) {
-	/*
-		u := uuid.NewV4()
-		service.Id = u.String()
+	u := uuid.NewV4()
+	service.Id = u.String()
+	service.Created = time.Now().UTC()
+	service.Updated = time.Now().UTC()
 
-		ips := make([]string, 0)
-		for _, network := range service.Default.Address {
-			ip, err := util.GetNetworkAddress(network)
-			if err != nil {
-				return nil, err
-			}
-			if util.IsIPv6(ip) {
-				ip = ip + "/64"
-			} else {
-				ip = ip + "/24"
-			}
-			ips = append(ips, ip)
+	// TODO: validate the subscription
+
+	if service.ServicePort == 0 {
+		service.ServicePort = 30000
+	}
+
+	if service.RelayHost.MeshName == "" {
+		// create a default mesh
+		mesh := model.Mesh{
+			Id:       uuid.NewV4().String(),
+			MeshName: "meshify",
+			Created:  time.Now().UTC(),
+			Updated:  time.Now().UTC(),
 		}
-
-		service.Default.Address = ips
-		if len(service.Default.AllowedIPs) == 0 {
-			service.Default.AllowedIPs = ips
-		}
-
-		service.Created = time.Now().UTC()
-		service.Updated = service.Created
-
-		if service.Default.PresharedKey == "" {
+		if mesh.Default.PresharedKey == "" {
 			presharedKey, err := wgtypes.GenerateKey()
 			if err != nil {
 				return nil, err
 			}
-			service.Default.PresharedKey = presharedKey.String()
+			mesh.Default.PresharedKey = presharedKey.String()
+		}
+		if len(mesh.Default.Address) == 0 {
+			mesh.Default.Address = []string{"10.10.10.0/24"}
 		}
 
-		// check if service is valid
-		errs := service.IsValid()
-		if len(errs) != 0 {
-			for _, err := range errs {
-				log.WithFields(log.Fields{
-					"err": err,
-				}).Error("service validation error")
-			}
-			return nil, errors.New("failed to validate service")
-		}
-
-		err := mongo.Serialize(service.Id, "id", "service", service)
+		err := mongo.Serialize(mesh.Id, "id", "mesh", mesh)
 		if err != nil {
 			return nil, err
 		}
+		service.RelayHost.MeshName = mesh.MeshName
+		service.RelayHost.MeshId = mesh.Id
+	}
 
-		v, err := mongo.Deserialize(service.Id, "id", "service", reflect.TypeOf(model.Service{}))
+	if service.RelayHost.Id == "" {
+		// create a default host using the mesh
+		host := model.Host{
+			Id:        uuid.NewV4().String(),
+			Name:      "relay" + "." + service.RelayHost.MeshName,
+			MeshId:    service.RelayHost.MeshId,
+			MeshName:  service.RelayHost.MeshName,
+			HostGroup: service.RelayHost.HostGroup,
+			Current:   service.RelayHost.Current,
+			Type:      "ServiceHost",
+			Created:   time.Now().UTC(),
+			Updated:   time.Now().UTC(),
+		}
+
+		// Failsafe entry for DNS.  Service will break without proper DNS setup.  If nothing is set use google
+		if len(host.Current.Dns) == 0 {
+			host.Current.Dns = append(host.Current.Dns, "8.8.8.8")
+		}
+
+		// Configure the routing for the relay/egress host
+		if host.Current.PostUp == "" {
+			host.Current.PostUp = fmt.Sprintf("iptables -A FORWARD -i %s -j ACCEPT; iptables -A FORWARD -o %s -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE", host.MeshName, host.MeshName)
+		}
+		if host.Current.PostDown == "" {
+			host.Current.PostDown = fmt.Sprintf("iptables -D FORWARD -i %s -j ACCEPT; iptables -D FORWARD -o %s -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE", host.MeshName, host.MeshName)
+		}
+
+		switch service.ServiceType {
+		case "relay":
+			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Current.Address...)
+			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Default.Address...)
+
+		case "egress":
+			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Current.Address...)
+			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Default.Address...)
+			host.Current.AllowedIPs = append(host.Current.AllowedIPs, "0.0.0/0")
+			host.Current.AllowedIPs = append(host.Current.AllowedIPs, ":::/0")
+
+		}
+
+		host2, err := CreateHost(&host)
 		if err != nil {
 			return nil, err
 		}
-		service = v.(*model.Service)
+		service.RelayHost = *host2
+	}
 
-		// data modified, dump new config
-		return service, UpdateServerConfigWg()
-	*/
-	return nil, errors.New("not implemented")
+	// check if service is valid
+	errs := service.IsValid()
+	if len(errs) != 0 {
+		for _, err := range errs {
+			log.Error(err)
+		}
+		return nil, errors.New("failed to validate service")
+	}
+
+	// create the service
+	err := mongo.Serialize(service.Id, "id", "service", service)
+	if err != nil {
+		return nil, err
+	}
+
+	v, err := mongo.Deserialize(service.Id, "id", "service", reflect.TypeOf(model.Service{}))
+	if err != nil {
+		return nil, err
+	}
+	service = v.(*model.Service)
+
+	// return the service
+	return service, nil
 }
 
 // ReadService service by id
@@ -93,7 +143,7 @@ func UpdateService(Id string, service *model.Service) (*model.Service, error) {
 	if err != nil {
 		return nil, err
 	}
-	//	current := v.(*model.Service)
+	current := v.(*model.Service)
 
 	if v == nil {
 		return nil, errors.New("service is nil")
@@ -101,9 +151,9 @@ func UpdateService(Id string, service *model.Service) (*model.Service, error) {
 		//		return nil, errors.New(x)
 	}
 
-	//	if current.ID != Id {
-	//		return nil, errors.New("records Id mismatch")
-	//	}
+	if current.Id != Id {
+		return nil, errors.New("records Id mismatch")
+	}
 
 	// check if service is valid
 	errs := service.IsValid()
@@ -130,25 +180,55 @@ func UpdateService(Id string, service *model.Service) (*model.Service, error) {
 	service = v.(*model.Service)
 
 	// data modified, dump new config
-	return service, UpdateServerConfigWg()
+	return service, nil
 }
 
-// DeleteService from disk
+// DeleteService from database
 func DeleteService(id string) error {
 
-	err := mongo.Delete(id, "id", "service")
-	//	path := filepath.Join(os.Getenv("WG_CONF_DIR"), id)
-	//	err := os.Remove(path)
+	// Get the service
+	v, err := mongo.Deserialize(id, "id", "service", reflect.TypeOf(model.Service{}))
+	if err != nil {
+		log.Errorf("failed to delete service %s", id)
+		return err
+	}
+	service := v.(*model.Service)
+
+	if service.RelayHost.Id != "" {
+		err = DeleteHost(service.RelayHost.Id)
+		if err != nil {
+			log.Errorf("failed to delete host %s", service.RelayHost.Id)
+			return err
+		}
+	}
+
+	if service.RelayHost.MeshId != "" {
+		hosts, err := ReadHost2("meshid", service.RelayHost.MeshId)
+		if err != nil {
+			log.Errorf("failed to delete mesh %s", service.RelayHost.MeshId)
+			return err
+		}
+		if len(hosts) == 0 {
+			err = DeleteMesh(service.RelayHost.MeshId)
+			if err != nil {
+				log.Errorf("failed to delete mesh %s", service.RelayHost.MeshId)
+				return err
+			}
+		}
+	}
+
+	// Now delete the service
+
+	err = mongo.Delete(id, "id", "service")
 	if err != nil {
 		return err
 	}
 
-	// data modified, dump new config
-	return UpdateServerConfigWg()
+	return nil
 }
 
-// ReadServicees all clients
-func ReadServicees(email string) ([]*model.Service, error) {
+// ReadServices all clients
+func ReadServices(email string) ([]*model.Service, error) {
 
 	accounts, err := mongo.ReadAllAccounts(email)
 
@@ -170,22 +250,8 @@ func ReadServicees(email string) ([]*model.Service, error) {
 	return results, err
 }
 
-// ReadServiceConfig in wg format
-func ReadServiceConfig(id string) ([]byte, error) {
-	client, err := ReadHost(id)
-	if err != nil {
-		return nil, err
-	}
-
-	server, err := ReadServer()
-	if err != nil {
-		return nil, err
-	}
-
-	configDataWg, err := template.DumpClientWg(client, server)
-	if err != nil {
-		return nil, err
-	}
-
-	return configDataWg, nil
+// ReadServiceHost returns all services configured for a host
+func ReadServiceHost(serviceGroup string) ([]*model.Service, error) {
+	services, err := mongo.ReadAllServices(serviceGroup)
+	return services, err
 }

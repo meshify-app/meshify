@@ -8,7 +8,6 @@ import (
 
 	model "github.com/meshify-app/meshify/model"
 	mongo "github.com/meshify-app/meshify/mongo"
-	template "github.com/meshify-app/meshify/template"
 	util "github.com/meshify-app/meshify/util"
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
@@ -74,7 +73,7 @@ func CreateMesh(mesh *model.Mesh) (*model.Mesh, error) {
 	mesh = v.(*model.Mesh)
 
 	// data modified, dump new config
-	return mesh, UpdateServerConfigWg()
+	return mesh, nil
 }
 
 // ReadMesh mesh by id
@@ -131,7 +130,7 @@ func UpdateMesh(Id string, mesh *model.Mesh) (*model.Mesh, error) {
 	mesh = v.(*model.Mesh)
 
 	// data modified, dump new config
-	return mesh, UpdateServerConfigWg()
+	return mesh, nil
 }
 
 // DeleteMesh from disk
@@ -144,8 +143,7 @@ func DeleteMesh(id string) error {
 		return err
 	}
 
-	// data modified, dump new config
-	return UpdateServerConfigWg()
+	return nil
 }
 
 // ReadMeshes all clients
@@ -165,52 +163,9 @@ func ReadMeshes(email string) ([]*model.Mesh, error) {
 		}
 	}
 
-	/*
-		files, err := ioutil.ReadDir(filepath.Join(os.Getenv("WG_CONF_DIR")))
-		if err != nil {
-			return nil, err
-		}
-
-		for _, f := range files {
-			// clients file name is an uuid
-			_, err := uuid.FromString(f.Name())
-			if err == nil {
-				c, err := mongo.Deserialize(f.Name())
-				if err != nil {
-					log.WithFields(log.Fields{
-						"err":  err,
-						"path": f.Name(),
-					}).Error("failed to deserialize client")
-				} else {
-					clients = append(clients, c.(*model.Host))
-				}
-			}
-		}
-	*/
-
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].Created.After(results[j].Created)
 	})
 
 	return results, err
-}
-
-// ReadMeshConfig in wg format
-func ReadMeshConfig(id string) ([]byte, error) {
-	client, err := ReadHost(id)
-	if err != nil {
-		return nil, err
-	}
-
-	server, err := ReadServer()
-	if err != nil {
-		return nil, err
-	}
-
-	configDataWg, err := template.DumpClientWg(client, server)
-	if err != nil {
-		return nil, err
-	}
-
-	return configDataWg, nil
 }

@@ -44,7 +44,7 @@ func CreateUser(user *model.User) (*model.User, error) {
 	user = v.(*model.User)
 
 	// data modified, dump new config
-	return user, UpdateServerConfigWg()
+	return user, nil
 }
 
 // ReadUser user by id
@@ -97,48 +97,18 @@ func UpdateUser(Id string, user *model.User) (*model.User, error) {
 	user = v.(*model.User)
 
 	// data modified, dump new config
-	return user, UpdateServerConfigWg()
+	return user, nil
 }
 
-// DeleteUser from disk
+// DeleteUser from database
 func DeleteUser(id string) error {
 
-	err := mongo.DeleteHost(id, "users")
-	//	path := filepath.Join(os.Getenv("WG_CONF_DIR"), id)
-	//	err := os.Remove(path)
-	if err != nil {
-		return err
-	}
-
-	// data modified, dump new config
-	return UpdateServerConfigWg()
+	return mongo.Delete(id, "id", "users")
 }
 
 // ReadUsers all users
 func ReadUsers() ([]*model.User, error) {
 	users := make([]*model.User, 0)
-	/*
-		files, err := ioutil.ReadDir(filepath.Join(os.Getenv("WG_CONF_DIR")))
-		if err != nil {
-			return nil, err
-		}
-
-		for _, f := range files {
-			// users file name is an uuid
-			_, err := uuid.FromString(f.Name())
-			if err == nil {
-				c, err := mongo.Deserialize(f.Name())
-				if err != nil {
-					log.WithFields(log.Fields{
-						"err":  err,
-						"path": f.Name(),
-					}).Error("failed to deserialize user")
-				} else {
-					users = append(users, c.(*model.User))
-				}
-			}
-		}
-	*/
 	users = mongo.ReadAllUsers()
 
 	sort.Slice(users, func(i, j int) bool {
@@ -146,26 +116,6 @@ func ReadUsers() ([]*model.User, error) {
 	})
 
 	return users, nil
-}
-
-// ReadUserConfig in wg format
-func ReadUserConfig(id string) ([]byte, error) {
-	user, err := ReadHost(id)
-	if err != nil {
-		return nil, err
-	}
-
-	server, err := ReadServer()
-	if err != nil {
-		return nil, err
-	}
-
-	configDataWg, err := template.DumpClientWg(user, server)
-	if err != nil {
-		return nil, err
-	}
-
-	return configDataWg, nil
 }
 
 // EmailHost send email to host
