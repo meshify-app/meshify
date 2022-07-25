@@ -25,6 +25,7 @@ type Service struct {
 	Description    string    `json:"description"  bson:"description"`
 	ServiceType    string    `json:"serviceType"  bson:"serviceType"`
 	ServicePort    int       `json:"servicePort"  bson:"servicePort"`
+	DefaultSubnet  string    `json:"defaultSubnet" bson:"defaultSubnet"`
 }
 
 // IsValid check if model is valid

@@ -14,6 +14,7 @@ type Server struct {
 	PortMax       int    `json:"portMax" bson:"portMax"`
 	ServiceGroup  string `json:"serviceGroup" bson:"serviceGroup"`
 	ServiceApiKey string `json:"serviceApiKey" bson:"serviceApiKey"`
+	DefaultSubnet string `json:"defaultSubnet" bson:"defaultSubnet"`
 }
 
 // IsValid check if model is valid

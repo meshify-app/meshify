@@ -46,6 +46,9 @@ func CreateService(service *model.Service) (*model.Service, error) {
 	if service.ServicePort == 0 {
 		service.ServicePort = 30000
 	}
+	if service.DefaultSubnet == "" {
+		service.DefaultSubnet = "10.10.10.0/24"
+	}
 
 	if service.RelayHost.MeshId == "" {
 		// create a default mesh
@@ -57,9 +60,7 @@ func CreateService(service *model.Service) (*model.Service, error) {
 			Updated:     time.Now().UTC(),
 			CreatedBy:   service.CreatedBy,
 		}
-		if len(mesh.Default.Address) == 0 {
-			mesh.Default.Address = []string{"10.10.10.0/24"}
-		}
+		mesh.Default.Address = []string{service.DefaultSubnet}
 		mesh.Default.Dns = append(mesh.Default.Dns, "8.8.8.8")
 		mesh.Default.EnableDns = true
 
@@ -70,12 +71,25 @@ func CreateService(service *model.Service) (*model.Service, error) {
 		service.RelayHost.MeshName = mesh2.MeshName
 		service.RelayHost.MeshId = mesh2.Id
 		service.RelayHost.Default = mesh2.Default
+	} else {
+		// check if mesh exists
+		mesh, err := ReadMesh(service.RelayHost.MeshId)
+		if err != nil {
+			return nil, err
+		}
+		if mesh == nil {
+			return nil, errors.New("mesh does not exist")
+		}
+		service.RelayHost.MeshName = mesh.MeshName
+		service.RelayHost.MeshId = mesh.Id
+		service.RelayHost.Default = mesh.Default
 	}
 
 	if service.RelayHost.Id == "" {
 		// create a default host using the mesh
 		host := model.Host{
 			Id:        uuid.NewV4().String(),
+			AccountId: service.AccountId,
 			Name:      "relay" + "." + service.RelayHost.MeshName,
 			Enable:    true,
 			MeshId:    service.RelayHost.MeshId,
@@ -86,6 +100,7 @@ func CreateService(service *model.Service) (*model.Service, error) {
 			Type:      "ServiceHost",
 			Created:   time.Now().UTC(),
 			Updated:   time.Now().UTC(),
+			CreatedBy: service.CreatedBy,
 		}
 
 		// Failsafe entry for DNS.  Service will break without proper DNS setup.  If nothing is set use google
