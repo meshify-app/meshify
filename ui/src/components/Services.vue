@@ -246,7 +246,7 @@
                                         :items="serverList.items"
                                         item-text = "text"
                                         item-value = "value"
-                                        label="Pick region"
+                                        label="Pick a region"
                                         :rules="[ v => !!v || 'Server is required', ]"
                                         single
                                         persistent-hint
@@ -263,13 +263,29 @@
                                         persistent-hint
                                         required
                                 />
-                                <template>
-                                    <input type="radio" id="relay" value="Relay" v-model="picked" />
-                                    <label for="relay"> Relay Service</label>
-                                    <br/><br/>
-                                    <input type="radio" id="tunnel" value="Tunnel" v-model="picked" />
-                                    <label for="tunnel"> Tunnel Service</label>
-                                </template>                                
+                                <v-select return-object
+                                        v-model="dnsList.selected"
+                                        :items="dnsList.items"
+                                        item-text = "text"
+                                        item-value = "value"
+                                        label="Select a DNS provider"
+                                        :rules="[ v => !!v || 'DNS is required', ]"
+                                        single
+                                        persistent-hint
+                                        required
+                                />
+                                 <v-select return-object
+                                        v-model="svcList.selected"
+                                        :items="svcList.items"
+                                        item-text = "text"
+                                        item-value = "value"
+                                        label="Choose type of Service"
+                                        :rules="[ v => !!v || 'Service is required', ]"
+                                        single
+                                        persistent-hint
+                                        required
+                                />
+
                             </v-form>
                         </v-col>
                     </v-row>
@@ -407,7 +423,6 @@
     name: 'Services',
 
     data: () => ({
-      picked: 'Relay',
       listView: true,
       dialogCreateService: false,
       dialogUpdate: false,
@@ -426,6 +441,16 @@
       panel: 1,
       valid: false,
       search: '',
+      dnsList:{ items: [
+        { text: "Google DNS", value: "8.8.8.8" },
+        { text: "Cloudflare DNS", value: "1.1.1.1" },
+        { text: "OpenDNS DNS", value: "208.67.222.222"},
+        { text: "Quad9 DNS", value: "9.9.9.9"},
+      ]},
+      svcList:{ items: [
+        { text: "Relay Service  (allows all machines in mesh to communicate with each other)", value: "Relay" },
+        { text: "Tunnel Service (tunnel all traffic through the Service Host)", value: "Tunnel" },
+      ]},
       headers: [
         { text: 'Name', value: 'name', },
         { text: "Description", value: 'description', },
@@ -541,6 +566,8 @@
         this.service.relayHost = {}
         this.service.relayHost.meshName = this.serverList.selected.value;
         this.service.relayHost.current = {}
+        this.service.relayHost.current.dns = []
+        this.service.relayHost.current.dns[0] = this.dnsList.selected.value;
         this.service.relayHost.current.endpoint = this.server.ipAddress + ":" + port;
         this.service.relayHost.current.listenPort = port;
         this.service.description = this.server.description
@@ -548,7 +575,7 @@
         this.service.serviceGroup = this.server.serviceGroup
         this.service.apiKey = this.server.serviceApiKey
 
-        this.service.serviceType = this.picked;
+        this.service.serviceType = this.svcList.selected.value;
 
         if (this.service.relayHost.meshName != "") {
             this.service.relayHost.meshId = this.meshList.selected.value;
