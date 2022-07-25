@@ -79,7 +79,7 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 		host.Current.PublicKey = key.PublicKey().String()
 	}
 
-	reserverIps, err := GetAllReservedMeshIps(host.MeshName)
+	reserverIps, err := GetAllReservedMeshIps(host.MeshId)
 	if err != nil {
 		return nil, err
 	}
@@ -142,8 +142,8 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 }
 
 // GetAllReservedIps the list of all reserved IPs, client and server
-func GetAllReservedMeshIps(meshName string) ([]string, error) {
-	clients, err := mongo.ReadAllHosts("meshName", meshName)
+func GetAllReservedMeshIps(meshId string) ([]string, error) {
+	clients, err := mongo.ReadAllHosts("meshid", meshId)
 
 	if err != nil {
 		return nil, err
@@ -151,7 +151,7 @@ func GetAllReservedMeshIps(meshName string) ([]string, error) {
 	reserverIps := make([]string, 0)
 
 	for _, client := range clients {
-		if client.MeshName == meshName {
+		if client.MeshId == meshId {
 			for _, cidr := range client.Current.Address {
 				ip, err := util.GetIpFromCidr(cidr)
 				if err != nil {
@@ -195,7 +195,7 @@ func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
 	if len(host.Current.Address) == 0 ||
 		(len(host.Default.Address) > 0 && len(current.Default.Address) > 0 &&
 			(host.Default.Address[0] != current.Default.Address[0])) {
-		reserverIps, err := GetAllReservedMeshIps(host.MeshName)
+		reserverIps, err := GetAllReservedMeshIps(host.MeshId)
 		if err != nil {
 			return nil, err
 		}
