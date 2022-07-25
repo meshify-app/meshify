@@ -536,6 +536,7 @@
         var range = this.server.portMax - this.server.portMin + 1;
         var port = this.server.portMin + Math.floor(Math.random() * range);
 
+        this.service.defaultSubnet = this.server.defaultSubnet;
         this.service.servicePort = port;
         this.service.relayHost = {}
         this.service.relayHost.meshName = this.serverList.selected.value;
