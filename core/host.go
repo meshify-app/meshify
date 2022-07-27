@@ -60,7 +60,7 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 			host.MeshId = mesh.Id
 			host.AccountId = mesh.AccountId
 			host.Current.AllowedIPs = current.AllowedIPs
-			host.Current.Dns = current.Dns
+			host.Current.Dns = append(host.Current.Dns, mesh.Default.Dns...)
 		}
 	}
 

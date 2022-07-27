@@ -103,6 +103,8 @@ func CreateService(service *model.Service) (*model.Service, error) {
 			CreatedBy: service.CreatedBy,
 		}
 
+		host.Current.Dns = append(host.Current.Dns, host.Default.Dns...)
+
 		// Failsafe entry for DNS.  Service will break without proper DNS setup.  If nothing is set use google
 		if len(host.Current.Dns) == 0 {
 			host.Current.Dns = append(host.Current.Dns, "8.8.8.8")
