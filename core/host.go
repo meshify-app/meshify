@@ -101,8 +101,8 @@ func CreateHost(host *model.Host) (*model.Host, error) {
 	}
 	host.Current.Address = ips
 	host.Current.AllowedIPs = append(host.Current.AllowedIPs, ips...)
-	if host.Current.EnableDns && len(host.Current.Dns) == 0 {
-		host.Current.Dns = ipsDns
+	if host.Current.EnableDns {
+		host.Current.Dns = append(host.Current.Dns, ipsDns...)
 	}
 
 	if host.Current.SubnetRouting && len(host.Current.PostUp) == 0 {
@@ -201,11 +201,14 @@ func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
 		}
 
 		ips := make([]string, 0)
+		ipsDns := make([]string, 0)
+
 		for _, network := range host.Default.Address {
 			ip, err := util.GetAvailableIp(network, reserverIps)
 			if err != nil {
 				return nil, err
 			}
+			ipsDns = append(ipsDns, ip)
 			if util.IsIPv6(ip) {
 				ip = ip + "/128"
 			} else {
@@ -215,8 +218,8 @@ func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
 		}
 		host.Current.Address = ips
 		host.Current.AllowedIPs = ips
-		if host.Current.EnableDns && len(host.Current.Dns) == 0 {
-			host.Current.Dns = ips
+		if host.Current.EnableDns {
+			host.Current.Dns = append(host.Current.Dns, ipsDns...)
 		}
 	}
 
