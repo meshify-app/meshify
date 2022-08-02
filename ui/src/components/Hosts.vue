@@ -86,7 +86,7 @@
                                 class="pr-1 pl-1"
                                 color="success"
                                 v-model="item.enable"
-                                v-on:change="update(item)"
+                                v-on:change="updateEnable(item)"
                         />
                     </v-row>
                 </template>
@@ -717,6 +717,10 @@
 
       reconcile(host, template) {
 
+      },
+      updateEnable(host) {
+        host.enable = !host.enable
+        this.updatehost(host)
       },
 
       update(host) {
