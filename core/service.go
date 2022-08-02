@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"sort"
+	"strings"
 	"time"
 
 	model "github.com/meshify-app/meshify/model"
@@ -90,7 +91,7 @@ func CreateService(service *model.Service) (*model.Service, error) {
 		host := model.Host{
 			Id:        uuid.NewV4().String(),
 			AccountId: service.AccountId,
-			Name:      "relay" + "." + service.RelayHost.MeshName,
+			Name:      strings.ToLower(service.ServiceType) + "." + service.RelayHost.MeshName,
 			Enable:    true,
 			MeshId:    service.RelayHost.MeshId,
 			MeshName:  service.RelayHost.MeshName,
