@@ -719,7 +719,7 @@
 
       },
       updateEnable(host) {
-        host.enable = !host.enable
+        // the switch automatically updates host.enable to the proper value
         this.updatehost(host)
       },
 
