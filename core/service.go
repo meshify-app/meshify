@@ -52,26 +52,46 @@ func CreateService(service *model.Service) (*model.Service, error) {
 	}
 
 	if service.RelayHost.MeshId == "" {
-		// create a default mesh
-		mesh := model.Mesh{
-			AccountId:   service.AccountId,
-			MeshName:    service.RelayHost.MeshName,
-			Description: service.Description,
-			Created:     time.Now().UTC(),
-			Updated:     time.Now().UTC(),
-			CreatedBy:   service.CreatedBy,
-		}
-		mesh.Default.Address = []string{service.DefaultSubnet}
-		mesh.Default.Dns = append(mesh.Default.Dns, "8.8.8.8")
-		mesh.Default.EnableDns = true
-
-		mesh2, err := CreateMesh(&mesh)
+		// get all the current meshes and see if there is one with the same name
+		meshes, err := ReadMeshes(service.CreatedBy)
 		if err != nil {
 			return nil, err
 		}
-		service.RelayHost.MeshName = mesh2.MeshName
-		service.RelayHost.MeshId = mesh2.Id
-		service.RelayHost.Default = mesh2.Default
+
+		found := false
+
+		for _, m := range meshes {
+			if m.MeshName == service.RelayHost.MeshName {
+				found = true
+				service.RelayHost.MeshName = m.MeshName
+				service.RelayHost.MeshId = m.Id
+				service.RelayHost.Default = m.Default
+				break
+			}
+		}
+
+		if !found {
+			// create a default mesh
+			mesh := model.Mesh{
+				AccountId:   service.AccountId,
+				MeshName:    service.RelayHost.MeshName,
+				Description: service.Description,
+				Created:     time.Now().UTC(),
+				Updated:     time.Now().UTC(),
+				CreatedBy:   service.CreatedBy,
+			}
+			mesh.Default.Address = []string{service.DefaultSubnet}
+			mesh.Default.Dns = service.RelayHost.Current.Dns
+			mesh.Default.EnableDns = true
+
+			mesh2, err := CreateMesh(&mesh)
+			if err != nil {
+				return nil, err
+			}
+			service.RelayHost.MeshName = mesh2.MeshName
+			service.RelayHost.MeshId = mesh2.Id
+			service.RelayHost.Default = mesh2.Default
+		}
 	} else {
 		// check if mesh exists
 		mesh, err := ReadMesh(service.RelayHost.MeshId)
@@ -103,8 +123,6 @@ func CreateService(service *model.Service) (*model.Service, error) {
 			Updated:   time.Now().UTC(),
 			CreatedBy: service.CreatedBy,
 		}
-
-		host.Current.Dns = append(host.Current.Dns, host.Default.Dns...)
 
 		// Failsafe entry for DNS.  Service will break without proper DNS setup.  If nothing is set use google
 		if len(host.Current.Dns) == 0 {
