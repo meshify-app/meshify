@@ -68,7 +68,7 @@
                     </v-row>
                 </template>
                 <template v-slot:item.action="{ item }">
-                    <v-row>
+                    <v-row v-if="item.type != 'ServiceHost'" >
                         <v-icon
                                 class="pr-1 pl-1"
                                 @click.stop="startUpdate(item)"
