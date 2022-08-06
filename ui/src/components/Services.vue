@@ -52,7 +52,7 @@
                     <v-row>
                         <v-icon
                                 class="pr-1 pl-1"
-                                @click="remove(item)"
+                                @click="removeSubscription(item)"
                         >
                             mdi-trash-can-outline
                         </v-icon>
@@ -428,6 +428,8 @@
       dialogUpdate: false,
       dialogMember : false,
       inDelete: false,
+      credits : 0,
+      used: 0,
       meshList: {},
       serverList: {},
       server: null,
@@ -455,7 +457,7 @@
         { text: 'Name', value: 'name', },
         { text: "Description", value: 'description', },
         { text: 'Issued', value: 'issued', },
-        { text: 'Expires', value: 'expires', },
+        { text: 'Credits', value: 'credits', },
         { text: 'Status', value: 'status', },
         { text: 'Actions', value: 'action', sortable: false, },
 
@@ -509,6 +511,8 @@
 
         ...mapActions('subscription', {
             readSubscriptions: 'read',
+            deleteSubscription: 'delete',
+            updateSubscription: 'update',
         }),
 
         ...mapActions('service', {
@@ -527,6 +531,16 @@
         }),
 
       startCreateService() {
+        this.credits = 0;
+        for (var i = 0; i < this.subscriptions.length; i++) {
+            if (this.subscriptions[i].status == "active") {
+                this.credits += this.subscriptions[i].credits;
+            }
+        }
+        if (this.credits <= this.services.length) {
+            alert("You have exceeded your credit limit. Please purchase more credits to create a new service.")
+            return
+        }        
         this.dialogCreateService = true;
         this.service = {
           name: "",
@@ -589,6 +603,18 @@
         this.dialogCreateService = false;
 
       },
+
+      removeSubscription(item) {
+        this.inDelete = true;
+        if (confirm(`Do you really want to delete ${item.name} ?`)){
+          this.deleteSubscription(item)
+        }
+        this.readAllAccounts(this.authuser.email)
+        this.readAllMeshes()
+        this.readServices(this.authuser.email)
+
+      },
+
 
       remove(item) {
         this.inDelete = true;

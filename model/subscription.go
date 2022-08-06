@@ -18,6 +18,8 @@ type Subscription struct {
 	CreatedBy   string    `json:"createdBy"   bson:"createdBy"`
 	UpdatedBy   string    `json:"updatedBy"   bson:"updatedBy"`
 	Status      string    `json:"status"      bson:"status"`
+	Sku         string    `json:"sku"         bson:"sku"`
+	Credits     int       `json:"credits"     bson:"credits"`
 	AutoRenew   bool      `json:"autoRenew"   bson:"autoRenew"`
 }
 

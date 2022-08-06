@@ -69,6 +69,10 @@ func createSubscription(c *gin.Context) {
 	links := sub["_links"].(map[string]interface{})
 	log.Info(links)
 
+	// get the sku from the line_items
+	sku := sub["line_items"].([]interface{})[0].(map[string]interface{})["sku"].(string)
+	status := sub["status"].(string)
+
 	customer := links["customer"].([]interface{})
 	log.Info(customer)
 
@@ -124,14 +128,47 @@ func createSubscription(c *gin.Context) {
 			log.Error(err)
 		}
 
+		credits := 0
+		name := ""
+		description := ""
+		switch sku {
+		case "Starter-0":
+			credits = 0
+			name = "Starter"
+			description = "The Starter subscription has no credits for relay service"
+		case "Relay-1":
+			fallthrough
+		case "RelayYear-1":
+			credits = 1
+			name = "Relay Service"
+			description = "A single Relay Service in any Region"
+		case "Premium-5":
+			fallthrough
+		case "PremiumYear-5":
+			credits = 5
+			name = "Premium"
+			description = "Up to 5 tunnel/relays in any Region"
+		case "Pro-10":
+			fallthrough
+		case "ProYear-10":
+			credits = 10
+			name = "Professional"
+			description = "Up to 10 tunnel/relays in any Region"
+		default:
+			log.Errorf("unknown sku %s", sku)
+		}
+
 		// construct a subscription object
 		subscription := model.Subscription{
 			Id:          id,
 			Email:       email,
-			Name:        "Relay Service",
-			Description: "One relay running in the region of your choice",
+			Name:        name,
+			Description: description,
 			Issued:      time.Now(),
 			LastUpdated: time.Now(),
+			Credits:     credits,
+			Sku:         sku,
+			Status:      status,
 		}
 
 		errs := subscription.IsValid()
