@@ -160,19 +160,19 @@ func createSubscription(c *gin.Context) {
 		case "RelayYear-1":
 			credits = 1
 			name = "Relay Service"
-			description = "A single Relay Service in any Region"
+			description = "A single tunnel or relay in any Region"
 		case "Premium-5":
 			fallthrough
 		case "PremiumYear-5":
 			credits = 5
 			name = "Premium"
-			description = "Up to 5 tunnel/relays in any Region"
+			description = "Up to 5 tunnels or relays in any Region"
 		case "Pro-10":
 			fallthrough
 		case "ProYear-10":
 			credits = 10
 			name = "Professional"
-			description = "Up to 10 tunnel/relays in any Region"
+			description = "Up to 10 tunnels or relays in any Region"
 		default:
 			log.Errorf("unknown sku %s", sku)
 		}
