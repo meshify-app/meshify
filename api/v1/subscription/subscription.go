@@ -66,7 +66,7 @@ func createSubscription(c *gin.Context) {
 	}
 
 	body = string(bytes)
-	// remove all the backslashes from the body
+	// remove all the backslashes from the body (is this needed?)
 	body = strings.Replace(body, "\\", "", -1)
 	log.Info(body)
 	bytes = []byte(body)
