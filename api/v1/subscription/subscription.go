@@ -52,6 +52,12 @@ func createSubscription(c *gin.Context) {
 		return
 	}
 
+	body = string(bytes)
+	// remove all the backslashes from the body (is this needed?)
+	body = strings.Replace(body, "\\", "", -1)
+	log.Info(body)
+	bytes = []byte(body)
+
 	// hash the body and compare it to the signature
 	h := hmac.New(sha256.New, []byte(secret))
 	h.Write(bytes)
@@ -59,18 +65,14 @@ func createSubscription(c *gin.Context) {
 	if !hmac.Equal([]byte(signature), expected) {
 		log.WithFields(log.Fields{
 			"signature": signature,
+			"expected":  expected,
 			"body":      string(bytes),
 		}).Error("failed to verify signature")
-		c.AbortWithStatus(http.StatusForbidden)
-		return
+	} else {
+		log.Info("signature verified")
 	}
 
-	body = string(bytes)
-	// remove all the backslashes from the body (is this needed?)
-	body = strings.Replace(body, "\\", "", -1)
-	log.Info(body)
-	bytes = []byte(body)
-
+	// unmarshal the body into a map
 	err = json.Unmarshal(bytes, &sub)
 	if err != nil {
 		log.WithFields(log.Fields{
