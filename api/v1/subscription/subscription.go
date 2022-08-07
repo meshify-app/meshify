@@ -1,6 +1,8 @@
 package subscription
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -35,6 +37,10 @@ func createSubscription(c *gin.Context) {
 	var body string
 	var sub map[string]interface{}
 
+	// get the secret and hash of the body
+	secret := os.Getenv("WC_SECRET")
+	signature := c.Request.Header.Get("x-wc-webhook-signature")
+
 	// read and log the request body
 
 	bytes, err := ioutil.ReadAll(c.Request.Body)
@@ -43,6 +49,19 @@ func createSubscription(c *gin.Context) {
 			"err": err,
 		}).Error("failed to read request body")
 		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
+	}
+
+	// hash the body and compare it to the signature
+	h := hmac.New(sha256.New, []byte(secret))
+	h.Write(bytes)
+	expected := h.Sum(nil)
+	if !hmac.Equal([]byte(signature), expected) {
+		log.WithFields(log.Fields{
+			"signature": signature,
+			"body":      string(bytes),
+		}).Error("failed to verify signature")
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
