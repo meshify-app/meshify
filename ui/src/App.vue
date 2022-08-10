@@ -56,10 +56,10 @@
       if (this.isAuthenticated == false) {
         if (this.$route.query.code && this.$route.query.state) {
             try {
-            // this.oauth2_exchange({
-            //  code: this.$route.query.code,
-            //  state: this.$route.query.state
-            //})
+              this.oauth2_exchange({
+                code: this.$route.query.code,
+                state: this.$route.query.state
+            })
           } catch (e) {
             this.notification = {
               show: true,
