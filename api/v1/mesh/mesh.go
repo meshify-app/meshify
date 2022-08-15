@@ -156,7 +156,7 @@ func readMeshes(c *gin.Context) {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
-		}).Error("failed to list clients")
+		}).Error("failed to list meshes")
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}

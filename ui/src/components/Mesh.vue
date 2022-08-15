@@ -1,5 +1,11 @@
 <template>
-    <v-container>
+    <v-container style="padding-top:0px">
+        <div>
+        <v-btn class="mb-3 mt-0" @click="Refresh()">
+            <v-icon dark>mdi-refresh</v-icon>
+            Refresh
+        </v-btn>
+        </div>
         <v-card>
             <v-card-title>
                 Meshes
@@ -483,7 +489,7 @@ var D3Network = window['vue-d3-network']
       headers: [
         { text: 'Name', value: 'meshName', },
         { text: 'Description', value:'description'},
-        { text: 'IP address pool', value: 'default.address', },
+        { text: 'Subnet', value: 'default.address', },
         { text: 'Created', value: 'created', sortable: false, },
         { text: 'Tags', value: 'tags', },
         { text: 'Actions', value: 'action', sortable: false, },
@@ -546,6 +552,11 @@ var D3Network = window['vue-d3-network']
           readAllAccounts: 'readAll',
       }),
 
+      Refresh() {
+        this.readAllAccounts(this.user.email)
+        this.readAllHosts()
+        this.readAllMeshes()
+      },
 
       loadNetwork(mesh) {
           let name = mesh.meshName

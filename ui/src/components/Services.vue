@@ -1,5 +1,11 @@
 <template>
-    <v-container>
+    <v-container style="padding-top:0px">
+        <div>
+        <v-btn class="mb-3 mt-0" @click="Refresh()">
+            <v-icon dark>mdi-refresh</v-icon>
+            Refresh
+        </v-btn>
+        </div>
         <v-card>
             <v-card-title>
                 Services & Subscriptions
@@ -529,6 +535,12 @@
         ...mapActions('mesh', {
             readAllMeshes: 'readAll',
         }),
+
+      Refresh() {
+        this.readSubscriptions(this.authuser.email)
+        this.readServices(this.authuser.email)
+        this.readServers()
+      },
 
       startCreateService() {
         this.credits = 0;

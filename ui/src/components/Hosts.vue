@@ -1,5 +1,11 @@
 <template>
-    <v-container>
+    <v-container style="padding-top:0px">
+        <div>
+        <v-btn class="mb-3 mt-0" @click="Refresh()">
+            <v-icon dark>mdi-refresh</v-icon>
+            Refresh
+        </v-btn>
+        </div>
         <v-card>
             <v-card-title>
                 Hosts
@@ -626,6 +632,12 @@
       ...mapActions('account', {
           readAllAccounts: 'readAll',
       }),
+
+      Refresh() {
+        this.readAllAccounts(this.user.email)
+        this.readAllHosts()
+        this.readAllMeshes()
+      },
 
 
       startCreate() {
