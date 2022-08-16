@@ -66,74 +66,6 @@
                 </template>
 
             </v-data-table>
-            <v-card-text v-else>
-                <v-row>
-                    <v-col
-                            v-for="(subscription, i) in subscriptions "
-                            :key="i"
-                            sm12 lg6
-                    >
-                        <v-card
-                                :color="subscription.enable ? '#1F7087' : 'warning'"
-                                class="mx-auto"
-                                raised
-                                shaped
-                        >
-                            <v-list-item>
-                                <v-list-item-content>
-                                    <v-list-item-title class="headline">{{ subscription.subscriptionName }}</v-list-item-title>
-                                    <v-list-item-subtitle>Created: {{ subscription.created | formatDate }} by {{ subscription.createdBy }}</v-list-item-subtitle>
-                                    <v-list-item-subtitle>Updated: {{ subscription.updated | formatDate }} by {{ subscription.updatedBy }}</v-list-item-subtitle>
-                                </v-list-item-content>
-
-                                <v-list-item-avatar
-                                        tile
-                                        size="150"
-                                >
-                                </v-list-item-avatar>
-                            </v-list-item>
-
-                            <v-card-text class="text--primary">
-                                <v-chip
-                                        v-for="(ip, i) in subscription.default.address"
-                                        :key="i"
-                                        color="indigo"
-                                        text-color="white"
-                                >
-                                    <v-icon left>mdi-ip-network</v-icon>
-                                    {{ ip }}
-                                </v-chip>
-                            </v-card-text>
-                            <v-card-text class="text--primary">
-                                <v-chip
-                                        v-for="(tag, i) in subscription.default.tags"
-                                        :key="i"
-                                        color="blue-grey"
-                                        text-color="white"
-                                >
-                                    <v-icon left>mdi-tag</v-icon>
-                                    {{ tag }}
-                                </v-chip>
-                            </v-card-text>
-                            <v-card-actions>
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                                text
-                                                @click="remove(subscription)"
-                                                v-on="on"
-                                        >
-                                            <span class="d-none d-lg-flex">Delete</span>
-                                            <v-icon right dark>mdi-trash-can-outline</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span>Delete</span>
-                                </v-tooltip>
-                            </v-card-actions>
-                        </v-card>
-                    </v-col>
-                </v-row>
-            </v-card-text>
         </v-card>
         <v-card>
             <v-card-title>
@@ -172,64 +104,6 @@
                 </template>
 
             </v-data-table>
-            <v-card-text v-else>
-                <v-row>
-                    <v-col
-                            v-for="(service, i) in services "
-                            :key="i"
-                            sm12 lg6
-                    >
-                        <v-card
-                                :color="member.enable ? '#1F7087' : 'warning'"
-                                class="mx-auto"
-                                raised
-                                shaped
-                        >
-                            <v-list-item>
-                                <v-list-item-content>
-                                    <v-list-item-title class="headline">{{ service.name }}</v-list-item-title>
-                                    <v-list-item-subtitle>{{ service.description }}</v-list-item-subtitle>
-                                </v-list-item-content>
-
-                                <v-list-item-avatar
-                                        tile
-                                        size="150"
-                                >
-                                </v-list-item-avatar>
-                            </v-list-item>
-                            <v-card-actions>
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                                text
-                                                @click.stop="startUpdateMember(member)"
-                                                v-on="on"
-                                        >
-                                            <span class="d-none d-lg-flex">Edit</span>
-                                            <v-icon right dark>mdi-square-edit-outline</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span>Edit</span>
-                                </v-tooltip>
-
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                                text
-                                                @click="removeService(service)"
-                                                v-on="on"
-                                        >
-                                            <span class="d-none d-lg-flex">Delete</span>
-                                            <v-icon right dark>mdi-trash-can-outline</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span>Delete</span>
-                                </v-tooltip>
-                            </v-card-actions>
-                        </v-card>
-                    </v-col>
-                </v-row>
-            </v-card-text>
         </v-card>
         <v-dialog
                 v-if="subscriptions"
