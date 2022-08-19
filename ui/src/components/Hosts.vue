@@ -722,7 +722,7 @@
         const url = window.URL.createObjectURL(new Blob([config]))
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', host.name.split(' ').join('-') + '-' + host.meshName.split(' ').join('-') + '.conf') //or any other extension
+        link.setAttribute('download', host.name.split(' ').join('-') + '-' + host.meshName.split(' ').join('-') + '.zip') //or any other extension
         document.body.appendChild(link)
         link.click()
       },

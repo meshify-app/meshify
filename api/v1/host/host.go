@@ -1,6 +1,7 @@
 package client
 
 import (
+	"archive/zip"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -343,7 +344,9 @@ func statusHost(c *gin.Context) {
 func configHost(c *gin.Context) {
 
 	formatQr := c.DefaultQuery("qrcode", "false")
-	data, err := core.ReadHostConfig(c.Param("id"))
+	zipcode := c.DefaultQuery("zip", "false")
+
+	data, mesh, err := core.ReadHostConfig(c.Param("id"))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -352,6 +355,31 @@ func configHost(c *gin.Context) {
 		return
 	}
 	sdata := string(data)
+
+	if zipcode == "false" {
+		c.Writer.Header().Set("Content-Type", "application/zip")
+		c.Writer.Header().Set("Content-Disposition", "attachment; filename="+*mesh+".zip")
+		w := zip.NewWriter(c.Writer)
+		defer w.Close()
+		// Make a zip file with the config file
+		f, err := w.Create(*mesh + ".conf")
+		if err != nil {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("failed to create zip file")
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		_, err = f.Write(data)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("failed to write zip file")
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		return
+	}
 
 	if formatQr == "false" {
 		// return config as txt file

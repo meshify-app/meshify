@@ -305,15 +305,16 @@ func ReadHostsForUser(email string) ([]*model.Host, error) {
 }
 
 // ReadHostConfig in wg format
-func ReadHostConfig(id string) ([]byte, error) {
+func ReadHostConfig(id string) ([]byte, *string, error) {
 
+	meshName := ""
 	host, err := ReadHost(id)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	hosts, err := ReadHost2("meshid", host.MeshId)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	index := 0
@@ -328,6 +329,7 @@ func ReadHostConfig(id string) ([]byte, error) {
 		log.Errorf("Error reading Mesh: %v", hosts)
 	} else {
 		host := hosts[index]
+		meshName = host.MeshName
 		hosts = append(hosts[:index], hosts[index+1:]...)
 
 		for i := 0; i < len(hosts); i++ {
@@ -342,22 +344,23 @@ func ReadHostConfig(id string) ([]byte, error) {
 
 		config, err := template.DumpWireguardConfig(host, hosts)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
-		return config, nil
+		return config, &meshName, nil
 	}
-	return nil, err
+	return nil, nil, err
 }
 
 // EmailHost send email to host
 func EmailHost(id string) error {
+
 	host, err := ReadHost(id)
 	if err != nil {
 		return err
 	}
 
-	configData, err := ReadHostConfig(id)
+	configData, _, err := ReadHostConfig(id)
 	if err != nil {
 		return err
 	}
