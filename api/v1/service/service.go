@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	auth "github.com/meshify-app/meshify/auth"
@@ -239,7 +240,7 @@ func readServices(c *gin.Context) {
 		return
 	}
 
-	if user.Email == "" {
+	if user.Email == "" && os.Getenv("OAUTH2_PROVIDER_NAME") != "fake" {
 		log.Error("security alert: Email empty on authenticated token")
 		c.AbortWithStatus(http.StatusForbidden)
 	}

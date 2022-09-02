@@ -296,7 +296,8 @@ func readSubscriptions(c *gin.Context) {
 		return
 	}
 
-	if user.Email == "" {
+	if user.Email == "" && os.Getenv("OAUTH2_PROVIDER_NAME") != "fake" {
+
 		log.Error("security alert: Email empty on authenticated token")
 		c.AbortWithStatus(http.StatusForbidden)
 	}
