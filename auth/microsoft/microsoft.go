@@ -3,6 +3,7 @@ package microsoft
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"encoding/json"
@@ -110,6 +111,7 @@ func (o *Oauth2Msft) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 	user := &model.User{}
 	user.Sub = claims["sub"].(string)
 	user.Email = claims["email"].(string)
+	user.Email = strings.ToLower(user.Email)
 
 	log.Infof("user.Sub: %s", user.Sub)
 

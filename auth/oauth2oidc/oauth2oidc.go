@@ -3,6 +3,7 @@ package oauth2oidc
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"encoding/json"
@@ -116,7 +117,7 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 	// get some infos about user
 	user := &model.User{}
 	user.Sub = userInfo.Subject
-	user.Email = userInfo.Email
+	user.Email = strings.ToLower(userInfo.Email)
 	user.Profile = userInfo.Profile
 
 	//	for k, v :=  range claims {
@@ -129,6 +130,12 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 		user.Name = v.(string)
 	} else {
 		log.Error("name not found in user info claims")
+	}
+
+	if v, found := claims["picture"]; found && v != nil {
+		user.Picture = v.(string)
+	} else {
+		user.Picture = "/meshify-bw.png"
 	}
 
 	user.Issuer = idToken.Issuer
@@ -146,18 +153,19 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 	u, err := m.User.Read(user.Sub)
 	if err != nil {
 		log.Errorf("Error reading user %s %v", user.Sub, err)
-	}
+	} else {
 
-	if u != nil {
-		log.Infof("User: %v", u)
-		if u.UserMetadata["Plan"] != nil {
-			user.Plan = u.UserMetadata["Plan"].(string)
+		if u != nil {
+			log.Infof("User: %v", u)
+			if u.UserMetadata["Plan"] != nil {
+				user.Plan = u.UserMetadata["Plan"].(string)
+			}
 		}
+
+		user.Picture = *u.Picture
+
+		log.Infof("user.Plan: %s", user.Plan)
 	}
-
-	user.Picture = *u.Picture
-
-	log.Infof("user.Plan: %s", user.Plan)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
