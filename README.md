@@ -1,6 +1,6 @@
 # Meshify
 
-<h1 align="center"><img height="300" src="./ui/src/assets/meshify.png" alt="A WireGuard control plane"></h1>
+<h1 align="center"><img src="./ui/src/assets/meshify.png" alt="A WireGuard control plane"></h1>
 
 A control plane for [WireGuard](https://wireguard.com).
 
@@ -22,6 +22,9 @@ For example by monitoring generated directory with [inotifywait](https://github.
  * User authentication (Oauth2 OIDC)
  * Dockerized
  * Pretty cool look
+
+![Screenshot](meshify-architecture.png)
+
 
 ![Screenshot](meshify-screenshot.png)
 ## Running
