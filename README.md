@@ -1,177 +1,203 @@
 # Meshify
 
-<h1 align="center"><img src="./ui/src/assets/meshify.png" alt="A WireGuard control plane"></h1>
+<h1><img src="./ui/src/assets/meshify.png" alt="A WireGuard control plane"></h1>
 
 A control plane for [WireGuard](https://wireguard.com).
 
-## Why another one ?
+## Requirements
 
-
-
-All WireGuard UI implementations are trying to manage the service by applying configurations and creating network rules.
-This implementation only generates configuration and its up to you to create network rules and apply configuration to WireGuard.
-For example by monitoring generated directory with [inotifywait](https://github.com/inotify-tools/inotify-tools/wiki). 
-
-## Features
-
- * Self-hosted and web based
- * Automatically select IP from the netowrk pool assigned to client
- * Enable / Disable client
- * Generation of configuration files on demand
- * IPv6 ready
- * User authentication (Oauth2 OIDC)
- * Dockerized
- * Pretty cool look
+* OIDC compliant OAuth2 implementation
+* MongoDB
+* Mail Server credentials for sending outgoing email
+* golang
+* nginx
+* NodeJS / Vue 2
 
 ![Screenshot](meshify-architecture.png)
 
+## Features
+
+ * Self-hosted and web based management of wireguard networks
+ * Mesh define the configuration of the hosts in the network
+ * Invite people to network with email
+ * Authenticate them with OAuth2
+ * Generation of configuration files on demand
+ * User authentication (Oauth2 OIDC)
+ * Fully configure all aspects of your VPN
+ * Manage hosts remotely
+ * Simple
+ * Lightweight
+ * Secure
+
+
 
 ![Screenshot](meshify-screenshot.png)
+
 ## Running
 
 
 ### Directly
 
-Put everything in one directory, create `.env` file with all configurations and run the backend.
+Install dependencies
 
-## Automatically apply changes to WireGuard
+Sample NGINX Config:
 
-### Using ```systemd```
-Using `systemd.path` monitor for directory changes see [systemd doc](https://www.freedesktop.org/software/systemd/man/systemd.path.html)
 ```
-# /etc/systemd/system/wg-gen-web.path
+server {
+
+        server_name meshifyvpn.com;
+
+        root /usr/share/meshify/ui/dist; index index.html; location / {
+            try_files $uri $uri/ /index.html;
+       }
+
+    location /api/ {
+        # app2 reverse proxy settings follow
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host localhost;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://127.0.0.1:8080;
+    }
+
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/meshifyvpn.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/meshifyvpn.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = meshifyvpn.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+
+        server_name meshifyvpn.com;
+    listen 80;
+    return 404; # managed by Certbot
+
+
+}
+```
+
+Example `.env` file:
+
+```
+# IP address to listen to
+SERVER=0.0.0.0
+# port to bind
+PORT=8080
+# Gin framework release mode
+GIN_MODE=release
+
+# SMTP settings to send email to clients
+SMTP_HOST=smtp.sendgrid.net
+SMTP_PORT=587
+SMTP_USERNAME=apikey
+SMTP_PASSWORD=
+SMTP_FROM=Meshify <info@meshifyvpn.com>
+
+# MONGO settings
+MONGODB_CONNECTION_STRING=mongodb://127.0.0.1:27017
+
+# example with google
+#OAUTH2_PROVIDER_NAME=google
+#OAUTH2_PROVIDER=
+#OAUTH2_CLIENT_ID=
+#OAUTH2_CLIENT_SECRET=
+#OAUTH2_REDIRECT_URL=
+
+# example with github
+#OAUTH2_PROVIDER_NAME=github
+#OAUTH2_PROVIDER=https://github.com
+#OAUTH2_CLIENT_ID=
+#OAUTH2_CLIENT_SECRET=
+#OAUTH2_REDIRECT_URL=
+
+#OAUTH2_PROVIDER_NAME=oauth2oidc
+#OAUTH2_PROVIDER=https://auth.meshifyvpn.com/
+#OAUTH2_PROVIDER_URL=meshifyvpn.us.auth0.com
+#OAUTH2_CLIENT_ID=
+#OAUTH2_CLIENT_ID_WINDOWS=
+#OAUTH2_CLIENT_SECRET=
+#OAUTH2_REDIRECT_URL=https://dev.meshifyvpn.com
+
+OAUTH2_PROVIDER_NAME=microsoft
+OAUTH2_PROVIDER=https://login.microsoftonline.com/.../v2.0
+OAUTH2_CLIENT_ID=
+OAUTH2_CLIENT_ID_WINDOWS=
+OAUTH2_CLIENT_SECRET=
+OAUTH2_REDIRECT_URL=https://meshifyvpn.com
+OAUTH2_TENET=...
+
+# set provider name to fake to disable auth, also the default
+OAUTH2_PROVIDER_NAME=microsoft
+```
+
+Create a systemd service for the API:
+
+```
+cat  /lib/systemd/system/meshify-api.service
 [Unit]
-Description=Watch /etc/wireguard for changes
-
-[Path]
-PathModified=/etc/wireguard
-
-[Install]
-WantedBy=multi-user.target
-```
-This `.path` will activate unit file with the same name
-```
-# /etc/systemd/system/wg-gen-web.service
-[Unit]
-Description=Restart WireGuard
+Description=Meshify API
+ConditionPathExists=/usr/share/meshify/cmd/meshify
 After=network.target
 
 [Service]
-Type=oneshot
-ExecStart=/usr/bin/systemctl restart wg-quick@wg0.service
+Type=simple
+User=root
+Group=root
+LimitNOFILE=1024000
+
+Restart=on-failure
+RestartSec=10
+#startLimitIntervalSec=60
+
+WorkingDirectory=/usr/share/meshify/
+ExecStart=/usr/share/meshify/cmd/meshify/meshify
+
+# make sure log directory exists and owned by syslog
+PermissionsStartOnly=true
+ExecStartPre=/bin/mkdir -p /var/log/meshify
+ExecStartPre=/bin/chown syslog:adm /var/log/meshify
+ExecStartPre=/bin/chmod 755 /var/log/meshify
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=meshify
 
 [Install]
 WantedBy=multi-user.target
 ```
-Which will restart WireGuard service 
 
-### Using ```inotifywait```
-For any other init system, create a daemon running this script
+Build the API
 ```
-#!/bin/sh
-while inotifywait -e modify -e create /etc/wireguard; do
-  wg-quick down wg0
-  wg-quick up wg0
-done
+cd /usr/share/meshify/cmd/meshify
+go build
 ```
 
-## How to use with existing WireGuard configuration
-
-After first run Wg Gen Web will create `server.json` in data directory with all server informations.
-
-Feel free to modify this file in order to use your existing keys
-
-## What is out of scope
-
- * Currently out of scope is setting firewall marks (FwMark)
-
-## Authentication
-
-Wg Gen Web can use Oauth2 OpenID Connect provider to authenticate users.
-Currently there are 4 implementations:
-- `fake` not a real implementation, use this if you don't want to authenticate your clients.
-
-Add the environment variable:
+Enable the service:
 
 ```
-OAUTH2_PROVIDER_NAME=fake
+sudo systemctl enable meshify-api
+sudo systemctl start meshify-api
 ```
 
-- `github` in order to use GitHub as Oauth2 provider.
-
-Add the environment variable:
-
+Install NodeJS using NVM
 ```
-OAUTH2_PROVIDER_NAME=github
-OAUTH2_PROVIDER=https://github.com
-OAUTH2_CLIENT_ID=********************
-OAUTH2_CLIENT_SECRET=********************
-OAUTH2_REDIRECT_URL=https://wg-gen-web-demo.127-0-0-1.fr
+nvm use lts-latest
 ```
+cd ui
+npm Install
+npm run build
 
-- `google` in order to use Google as Oauth2 provider. Not yet implemented
-```
-help wanted
-```
-
-- `oauth2oidc` in order to use RFC compliant Oauth2 OpenId Connect provider.
-
-Add the environment variable:
-
-```
-OAUTH2_PROVIDER_NAME=oauth2oidc
-OAUTH2_PROVIDER=https://gitlab.com
-OAUTH2_CLIENT_ID=********************
-OAUTH2_CLIENT_SECRET=********************
-OAUTH2_REDIRECT_URL=https://wg-gen-web-demo.127-0-0-1.fr
-```
-
-Please fell free to test and report any bugs.
-Wg Gen Web will only access your profile to get email address and your name, no other unnecessary scopes will be requested.
+With the given nginx config, you should now be able to use your website.  Don't forget
+to get a cert using certbot
 
 ## Need Help
 
 mailto:support@meshify.app
 
-## Development
-
-### Backend
-
-From the top level directory run
-
-```
-$ go run main.go
-```
-
-### Frontend
-
-Inside another terminal session navigate into the `ui` folder
-
-```
-$ cd ui
-```
-Install required dependencies
-```
-$ npm install
-```
-Set the base url for the api
-```
-$ export VUE_APP_API_BASE_URL=http://localhost:8080/api/v1.0
-```
-Start the development server. It will rebuild and reload the site once you make a change to the source code.
-```
-$ npm run serve
-```
-
-Now you can access the site from a webbrowser with the url `http://localhost:8081`.
-
-## Application stack
-
- * [Gin, HTTP web framework written in Go](https://github.com/gin-gonic/gin)
- * [go-template, data-driven templates for generating textual output](https://golang.org/pkg/text/template/)
- * [Vue.js, progressive javaScript framework](https://github.com/vuejs/vue)
- * [Vuetify, material design component framework](https://github.com/vuetifyjs/vuetify)
-
 ## License
-
- * Do What the Fuck You Want to Public License. [LICENSE-WTFPL](LICENSE-WTFPL) or http://www.wtfpl.net
+* Released under MIT License
