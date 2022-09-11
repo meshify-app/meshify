@@ -188,9 +188,14 @@ Install NodeJS using NVM
 ```
 nvm use lts-latest
 ```
+
+Build the frontend
+
+```
 cd ui
 npm Install
 npm run build
+```
 
 With the given nginx config, you should now be able to use your website.  Don't forget
 to get a cert using certbot
