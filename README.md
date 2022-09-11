@@ -193,7 +193,7 @@ Build the frontend
 
 ```
 cd ui
-npm Install
+npm install
 npm run build
 ```
 
