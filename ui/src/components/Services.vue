@@ -59,6 +59,7 @@
                         <v-icon
                                 class="pr-1 pl-1"
                                 @click="removeSubscription(item)"
+                                title = "Remove Subscription (not recommended)"
                         >
                             mdi-trash-can-outline
                         </v-icon>
@@ -97,6 +98,7 @@
                         <v-icon
                                 class="pr-1 pl-1"
                                 @click="remove(item)"
+                                title = "Delete Service Host"
                         >
                             mdi-trash-can-outline
                         </v-icon>

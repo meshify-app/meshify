@@ -74,12 +74,14 @@
                         <v-icon
                                 class="pr-1 pl-1"
                                 @click.stop="startUpdate(item)"
+                                title = "Edit"
                         >
                             mdi-square-edit-outline
                         </v-icon>
                         <v-icon
                                 class="pr-1 pl-1"
                                 @click="remove(item)"
+                                title = "Delete"
                         >
                             mdi-trash-can-outline
                         </v-icon>

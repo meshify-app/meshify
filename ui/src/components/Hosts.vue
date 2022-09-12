@@ -78,12 +78,21 @@
                         <v-icon
                                 class="pr-1 pl-1"
                                 @click.stop="startUpdate(item)"
+                                title = "Edit"
                         >
                             mdi-square-edit-outline
                         </v-icon>
                         <v-icon
                                 class="pr-1 pl-1"
+                                @click.stop="startCopy(item)"
+                                title = "Copy"
+                        >
+                            mdi-content-copy
+                        </v-icon>
+                        <v-icon
+                                class="pr-1 pl-1"
                                 @click="remove(item)"
+                                title = "Delete"
                         >
                             mdi-trash-can-outline
                         </v-icon>
@@ -105,7 +114,7 @@
                 max-width="550"
         >
             <v-card>
-                <v-card-title class="headline">Add new host</v-card-title>
+                <v-card-title class="headline">Add New Host</v-card-title>
                 <v-card-text>
                     <v-row>
                         <v-col
@@ -447,6 +456,68 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog
+                v-if="host"
+                v-model="dialogCopy"
+                max-width="550"
+        >
+            <v-card>
+            <v-card-title class="headline">Copy Host to Mesh</v-card-title>
+                    <v-card-text>
+
+                        <v-row>
+                            <v-col
+                                    cols="12"
+                            >
+                                <v-form
+                                        ref="form"
+                                        v-model="valid"
+                                >
+                                    <v-text-field
+                                            v-model="name"
+                                            label="New name for host"
+                                            :rules="[ v => !!v || 'host name is required',]"
+                                            required
+                                    />
+
+                                    <v-select return-object
+                                            v-model="meshList.selected"
+                                            :items="meshList.items"
+                                            item-text = "text"
+                                            item-value = "value"
+                                            label="Copy to this mesh"
+                                            :rules="[ v => !!v || 'Mesh is required', ]"
+                                            single
+                                            persistent-hint
+                                            required
+                                    />
+                                </v-form>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-card>
+                <v-card>
+                <v-card-actions>
+                        <v-btn
+                                :disabled="!valid"
+                                color="success"
+                                @click="copy(host)"
+                        >
+                            Submit
+                            <v-icon right dark>mdi-check-outline</v-icon>
+                        </v-btn>
+                        <v-btn
+                                color="primary"
+                                @click="dialogCopy = false"
+                        >
+                            Cancel
+                            <v-icon right dark>mdi-close-circle-outline</v-icon>
+                        </v-btn>
+                </v-card-actions>
+            </v-card>
+
+            </v-dialog>
+
     </v-container>
 </template>
 <script>
@@ -463,8 +534,10 @@
       listView: true,
       dialogCreate: false,
       dialogUpdate: false,
+      dialogCopy: false,
       host: null,
       mesh: null,
+      name: '',
       panel: 1,
       valid: false,
       meshList: {},
@@ -624,9 +697,30 @@
 
       },
 
-      reconcile(host, template) {
+      startCopy(host) {
 
-      },
+        this.host = host;
+        this.name = host.name;
+        this.readConfig(host);
+
+        this.meshList = { selected: { "text": this.host.meshName,  "value": this.host.meshid },
+                        items: [] }
+
+        var selected = 0;
+        for (let i=0; i<this.meshes.length; i++) {
+            this.meshList.items[i]= { "text": this.meshes[i].meshName, "value": this.meshes[i].id }
+            if (this.meshList.items[i].text == this.host.meshName) {
+                selected = i
+            }
+        }
+
+        this.meshList.selected = this.meshList.items[selected];
+
+        this.dialogCopy = true;
+        this.dialogUpdate = false;
+
+        },
+
       updateEnable(host) {
         // the switch automatically updates host.enable to the proper value
         this.updatehost(host)
@@ -711,6 +805,40 @@
         // all good, submit
         this.dialogUpdate = false;
         this.updatehost(host)
+      },
+
+      copy(host) {
+
+        this.noEdit = true
+        this.host = host
+
+        this.host.current.listenPort = parseInt(this.host.current.listenPort, 10);
+        this.host.current.persistentKeepalive = parseInt(this.host.current.persistentKeepalive, 10);
+        this.host.current.mtu = parseInt(this.host.current.mtu, 10);
+
+        var changed = false;
+        if (this.host.meshid != this.meshList.selected.value) {
+            this.host.meshName = this.meshList.selected.text
+            this.host.meshid = this.meshList.selected.value
+            changed = true;
+        }
+        this.host.meshName = this.meshList.selected.text
+        this.host.platform = this.platforms.selected.text
+
+        if (changed) {
+
+            this.host.id = ""
+            this.host.current.endpoint = ""
+            this.host.current.listenPort = 0
+            this.host.meshName = this.meshList.selected.text
+            this.host.meshid = this.meshList.selected.value
+            this.createhost(host)
+
+        }
+
+        this.readAllHosts();
+
+        this.dialogCopy = false;
       },
 
       forceFileDownload(host){
