@@ -123,7 +123,6 @@
                                         :rules="[ v => !!v || 'Account is required', ]"
                                         single
                                         persistent-hint
-                                        required
                                 />
 
 

@@ -155,6 +155,12 @@
                                         :rules="[ v => !!v || 'Email address is required', ]"
                                         required
                                 />
+                                <v-switch
+                                        v-model="sendEmail"
+                                        color="success"
+                                        inset
+                                        label="Send Email"
+                               />
                             </v-form>
                         </v-col>
                     </v-row>
@@ -342,6 +348,7 @@
       inDelete: false,
       meshList: {},
       toAddress: "",
+      sendEmail: true,
       roles : ["Owner", "Admin", "User"],
       statuses : ["Active", "Pending", "Suspended", "Hidden"],
       user: null,
@@ -455,6 +462,11 @@
 
         var result = this.createAccount(this.account)
         console.log( "result = %s", result)
+
+        if ((result) && (this.sendEmail)) {
+            this.emailUser(result)
+        }
+
         this.dialogCreate = false;
 
       },
@@ -471,19 +483,14 @@
 
       },
 
-      email(toAddress, mesh) {
+      email(account) {
         this.dialogCreate = false;
-        if (!toAddress) {
+        if ( account.Email == "") {
           this.errorUser('email address is not defined')
           return
         }
 
-        for (let i=0; i<this.accounts.length; i++) {
-            if (this.accounts[i].id == this.accounts[i].parent) {
-                this.emailUser(toAddress + "/" + this.accounts[i].id);
-                break;        
-            }
-        }
+        this.emailUser(account)
 
       },
 

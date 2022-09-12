@@ -87,8 +87,8 @@ const actions = {
       })
   },
 
-  email({ commit }, toAddress){
-    ApiService.get(`/users/${toAddress}/invite`)
+  email({ commit }, account){
+    ApiService.get(`/accounts/${account.id}/invite`)
       .then(() => {
       })
       .catch(err => {

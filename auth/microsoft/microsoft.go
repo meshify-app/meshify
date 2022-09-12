@@ -135,6 +135,10 @@ func (o *Oauth2Msft) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION_STRING")))
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
 
 	defer func() {
 		if err = client.Disconnect(ctx); err != nil {

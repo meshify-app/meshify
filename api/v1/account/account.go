@@ -21,6 +21,7 @@ func ApplyRoutes(r *gin.RouterGroup) {
 		g.POST("/", createAccount)
 		g.POST("/:id/activate", activateAccount)
 		g.PATCH("/:id/activate", activateAccount)
+		g.GET("/:id/invite", emailAccount)
 		g.GET("/:id", readAllAccounts)
 		g.PATCH("/:id", updateAccount)
 		g.DELETE("/:id", deleteAccount)
@@ -40,6 +41,54 @@ func activateAccount(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, v)
+}
+
+func emailAccount(c *gin.Context) {
+	id := c.Param("id")
+
+	oauth2Token := c.MustGet("oauth2Token").(*oauth2.Token)
+	oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
+
+	user, err := oauth2Client.UserInfo(oauth2Token)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"oauth2Token": oauth2Token,
+			"err":         err,
+		}).Error("failed to get user with oauth token")
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	if user.Email == "" {
+		log.WithFields(log.Fields{
+			"oauth2Token": oauth2Token,
+			"err":         err,
+		}).Error("failed to get user with oauth token")
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	account, err := core.ReadAccount(id)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to read account")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	account.From = user.Email
+
+	err = core.EmailUser(account.Email, account.Id, account.MeshId)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to send email to client")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func createAccount(c *gin.Context) {
@@ -73,17 +122,6 @@ func createAccount(c *gin.Context) {
 		log.WithFields(log.Fields{
 			"err": err,
 		}).Error("failed to create account")
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-
-	log.Infof("emailUser account = %v %v %v", account.Email, account.Id, account.MeshId)
-
-	err = core.EmailUser(account.Email, account.Id, account.MeshId)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error("failed to send email to client")
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}

@@ -63,6 +63,18 @@ func CreateAccount(account *model.Account) (*model.Account, error) {
 	return account, nil
 }
 
+// ReadACcount by id
+func ReadAccount(id string) (*model.Account, error) {
+
+	v, err := mongo.Deserialize(id, "id", "accounts", reflect.TypeOf(model.Account{}))
+	if err != nil {
+		return nil, err
+	}
+	account := v.(*model.Account)
+
+	return account, nil
+}
+
 // ReadAllAccounts account by id or email address
 func ReadAllAccounts(email string) ([]*model.Account, error) {
 
