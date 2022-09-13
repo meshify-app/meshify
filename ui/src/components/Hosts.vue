@@ -642,6 +642,10 @@
 
       create(host) {
         this.host.current.listenPort = parseInt(this.host.current.listenPort, 10); 
+        // append the port to the endpoint if it is not there
+        if (this.host.current.endpoint != "" && this.host.current.endpoint.indexOf(":") == -1) {
+            this.host.current.endpoint = this.host.current.endpoint + ":" + this.host.current.listenPort
+        }
         this.host.meshName = this.meshList.selected.text
         this.host.meshid = this.meshList.selected.value
         this.host.platform = this.platforms.selected.text
@@ -733,6 +737,10 @@
         this.host = host
 
         this.host.current.listenPort = parseInt(this.host.current.listenPort, 10);
+        // append the port to the endpoint if it is not there
+        if (this.host.current.endpoint != "" && this.host.current.endpoint.indexOf(":") == -1) {
+            this.host.current.endpoint = this.host.current.endpoint + ":" + this.host.current.listenPort
+        }
         this.host.current.persistentKeepalive = parseInt(this.host.current.persistentKeepalive, 10);
         this.host.current.mtu = parseInt(this.host.current.mtu, 10);
 
