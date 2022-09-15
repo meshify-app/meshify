@@ -206,3 +206,5 @@ mailto:support@meshify.app
 
 ## License
 * Released under MIT License
+
+WireGuard® is a registered trademark of Jason A. Donenfeld.
