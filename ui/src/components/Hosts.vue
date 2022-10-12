@@ -474,7 +474,7 @@
                                         v-model="valid"
                                 >
                                     <v-text-field
-                                            v-model="name"
+                                            v-model="host.name"
                                             label="New name for host"
                                             :rules="[ v => !!v || 'host name is required',]"
                                             required
@@ -644,7 +644,10 @@
         this.host.current.listenPort = parseInt(this.host.current.listenPort, 10); 
         // append the port to the endpoint if it is not there
         if (this.host.current.endpoint != null && this.host.current.endpoint != "" && this.host.current.endpoint.indexOf(":") == -1) {
-            this.host.current.endpoint = this.host.current.endpoint + ":" + this.host.current.listenPort
+            if (this.host.current.listenPort == 0 ) {
+                this.host.current.listenPort = 51820
+            }
+            this.host.current.endpoint = this.host.current.endpoint + ":" + this.host.current.listenPort.toString()
         }
         this.host.meshName = this.meshList.selected.text
         this.host.meshid = this.meshList.selected.value
@@ -704,7 +707,6 @@
       startCopy(host) {
 
         this.host = host;
-        this.name = host.name;
         this.readConfig(host);
 
         this.meshList = { selected: { "text": this.host.meshName,  "value": this.host.meshid },
@@ -724,6 +726,38 @@
         this.dialogUpdate = false;
 
         },
+      copy(host) {
+
+        this.noEdit = true;
+        this.host = host;
+
+        this.host.current.listenPort = parseInt(this.host.current.listenPort, 10);
+        this.host.current.persistentKeepalive = parseInt(this.host.current.persistentKeepalive, 10);
+        this.host.current.mtu = parseInt(this.host.current.mtu, 10);
+
+        var changed = false;
+        if (this.host.meshid != this.meshList.selected.value) {
+            this.host.meshName = this.meshList.selected.text
+            this.host.meshid = this.meshList.selected.value
+            changed = true;
+        }
+        this.host.meshName = this.meshList.selected.text
+        this.host.platform = this.platforms.selected.text
+
+        if (changed) {
+            this.host.id = ""
+            this.host.current.endpoint = ""
+            this.host.current.listenPort = 0
+            this.host.meshName = this.meshList.selected.text
+            this.host.meshid = this.meshList.selected.value
+            this.createhost(host)
+
+        }
+
+        this.readAllHosts();
+
+        this.dialogCopy = false;
+      },
 
       updateEnable(host) {
         // the switch automatically updates host.enable to the proper value
@@ -732,13 +766,15 @@
 
       update(host) {
 
-        this.noEdit = true
-
-        this.host = host
+        this.noEdit = true;
+        this.host = host;
 
         this.host.current.listenPort = parseInt(this.host.current.listenPort, 10);
         // append the port to the endpoint if it is not there
-        if (this.host.current.endpoint != "" && this.host.current.endpoint.indexOf(":") == -1) {
+        if (this.host.current.endpoint != null && this.host.current.endpoint != "" && this.host.current.endpoint.indexOf(":") == -1) {
+            if (this.host.current.listenPort == 0 ) {
+                this.host.current.listenPort = 51820
+            }
             this.host.current.endpoint = this.host.current.endpoint + ":" + this.host.current.listenPort
         }
         this.host.current.persistentKeepalive = parseInt(this.host.current.persistentKeepalive, 10);
@@ -813,40 +849,6 @@
         // all good, submit
         this.dialogUpdate = false;
         this.updatehost(host)
-      },
-
-      copy(host) {
-
-        this.noEdit = true
-        this.host = host
-
-        this.host.current.listenPort = parseInt(this.host.current.listenPort, 10);
-        this.host.current.persistentKeepalive = parseInt(this.host.current.persistentKeepalive, 10);
-        this.host.current.mtu = parseInt(this.host.current.mtu, 10);
-
-        var changed = false;
-        if (this.host.meshid != this.meshList.selected.value) {
-            this.host.meshName = this.meshList.selected.text
-            this.host.meshid = this.meshList.selected.value
-            changed = true;
-        }
-        this.host.meshName = this.meshList.selected.text
-        this.host.platform = this.platforms.selected.text
-
-        if (changed) {
-
-            this.host.id = ""
-            this.host.current.endpoint = ""
-            this.host.current.listenPort = 0
-            this.host.meshName = this.meshList.selected.text
-            this.host.meshid = this.meshList.selected.value
-            this.createhost(host)
-
-        }
-
-        this.readAllHosts();
-
-        this.dialogCopy = false;
       },
 
       forceFileDownload(host){
