@@ -349,7 +349,7 @@
                                                 :input-value="selected"
                                                 close
                                                 @click="select"
-                                                @click:close="host.current.splice(host.current.dns.indexOf(item), 1)"
+                                                @click:close="host.current.dns.splice(host.current.dns.indexOf(item), 1)"
                                         >
                                             <strong>{{ item }}</strong>&nbsp;
                                         </v-chip>
