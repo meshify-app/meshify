@@ -1,8 +1,7 @@
 module.exports = {
   devServer: {
-    public : 'dev.meshify.app',
-    clientLogLevel: 'debug',
-    disableHostCheck: true,
+    client : { webSocketURL : 'https://dev.meshify.app' },
+    allowedHosts: 'all',
     port: 8081,
   },
   "transpileDependencies": [

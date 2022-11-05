@@ -345,7 +345,7 @@
 
       ],
       bottom_headers: [
-        { text: 'Name', value: 'name', },
+        { text: 'Name', value: 'relayHost.name', },
         { text: "Location", value: 'description', },
         { text: 'Service', value: 'serviceType'},
         { text: 'Created', value: 'created', },
