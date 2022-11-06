@@ -34,7 +34,19 @@ const actions = {
   readAll({ commit, dispatch }){
     ApiService.get("/host")
       .then(resp => {
-        commit('hosts', resp)
+        for (var i = 0; i < resp.length; i++) {
+          var host = resp[i]
+          var last = new Date(host.lastSeen)
+          var diff = Math.abs(Date.now() - last)
+          console.log( "Host: " + host.name + " lastSeen: " + host.lastSeen + " ms: "  + diff)
+          if (diff > 10000) {
+              host.status = "Offline"
+          } else {
+              host.status = "Online"
+          }
+          commit('hosts', resp)
+        }
+  
 //        dispatch('readQrcodes')
 //        dispatch('readConfigs')
       })

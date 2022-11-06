@@ -584,17 +584,6 @@
       this.readAllAccounts(this.user.email)
       this.readAllHosts()
       this.readAllMeshes()
-
-      // set the status for each host
-        this.hosts.forEach(host => {
-            if (host.current.lastSeen == null || 
-                host.current.lastSeen > time.Now() - 10 * time.Minute) {
-                host.status = "Offline"
-            } else {
-                host.status = "Online"
-            }
-            this.readHostStatus(host.id)
-        })
     },
 
     methods: {
