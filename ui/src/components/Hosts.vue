@@ -555,6 +555,7 @@
       search: '',
       headers: [
         { text: 'Name', value: 'name', },
+        { text: 'Status', value: 'status', },
         { text: 'Mesh', value: 'meshName', },
         { text: 'IP addresses', value: 'current.address', },
 //        { text: 'ID', value:'id', },
@@ -583,6 +584,17 @@
       this.readAllAccounts(this.user.email)
       this.readAllHosts()
       this.readAllMeshes()
+
+      // set the status for each host
+        this.hosts.forEach(host => {
+            if (host.current.lastSeen == null || 
+                host.current.lastSeen > time.Now() - 10 * time.Minute) {
+                host.status = "Offline"
+            } else {
+                host.status = "Online"
+            }
+            this.readHostStatus(host.id)
+        })
     },
 
     methods: {

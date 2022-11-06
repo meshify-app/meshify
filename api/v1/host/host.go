@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	auth "github.com/meshify-app/meshify/auth"
@@ -158,7 +159,7 @@ func updateHost(c *gin.Context) {
 		data.UpdatedBy = user.Name
 	}
 
-	client, err := core.UpdateHost(id, &data)
+	client, err := core.UpdateHost(id, &data, false)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -320,7 +321,15 @@ func statusHost(c *gin.Context) {
 				if client.HostGroup != hostGroup {
 					client.Current.PrivateKey = ""
 					client.APIKey = ""
+				} else {
+					client.LastSeen = time.Now()
+					// update host from id with new last seen
+					client, err = core.UpdateHost(client.Id, client, true)
+					if err != nil {
+						log.Error(err)
+					}
 				}
+				client.LastSeen = time.Time{}
 				msg.Config[i].Hosts = append(msg.Config[i].Hosts, *client)
 			} else {
 				log.Errorf("internal error")

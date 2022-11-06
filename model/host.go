@@ -27,6 +27,7 @@ type Host struct {
 	UpdatedBy string    `json:"updatedBy"                 bson:"updatedBy"`
 	Created   time.Time `json:"created"                   bson:"created"`
 	Updated   time.Time `json:"updated"                   bson:"updated"`
+	LastSeen  time.Time `json:"lastSeen"				  bson:"lastSeen"`
 	Current   Settings  `json:"current"                   bson:"current"`
 	Default   Settings  `json:"default"                   bson:"default"`
 }

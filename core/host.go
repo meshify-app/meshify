@@ -181,7 +181,7 @@ func ReadHost(id string) (*model.Host, error) {
 }
 
 // UpdateHost preserve keys
-func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
+func UpdateHost(Id string, host *model.Host, flag bool) (*model.Host, error) {
 	v, err := mongo.Deserialize(Id, "id", "hosts", reflect.TypeOf(model.Host{}))
 	if err != nil {
 		return nil, err
@@ -241,7 +241,9 @@ func UpdateHost(Id string, host *model.Host) (*model.Host, error) {
 		return nil, errors.New("failed to validate host")
 	}
 
-	host.Updated = time.Now().UTC()
+	if !flag {
+		host.Updated = time.Now().UTC()
+	}
 
 	err = mongo.Serialize(host.Id, "id", "hosts", host)
 	if err != nil {
