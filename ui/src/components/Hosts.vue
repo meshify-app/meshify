@@ -41,6 +41,12 @@
                 <template v-slot:item.name="{ item }">
                         {{ item.name }}
                 </template>
+                <template v-slot:item.status="{ item }">
+                    <v-icon v-if="item.status == 'Online'" color="green">mdi-check-circle</v-icon>
+                    <v-icon v-else color="red">mdi-close-circle</v-icon>
+                    {{ item.status}}
+                </template>
+                
                 <template v-slot:item.address="{ item }">
                     <v-chip
                             v-for="(ip, i) in item.address"
