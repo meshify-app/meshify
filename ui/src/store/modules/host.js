@@ -39,7 +39,7 @@ const actions = {
           var last = new Date(host.lastSeen)
           var diff = Math.abs(Date.now() - last)
           console.log( "Host: " + host.name + " lastSeen: " + host.lastSeen + " ms: "  + diff)
-          if (diff > 10000) {
+          if (diff > 20000) {
               host.status = "Offline"
           } else {
               host.status = "Online"
