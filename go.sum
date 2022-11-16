@@ -2,8 +2,12 @@
 9fans.net/go v0.0.0-20181112161441-237454027057/go.mod h1:diCsxrliIURU9xsYtjCp5AbpQKqdhKmf0ujWDUSkfoY=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
+github.com/GehirnInc/crypt v0.0.0-20200316065508-bb7000b8a962 h1:KeNholpO2xKjgaaSyd+DyQRrsQjhbSeS7qe4nEw8aQw=
+github.com/GehirnInc/crypt v0.0.0-20200316065508-bb7000b8a962/go.mod h1:kC29dT1vFpj7py2OvG1khBdQpo3kInWP+6QipLbdngo=
 github.com/PuerkitoBio/rehttp v1.0.0 h1:aJ7A7YI2lIvOxcJVeUZY4P6R7kKZtLeONjgyKGwOIu8=
 github.com/PuerkitoBio/rehttp v1.0.0/go.mod h1:ItsOiHl4XeMOV3rzbZqQRjLc3QQxbE6391/9iNG7rE8=
+github.com/amoghe/go-crypt v0.0.0-20220222110647-20eada5f5964 h1:I9YN9WMo3SUh7p/4wKeNvD/IQla3U3SUa61U7ul+xM4=
+github.com/amoghe/go-crypt v0.0.0-20220222110647-20eada5f5964/go.mod h1:eFiR01PwTcpbzXtdMces7zxg6utvFM5puiWHpWB8D/k=
 github.com/aws/aws-sdk-go v1.29.15 h1:0ms/213murpsujhsnxnNKNeVouW60aJqSd992Ks3mxs=
 github.com/aws/aws-sdk-go v1.29.15/go.mod h1:1KvfttTE3SPKMpo8g2c6jL3ZKfXtFvKscTgahTma5Xg=
 github.com/coreos/go-oidc v2.2.1+incompatible h1:mh48q/BqXqgjVHpy2ZY7WnWAbenxRjsz9N1i1YxjHAk=

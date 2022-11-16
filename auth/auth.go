@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/meshify-app/meshify/auth/basic"
 	"github.com/meshify-app/meshify/auth/fake"
 	"github.com/meshify-app/meshify/auth/github"
 	"github.com/meshify-app/meshify/auth/microsoft"
@@ -38,6 +39,10 @@ func GetAuthProvider() (Auth, error) {
 	case "microsoft":
 		log.Warn("Oauth is set to Microsoft")
 		oauth2Client = &microsoft.Oauth2Msft{}
+
+	case "basic":
+		log.Warn("Oauth is set to basic.  Authenication against the shadow file")
+		oauth2Client = &basic.Oauth2Basic{}
 
 	case "github":
 		log.Warn("Oauth is set to github, no openid will be used")

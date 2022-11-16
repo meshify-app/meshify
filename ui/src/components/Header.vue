@@ -41,7 +41,7 @@
                         max-width="344"
                         outlined
                 >
-                    <v-list-item three-line>
+                    <v-list-item three-line v-show="isAuthenticated">
                         <v-list-item-content>
                             <div class="overline mb-4">connected as</div>
                             <v-list-item-title class="headline mb-1">{{user.name}}
@@ -71,13 +71,13 @@
 
 <script>
   import {mapActions, mapGetters} from "vuex";
-  import { showServicesTab, title } from "../../env"
+  import env from "../../env"
 
   export default {
     name: 'Header',
       data: () => ({
-            showServices: showServicesTab,
-            title: title,
+            showServices: env.showServicesTab,
+            title: env.title,
         }),
 
     computed:{
@@ -93,7 +93,7 @@
       }),
       mylogout() {
         this.logout();
-        window.location.href = "https://auth.meshify.app/v2/logout?client_id=Boc4FHUn6armCu7O5PCQxRwXV13Ebqae&returnTo=https://my.meshify.app";
+        window.location.href = env.logoutUrl;
       }
     },
   }

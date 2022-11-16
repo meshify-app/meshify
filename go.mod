@@ -3,6 +3,8 @@ module github.com/meshify-app/meshify
 go 1.14
 
 require (
+	github.com/GehirnInc/crypt v0.0.0-20200316065508-bb7000b8a962 // indirect
+	github.com/amoghe/go-crypt v0.0.0-20220222110647-20eada5f5964
 	github.com/aws/aws-sdk-go v1.29.15 // indirect
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/danielkov/gin-helmet v0.0.0-20171108135313-1387e224435e

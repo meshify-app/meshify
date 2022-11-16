@@ -80,13 +80,15 @@ func oauth2Exchange(c *gin.Context) {
 	cacheDb := c.MustGet("cache").(*cache.Cache)
 	savedState, exists := cacheDb.Get(loginVals.ClientId)
 
-	if !exists || savedState != loginVals.State {
-		log.WithFields(log.Fields{
-			"state":      loginVals.State,
-			"savedState": savedState,
-		}).Error("saved state and client provided state mismatch")
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
+	if loginVals.State != "basic_auth" {
+		if !exists || savedState != loginVals.State {
+			log.WithFields(log.Fields{
+				"state":      loginVals.State,
+				"savedState": savedState,
+			}).Error("saved state and client provided state mismatch")
+			c.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
 	}
 	oauth2Client := c.MustGet("oauth2Client").(auth.Auth)
 

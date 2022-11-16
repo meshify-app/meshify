@@ -1,7 +1,7 @@
 <template>
   <v-app id="inspire">
     <Notification v-bind:notification="notification"/>
-      <Header/>
+      <Header v-show="isAuthenticated"/>
 
         <v-container>
           <router-view />

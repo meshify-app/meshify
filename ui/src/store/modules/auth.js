@@ -63,6 +63,11 @@ const actions = {
       })
   },
 
+  basic_auth({ commit }){
+    commit( 'authStatus', 'basic')
+
+  },
+
   oauth2_exchange({ commit, dispatch }, data){
     data.clientId = TokenService.getClientId()
     ApiService.post("/auth/oauth2_exchange", data)

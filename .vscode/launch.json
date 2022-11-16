@@ -18,7 +18,8 @@
             "reAttach": true,
             "name": "Launch dev.meshify.app",
             "url": "http://dev.meshify.app/",
-            "webRoot": "${workspaceFolder}/ui"
+            "webRoot": "${workspaceFolder}/ui",
+            "tmpDir": "~/tmp"
         },
         {
             "name": "Launch via NPM",
