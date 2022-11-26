@@ -169,6 +169,8 @@ func (o *Oauth2Basic) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 		if len(accounts) == 0 {
 			var account model.Account
 			account.Email = user.Email
+			account.Name = user.Sub
+			account.AccountName = user.Sub
 			account.Role = "Owner"
 			account.Status = "Active"
 			a, err := core.CreateAccount(&account)

@@ -23,7 +23,6 @@
                                         type="password"
                                         :append-icon="showPrivate ? 'mdi-eye' : 'mdi-eye-off'"
                                         :type="showPrivate ? 'text' : 'password'"
-                                        hint="Clear this field to have the client manage its private key"
                                         @click:append="showPrivate = !showPrivate"
                                         label="Password"
                                         :rules="[ v => !!v || 'password is required', ]"
