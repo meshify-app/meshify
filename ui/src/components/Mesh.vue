@@ -158,6 +158,18 @@
                                         </v-chip>
                                     </template>
                                 </v-combobox>
+                                <v-switch
+                                        v-model="mesh.default.upnp"
+                                        color="success"
+                                        inset
+                                        label="Enable UPnP where possible"
+                               />
+                                    <v-switch
+                                        v-model="mesh.default.enableDns"
+                                        color="success"
+                                        inset
+                                        label="Enable Meshify DNS"
+                               />                                
                             </v-form>
                         </v-col>
                     </v-row>
@@ -525,8 +537,8 @@ var D3Network = window['vue-d3-network']
         this.mesh.default = {
           allowedIPs: [],
           address: [],
-          enableDns: true,
-          upnp : true,
+          enableDns: false,
+          upnp : false,
         }
         this.acntList = { selected: { "text": "",  "value": ""},
                           items: [] }
