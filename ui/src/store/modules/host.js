@@ -38,9 +38,12 @@ const actions = {
           var host = resp[i]
           var last = new Date(host.lastSeen)
           var diff = Math.abs(Date.now() - last)
-          console.log( "Host: " + host.name + " lastSeen: " + host.lastSeen + " ms: "  + diff)
+          // console.log( "Host: " + host.name + " lastSeen: " + host.lastSeen + " ms: "  + diff)
           if (diff > 20000) {
               host.status = "Offline"
+              if (host.platform == "Native") {
+                host.status = "Native"
+              }
           } else {
               host.status = "Online"
           }
