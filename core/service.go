@@ -82,7 +82,8 @@ func CreateService(service *model.Service) (*model.Service, error) {
 			}
 			mesh.Default.Address = []string{service.DefaultSubnet}
 			mesh.Default.Dns = service.RelayHost.Current.Dns
-			mesh.Default.EnableDns = true
+			mesh.Default.EnableDns = false
+			mesh.Default.UPnP = false
 
 			mesh2, err := CreateMesh(&mesh)
 			if err != nil {
