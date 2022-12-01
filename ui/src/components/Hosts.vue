@@ -42,7 +42,8 @@
                         {{ item.name }}
                 </template>
                 <template v-slot:item.status="{ item }">
-                    <v-icon v-if="item.status == 'Online' || item.status == 'Native'" color="green">mdi-check-circle</v-icon>
+                    <v-icon v-if="item.status == 'Online'" color="green">mdi-check-circle</v-icon>
+                    <v-icon v-else-if="item.status == 'Native'" color="blue">mdi-minus-circle</v-icon>
                     <v-icon v-else color="red">mdi-close-circle</v-icon>
                     {{ item.status }}
                 </template>
@@ -562,7 +563,7 @@
                         { text: "Windows", value:"Windows",},
                         { text: "Linux",  value: "Linux", },
                         { text: "MacOS" , value:"MacOS", },
-                        { text: "Apple iOS" , value:"Apple iOS", },
+                        { text: "Apple iOS" , value:"iOS", },
                         { text: "Android" , value:"Android", },
                         { text: "Native WireGuard", value: "Native", },
                    ],
