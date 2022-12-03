@@ -53,13 +53,12 @@ func Serialize(id string, parm string, col string, c interface{}) error {
 	}
 
 	opts := options.Update().SetUpsert(true)
-	res, err := collection.UpdateOne(ctx, filter, update, opts)
+	_, err = collection.UpdateOne(ctx, filter, update, opts)
 
 	//	if res != nil && res.Err != nil {
 	//		collection.InsertOne(ctx, b)
 	//	}
 
-	log.Infof("Res: %v", res)
 	return err
 }
 

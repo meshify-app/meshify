@@ -81,6 +81,15 @@
                     </v-row>
                 </template>
                 <template v-slot:item.action="{ item }">
+                    <v-row v-if="item.type == 'ServiceHost'" >
+                        <v-icon
+                                class="pr-1 pl-1"
+                                @click.stop="startUpdateServiceHost(item)"
+                                title = "Edit Service"
+                        >
+                            mdi-square-edit-outline
+                        </v-icon>
+                    </v-row>
                     <v-row v-if="item.type != 'ServiceHost'" >
                         <v-icon
                                 class="pr-1 pl-1"
@@ -532,6 +541,70 @@
             </v-card>
 
             </v-dialog>
+            <v-dialog
+                v-if="host"
+                v-model="dialogServiceHost"
+                max-width="550"
+        >
+            <v-card>
+            <v-card-title class="headline">Manage Service: {{ host.name }}</v-card-title>
+                    <v-card-text>
+
+                        <v-row>
+                            <v-col
+                                    cols="12"
+                            >
+                                <v-form
+                                        ref="form"
+                                        v-model="valid"
+                                >
+                                    <v-combobox
+                                            v-model="host.current.allowedIPs"
+                                            chips
+                                            hint="Enter IPv4 or IPv6 CIDR and press tab"
+                                            label="Allowed IPs"
+                                            multiple
+                                            dark
+                                    >
+                                
+                                        <template v-slot:selection="{ attrs, item, select, selected }">
+                                            <v-chip
+                                                    v-bind="attrs"
+                                                    :input-value="selected"
+                                                    close
+                                                    @click="select"
+                                                    @click:close="host.current.allowedIPs.splice(host.current.allowedIPs.indexOf(item), 1)"
+                                            >
+                                                <strong>{{ item }}</strong>&nbsp;
+                                            </v-chip>
+                                        </template>
+                                    </v-combobox>
+                                </v-form>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-card>
+                <v-card>
+                <v-card-actions>
+                        <v-btn
+                                :disabled="!valid"
+                                color="success"
+                                @click="update(host)"
+                        >
+                            Submit
+                            <v-icon right dark>mdi-check-outline</v-icon>
+                        </v-btn>
+                        <v-btn
+                                color="primary"
+                                @click="dialogServiceHost = false"
+                        >
+                            Cancel
+                            <v-icon right dark>mdi-close-circle-outline</v-icon>
+                        </v-btn>
+                </v-card-actions>
+            </v-card>
+
+            </v-dialog>
 
     </v-container>
 </template>
@@ -550,6 +623,7 @@
       dialogCreate: false,
       dialogUpdate: false,
       dialogCopy: false,
+      dialogServiceHost: false,
       host: null,
       mesh: null,
       name: '',
@@ -722,6 +796,14 @@
 
       },
 
+      startUpdateServiceHost(host) {
+
+        this.host = host;
+        this.readConfig(host);
+        
+        this.dialogServiceHost = true;
+
+      },
       startCopy(host) {
 
         this.host = host;
@@ -874,6 +956,7 @@
         }
         // all good, submit
         this.dialogUpdate = false;
+        this.dialogServiceHost = false;
         this.updatehost(host)
       },
 
