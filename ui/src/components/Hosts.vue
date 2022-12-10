@@ -881,12 +881,12 @@
         this.host.current.mtu = parseInt(this.host.current.mtu, 10);
 
         var changed = false;
-        if (this.host.meshid != this.meshList.selected.value) {
+
+        if (this.meshList.selected != null && this.host.meshid != this.meshList.selected.value) {
             this.host.meshName = this.meshList.selected.text
             this.host.meshid = this.meshList.selected.value
             changed = true;
         }
-        this.host.meshName = this.meshList.selected.text
         this.host.platform = this.platforms.selected.value
         if (this.publicSubnets) {
             this.host.current.allowedIPs.push("0.0.0.0/5","8.0.0.0/7",
