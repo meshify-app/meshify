@@ -887,7 +887,12 @@
             this.host.meshid = this.meshList.selected.value
             changed = true;
         }
-        this.host.platform = this.platforms.selected.value
+        if (this.meshList.selected != null ) {
+            this.host.meshName = this.meshList.selected.text
+        }
+        if (this.platforms.selected != null) {
+            this.host.platform = this.platforms.selected.value
+        }
         if (this.publicSubnets) {
             this.host.current.allowedIPs.push("0.0.0.0/5","8.0.0.0/7",
             "11.0.0.0/8","12.0.0.0/6", "16.0.0.0/4", "32.0.0.0/3", "64.0.0.0/3", "96.0.0.0/6",
