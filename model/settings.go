@@ -14,6 +14,7 @@ type Settings struct {
 	AllowedIPs          []string `json:"allowedIPs"                bson:"allowedIPs"`
 	Address             []string `json:"address"                   bson:"address"`
 	Dns                 []string `json:"dns"                       bson:"dns"`
+	Table               string   `json:"table"                     bson:"table"`
 	PersistentKeepalive int      `json:"persistentKeepalive"       bson:"persistentKeepalive"`
 	ListenPort          int      `json:"listenPort"                bson:"listenPort"`
 	Endpoint            string   `json:"endpoint"                  bson:"endpoint"`
