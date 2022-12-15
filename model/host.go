@@ -15,6 +15,7 @@ type Host struct {
 	Name      string    `json:"name"                      bson:"name"`
 	HostGroup string    `json:"hostGroup"                 bson:"hostGroup"`
 	Type      string    `json:"type"                      bson:"type"`
+	Role      string    `json:"role"                      bson:"role"`
 	MeshId    string    `json:"meshid"                    bson:"meshid"`
 	MeshName  string    `json:"meshName"                  bson:"meshName"`
 	APIKey    string    `json:"apiKey"                    bson:"apiKey"`

@@ -313,27 +313,89 @@ func statusHost(c *gin.Context) {
 		msg.Config[i].MeshName = mesh.MeshName
 		msg.Config[i].MeshId = mesh.MeshId
 
+		hasIngress := false
+		ingress := &model.Host{}
+		egress := &model.Host{}
+		isIngress := false
+		isEgress := false
+
+		// Check the mesh to see if it has ingress and egress roles
 		for _, client := range clients {
 			// They should all match
 			if client.MeshId == msg.Config[i].MeshId {
-				// If this config isn't explicitly for this host, remove the private key
-				// and api key from the results
-				if client.HostGroup != hostGroup {
-					client.Current.PrivateKey = ""
-					client.APIKey = ""
-				} else {
-					client.LastSeen = time.Now()
-					// update host from id with new last seen
-					client, err = core.UpdateHost(client.Id, client, true)
+				if client.Role == "ingress" {
+					hasIngress = true
+					ingress = client
+					if client.HostGroup == hostGroup {
+						isIngress = true
+					}
+				}
+				if client.Role == "egress" {
+					egress = client
+					if client.HostGroup == hostGroup {
+						isEgress = true
+					}
+				}
+			} else {
+				log.Errorf("internal error")
+				c.AbortWithStatus(http.StatusInternalServerError)
+				return
+			}
+		}
+
+		if isEgress && hasIngress {
+			// If this is the egress host, only return the ingress and egress hosts
+			// and remove the 0.0.0.0/0 from allowedIPs on the ingress host
+			allowed := ingress.Current.AllowedIPs
+			// Remove 0.0.0.0/0 from the allowed IPs
+			for x, ip := range allowed {
+				if ip == "0.0.0.0/0" {
+					allowed = append(allowed[:x], allowed[x+1:]...)
+					break
+				}
+			}
+			msg.Config[i].Hosts = make([]model.Host, 2)
+			msg.Config[i].Hosts[0] = *ingress
+			msg.Config[i].Hosts[0].Current.AllowedIPs = allowed
+			msg.Config[i].Hosts[1] = *egress
+		}
+
+		for _, client := range clients {
+			// If this config isn't explicitly for this host, remove the private key
+			// and api key from the results
+			if client.HostGroup != hostGroup {
+				client.Current.PrivateKey = ""
+				client.APIKey = ""
+			} else {
+				client.LastSeen = time.Now()
+				client2 := *client
+				// update host from id with new last seen
+				go func() {
+					_, err = core.UpdateHost(client2.Id, &client2, true)
 					if err != nil {
 						log.Error(err)
 					}
-				}
-				client.LastSeen = time.Time{}
-				msg.Config[i].Hosts = append(msg.Config[i].Hosts, *client)
-			} else {
-				log.Errorf("internal error")
+				}()
 			}
+			client.LastSeen = time.Time{}
+
+			if isEgress {
+				// If this is the egress host, only return the ingress and egress hosts
+				// (which was done above)
+				continue
+			}
+
+			if client.Role == "Egress" && hasIngress && !isIngress {
+				// Hosts pointing to ingress do not see the egress host
+				// If it's the ingress itself, it needs to see the egress host
+				continue
+			}
+
+			// If this isn't the egress host, or there is
+			// only an egress host, or if it's neither,
+			// include this client in the results
+
+			msg.Config[i].Hosts = append(msg.Config[i].Hosts, *client)
 		}
 	}
 	bytes, err := json.Marshal(msg)
