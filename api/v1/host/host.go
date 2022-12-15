@@ -323,14 +323,14 @@ func statusHost(c *gin.Context) {
 		for _, client := range clients {
 			// They should all match
 			if client.MeshId == msg.Config[i].MeshId {
-				if client.Role == "ingress" {
+				if client.Role == "Ingress" {
 					hasIngress = true
 					ingress = client
 					if client.HostGroup == hostGroup {
 						isIngress = true
 					}
 				}
-				if client.Role == "egress" {
+				if client.Role == "Egress" {
 					egress = client
 					if client.HostGroup == hostGroup {
 						isEgress = true

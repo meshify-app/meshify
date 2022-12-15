@@ -380,6 +380,10 @@
                                     </template>
                                 </v-combobox>
                                 <v-text-field
+                                        v-model="host.current.table"
+                                        label="Table"
+                                />
+                                <v-text-field
                                         v-model="host.id"
                                         label="Host ID"
                                         disabled
