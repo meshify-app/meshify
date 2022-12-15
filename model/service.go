@@ -18,6 +18,8 @@ type Service struct {
 	CreatedBy      string    `json:"createdBy"    bson:"createdBy"`
 	UpdatedBy      string    `json:"updatedBy"    bson:"updatedBy"`
 	RelayHost      Host      `json:"relayHost"    bson:"relayHost"`
+	IngressHost    Host      `json:"ingressHost"  bson:"ingressHost"`
+	EgressHost     Host      `json:"egressHost"   bson:"egressHost"`
 	ContainerId    string    `json:"containerId"  bson:"containerId"`
 	Status         string    `json:"status"       bson:"status"`
 	ServiceHost    string    `json:"serviceHost"  bson:"serviceHost"`
