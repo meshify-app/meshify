@@ -25,6 +25,13 @@
                 >
                     Add Service Host
                     <v-icon right dark>mdi-weather-cloudy</v-icon>
+                </v-btn>&nbsp;
+                <v-btn
+                        color="success"
+                        @click="startCreateMultihop"
+                >
+                    Add Multihop
+                    <v-icon right dark>mdi-weather-cloudy</v-icon>
                 </v-btn>
             </v-card-title>
         </v-card>
@@ -193,39 +200,13 @@
             </v-card>
         </v-dialog>
         <v-dialog
-                v-if="user"
-                v-model="dialogUpdate"
+                v-if="subscriptions"
+                v-model="dialogCreateMultihop"
                 max-width="550"
         >
             <v-card>
-                    <v-card-actions>
-                        <v-btn
-                                :disabled="!valid"
-                                color="success"
-                                @click="update(user)"
-                        >
-                            Submit
-                            <v-icon right dark>mdi-check-outline</v-icon>
-                        </v-btn>
-                        <v-btn
-                                color="primary"
-                                @click="dialogUpdate = false"
-                        >
-                            Cancel
-                            <v-icon right dark>mdi-close-circle-outline</v-icon>
-                        </v-btn>
-                    </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <v-dialog
-                v-if="member"
-                v-model="dialogMember"
-                max-width="550"
-        >
-            <v-card>
-                <v-card-title class="headline">Edit Member</v-card-title>
+                <v-card-title class="headline">Create New Multihop Service</v-card-title>
                 <v-card-text>
-
                     <v-row>
                         <v-col
                                 cols="12"
@@ -234,22 +215,26 @@
                                     ref="form"
                                     v-model="valid"
                             >
-                                <v-text-field
-                                        v-model="member.accountName"
-                                        label="Account Name"
-                                        :rules="[ v => !!v || 'Account name is required',]"
+                            <v-select return-object
+                                        v-model="ingressList.selected"
+                                        :items="ingressList.items"
+                                        item-text = "text"
+                                        item-value = "value"
+                                        label="Pick a region for ingress"
+                                        :rules="[ v => !!v || 'Ingress region is required', ]"
+                                        single
+                                        persistent-hint
                                         required
                                 />
-                                <v-text-field
-                                        v-model="member.email"
-                                        label="Email Address"
-                                        :rules="[ v => !!v || 'Email address is required',]"
-                                        required
-                                />
-                                <v-text-field
-                                        v-model="member.name"
-                                        label="Name"
-                                        :rules="[ v => !!v || 'Name is required',]"
+                                <v-select return-object
+                                        v-model="egressList.selected"
+                                        :items="egressList.items"
+                                        item-text = "text"
+                                        item-value = "value"
+                                        label="Pick a region for egress"
+                                        :rules="[ v => !!v || 'Egress region is required', ]"
+                                        single
+                                        persistent-hint
                                         required
                                 />
                                 <v-select return-object
@@ -263,37 +248,28 @@
                                         persistent-hint
                                         required
                                 />
-                                <v-select
-                                    :items="roles"
-                                    v-model="member.role"
-                                    label="Role"
-                                ></v-select>
-                                <v-select
-                                    :items="statuses"
-                                    v-model="member.status"
-                                    label="Status"
-                                ></v-select>
                             </v-form>
                         </v-col>
                     </v-row>
                 </v-card-text>
-                    <v-card-actions>
-                        <v-btn
-                                :disabled="!valid"
-                                color="success"
-                                @click="updateMember(member)"
-                        >
-                            Submit
-                            <v-icon right dark>mdi-check-outline</v-icon>
-                        </v-btn>
-                        <v-btn
-                                color="primary"
-                                @click="dialogMember = false"
-                        >
-                            Cancel
-                            <v-icon right dark>mdi-close-circle-outline</v-icon>
-                        </v-btn>
-                    </v-card-actions>
+                <v-card-actions>
+                    <v-spacer/>
+                    <v-btn
+                            :disabled="!valid"
+                            color="success"
+                            @click="create_multihop()"
+                    >
+                        Submit
+                        <v-icon right dark>mdi-check-outline</v-icon>
+                    </v-btn>
+                    <v-btn
+                            color="primary"
+                            @click="dialogCreateMultihop = false"
+                    >
+                        Cancel
+                        <v-icon right dark>mdi-close-circle-outline</v-icon>
+                    </v-btn>
+                </v-card-actions>
             </v-card>
         </v-dialog>
     </v-container>
@@ -307,6 +283,7 @@
     data: () => ({
       listView: true,
       dialogCreateService: false,
+      dialogCreateMultihop: false,
       dialogUpdate: false,
       dialogMember : false,
       inDelete: false,
@@ -314,7 +291,11 @@
       used: 0,
       meshList: {},
       serverList: {},
+      ingressList: {},
+      egressList: {},
       server: null,
+      ingressServer: null,
+      egressServer: null,
       roles : ["Owner", "Admin", "User"],
       statuses : ["Active", "Pending", "Suspended", "Hidden"],
       user: null,
@@ -322,6 +303,8 @@
       account: null,
       subscription: null,
       service: null,
+      ingress: null,
+      egress : null,
       panel: 1,
       valid: false,
       search: '',
@@ -452,45 +435,162 @@
         }
       },
 
-      create() {
-
-        for (let i=0; i<this.serverList.items.length; i++) {
-            if (this.serverList.items[i].value == this.serverList.selected.value) {
-                this.server = this.servers[i];
+      startCreateMultihop() {
+        this.credits = 0;
+        for (var i = 0; i < this.subscriptions.length; i++) {
+            if (this.subscriptions[i].status == "active") {
+                this.credits += this.subscriptions[i].credits;
             }
         }
-
-        var range = this.server.portMax - this.server.portMin + 1;
-        var port = this.server.portMin + Math.floor(Math.random() * range);
-
-        this.service.defaultSubnet = this.server.defaultSubnet;
-        this.service.servicePort = port;
-        this.service.relayHost = {}
-        this.service.relayHost.meshName = this.serverList.selected.value;
-        this.service.relayHost.current = {}
-        this.service.relayHost.current.dns = []
-        this.service.relayHost.current.dns[0] = this.dnsList.selected.value;
-        this.service.relayHost.current.endpoint = this.server.ipAddress + ":" + port;
-        this.service.relayHost.current.listenPort = port;
-        this.service.description = this.server.description
-        this.service.name = this.server.name
-        this.service.serviceGroup = this.server.serviceGroup
-        this.service.apiKey = this.server.serviceApiKey
-
-        this.service.serviceType = this.svcList.selected.value;
-
-        if (this.service.relayHost.meshName != "") {
-            this.service.relayHost.meshId = this.meshList.selected.value;
+        if ((this.credits - 1) <= this.services.length) {
+            alert("Multihop requires 2 credits and exceeds your current limit. Please purchase more credits to create a new multihop service.")
+            return
+        }        
+        this.dialogCreateMultihop = true;
+        this.ingress = {
+          name: "",
+          email: this.authuser.email,
         }
-        else {
-            this.service.relayHost.meshId = "";
+        this.egress = {
+          name: "",
+          email: this.authuser.email,
+        }
+        this.meshList = { selected: { "text": "",  "value": ""},
+                          items: [] }
+
+        var selected = -1;
+        for (let i=0; i<this.meshes.length; i++) {
+            this.meshList.items[i]= { "text": this.meshes[i].meshName, "value": this.meshes[i].id }
         }
 
-        this.createService(this.service);
+        this.meshList.selected = this.meshList.items[selected];
 
-        this.dialogCreateService = false;
+        this.ingressList = { selected: { "text": "",  "value": ""},
+                          items: [] }
+        for (let i=0; i<this.servers.length; i++) {
+            this.ingressList.items[i]= { "text": this.servers[i].description, "value": this.servers[i].name }
+        }
+        this.egressList = { selected: { "text": "",  "value": ""},
+                          items: [] }
+        for (let i=0; i<this.servers.length; i++) {
+            this.egressList.items[i]= { "text": this.servers[i].description, "value": this.servers[i].name }
+        }
 
-      },
+    },
+
+    create() {
+
+    for (let i=0; i<this.serverList.items.length; i++) {
+        if (this.serverList.items[i].value == this.serverList.selected.value) {
+            this.server = this.servers[i];
+        }
+    }
+
+    var range = this.server.portMax - this.server.portMin + 1;
+    var port = this.server.portMin + Math.floor(Math.random() * range);
+
+    this.service.defaultSubnet = this.server.defaultSubnet;
+    this.service.servicePort = port;
+    this.service.relayHost = {}
+    this.service.relayHost.meshName = this.serverList.selected.value;
+    this.service.relayHost.current = {}
+    this.service.relayHost.current.dns = []
+    this.service.relayHost.current.dns[0] = this.dnsList.selected.value;
+    this.service.relayHost.current.endpoint = this.server.ipAddress + ":" + port;
+    this.service.relayHost.current.listenPort = port;
+    this.service.description = this.server.description
+    this.service.name = this.server.name
+    this.service.serviceGroup = this.server.serviceGroup
+    this.service.apiKey = this.server.serviceApiKey
+
+    this.service.serviceType = this.svcList.selected.value;
+
+    if (this.service.relayHost.meshName != "") {
+        this.service.relayHost.meshId = this.meshList.selected.value;
+    }
+    else {
+        this.service.relayHost.meshId = "";
+    }
+
+    this.createService(this.service);
+
+    this.dialogCreateService = false;
+
+    },
+
+    create_multihop() {
+
+    for (let i=0; i<this.ingressList.items.length; i++) {
+        if (this.ingressList.items[i].value == this.ingressList.selected.value) {
+            this.ingressServer = this.servers[i];
+        }
+    }
+
+    for (let i=0; i<this.egressList.items.length; i++) {
+        if (this.egressList.items[i].value == this.egressList.selected.value) {
+            this.egressServer = this.servers[i];
+        }
+    }
+
+    var rangeI = this.ingressServer.portMax - this.ingressServer.portMin + 1;
+    var portI = this.ingressServer.portMin + Math.floor(Math.random() * rangeI);
+
+    this.ingress.defaultSubnet = this.ingressServer.defaultSubnet;
+    this.ingress.servicePort = portI;
+    this.ingress.relayHost = {}
+    this.ingress.relayHost.meshName = this.meshList.selected.value;
+    this.ingress.relayHost.current = {}
+    this.ingress.relayHost.current.dns = []
+    this.ingress.relayHost.current.dns[0] = "8.8.8.8";
+    this.ingress.relayHost.current.endpoint = this.ingressServer.ipAddress + ":" + portI;
+    this.ingress.relayHost.current.listenPort = portI;
+    this.ingress.description = this.ingressServer.description + " (ingress)"
+    this.ingress.name = this.ingressServer.name
+    this.ingress.serviceGroup = this.ingressServer.serviceGroup
+    this.ingress.apiKey = this.ingressServer.serviceApiKey
+
+    this.ingress.serviceType = "Ingress";
+
+    if (this.ingress.relayHost.meshName != "") {
+        this.ingress.relayHost.meshId = this.meshList.selected.value;
+    }
+    else {
+        this.ingress.relayHost.meshId = "";
+    }
+
+    var rangeE = this.egressServer.portMax - this.egressServer.portMin + 1;
+    var portE = this.egressServer.portMin + Math.floor(Math.random() * rangeE);
+
+    this.egress.defaultSubnet = this.ingressServer.defaultSubnet;
+    this.egress.servicePort = portE;
+    this.egress.relayHost = {}
+    this.egress.relayHost.meshName = this.meshList.selected.value;
+    this.egress.relayHost.current = {}
+    this.egress.relayHost.current.dns = []
+    this.egress.relayHost.current.dns[0] = "8.8.8.8";
+    this.egress.relayHost.current.endpoint = this.egressServer.ipAddress + ":" + portE;
+    this.egress.relayHost.current.listenPort = portE;
+    this.egress.description = this.egressServer.description + " (egress)"
+    this.egress.name = this.egressServer.name
+    this.egress.serviceGroup = this.egressServer.serviceGroup
+    this.egress.apiKey = this.egressServer.serviceApiKey
+
+    this.egress.serviceType = "Egress";
+
+    if (this.egress.relayHost.meshName != "") {
+        this.egress.relayHost.meshId = this.meshList.selected.value;
+    }
+    else {
+        this.egress.relayHost.meshId = "";
+    }
+
+
+    this.createService(this.ingress);
+    this.createService(this.egress);
+
+    this.dialogCreateMultihop = false;
+
+    },
 
       removeSubscription(item) {
         this.inDelete = true;

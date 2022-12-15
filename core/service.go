@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	model "github.com/meshify-app/meshify/model"
@@ -15,8 +16,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var (
+	CreateLock sync.Mutex
+)
+
 // CreateService service with all necessary data
 func CreateService(service *model.Service) (*model.Service, error) {
+
+	// lock the function so only one service can be created at a time
+	CreateLock.Lock()
+	defer CreateLock.Unlock()
+
 	var err error
 	u := uuid.NewV4()
 	service.Id = u.String()
@@ -105,6 +115,7 @@ func CreateService(service *model.Service) (*model.Service, error) {
 		service.RelayHost.MeshName = mesh.MeshName
 		service.RelayHost.MeshId = mesh.Id
 		service.RelayHost.Default = mesh.Default
+		log.Infof("Using existing mesh: %s", mesh.MeshName)
 	}
 
 	if service.RelayHost.Id == "" {
@@ -148,6 +159,17 @@ func CreateService(service *model.Service) (*model.Service, error) {
 		case "Tunnel":
 			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Current.Address...)
 			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Default.Address...)
+			host.Current.AllowedIPs = append(host.Current.AllowedIPs, "0.0.0.0/0")
+
+		case "Ingress":
+			host.Role = "Ingress"
+			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Current.Address...)
+			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Default.Address...)
+			host.Current.AllowedIPs = append(host.Current.AllowedIPs, "0.0.0.0/0")
+
+		case "Egress":
+			host.Role = "Egress"
+			host.Current.AllowedIPs = append(host.Current.AllowedIPs, host.Current.Address...)
 			host.Current.AllowedIPs = append(host.Current.AllowedIPs, "0.0.0.0/0")
 
 		}
