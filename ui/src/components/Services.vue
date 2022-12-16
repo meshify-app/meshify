@@ -25,7 +25,7 @@
                 >
                     Add Service Host
                     <v-icon right dark>mdi-weather-cloudy</v-icon>
-                </v-btn>&nbsp;
+                </v-btn>&nbsp; 
                 <v-btn
                         color="success"
                         @click="startCreateMultihop"
