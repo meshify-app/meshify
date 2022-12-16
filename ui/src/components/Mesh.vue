@@ -139,6 +139,26 @@
                                         required
                                 />
                                 <v-combobox
+                                    v-model="mesh.default.dns"
+                                    chips
+                                    hint="Enter the IP address of a global DNS resolver, hit tab, hit enter."
+                                    label="DNS servers for this mesh"
+                                    multiple
+                                    dark
+                                >
+                                    <template v-slot:selection="{ attrs, item, select, selected }">
+                                        <v-chip
+                                                v-bind="attrs"
+                                                :input-value="selected"
+                                                close
+                                                @click="select"
+                                                @click:close="mesh.default.dns.splice(mesh.default.dns.indexOf(item), 1)"
+                                        >
+                                            <strong>{{ item }}</strong>&nbsp;
+                                        </v-chip>
+                                    </template>
+                                </v-combobox>
+                                <v-combobox
                                         v-model="mesh.default.tags"
                                         chips
                                         hint="Enter a tag, hit tab, hit enter."
@@ -248,6 +268,26 @@
                                     </template>
                                 </v-combobox>
                                 <v-combobox
+                                    v-model="mesh.default.dns"
+                                    chips
+                                    hint="Write IP address(es) and hit enter or leave empty.  If not empty, be sure to include your local resolver."
+                                    label="DNS servers for this mesh"
+                                    multiple
+                                    dark
+                                >
+                                    <template v-slot:selection="{ attrs, item, select, selected }">
+                                        <v-chip
+                                                v-bind="attrs"
+                                                :input-value="selected"
+                                                close
+                                                @click="select"
+                                                @click:close="mesh.default.dns.splice(mesh.default.dns.indexOf(item), 1)"
+                                        >
+                                            <strong>{{ item }}</strong>&nbsp;
+                                        </v-chip>
+                                    </template>
+                                </v-combobox>
+                                <v-combobox
                                         v-model="mesh.default.tags"
                                         chips
                                         hint="Write tag name and hit enter"
@@ -282,29 +322,6 @@
                                         v-model="mesh.default.presharedKey"
                                         label="Preshared Key"
                                 />
-
-
-                                <v-combobox
-                                    v-model="mesh.default.dns"
-                                    chips
-                                    hint="Write IP address(es) and hit enter or leave empty.  If not empty, be sure to include your local resolver."
-                                    label="DNS servers for this mesh"
-                                    multiple
-                                    dark
-                                >
-                                    <template v-slot:selection="{ attrs, item, select, selected }">
-                                        <v-chip
-                                                v-bind="attrs"
-                                                :input-value="selected"
-                                                close
-                                                @click="select"
-                                                @click:close="mesh.default.dns.splice(mesh.default.dns.indexOf(item), 1)"
-                                        >
-                                            <strong>{{ item }}</strong>&nbsp;
-                                        </v-chip>
-                                    </template>
-                                </v-combobox>
-
                                 <v-combobox
                                         v-model="mesh.default.allowedIPs"
                                         chips
