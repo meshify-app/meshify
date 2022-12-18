@@ -517,12 +517,20 @@ var D3Network = window['vue-d3-network']
               if (this.hosts[i].meshName == name) {
                     mesh_hosts[x] = this.hosts[i]
                     this.nodes[x] = { id: x, name: this.hosts[i].name, /* _color:'gray'*/}
+                    if (this.hosts[i].current.endpoint == "") {
+                        this.nodes[x]._color = "#34adcd"
+                    } else {
+                        this.nodes[x]._color = "#83c44d"
+                    }
+                    if (this.hosts[i].role == "Egress") {
+                        this.nodes[x]._color = "#50C878"
+                    }
                     x++
               }
           }
           for (let i=0; i<mesh_hosts.length; i++) {
               for (let j=0; j<mesh_hosts.length; j++) {
-                  if (i != j && mesh_hosts[j].current.endpoint != "") {
+                  if (i != j && mesh_hosts[j].current.endpoint != "" && mesh_hosts[j].role !="Egress") {
                       this.links[l] = { sid: i, tid: j, _color: "white"}
                       l++
                   }
