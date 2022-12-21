@@ -39,11 +39,16 @@ func (e *Entry) VerifyPassword(pass string) (err error) {
 	}
 
 	// Get the salt from the password.
+	salt := ""
 	parts := strings.SplitN(e.Pass, "$", 5)
-	if len(parts) != 5 {
+	switch len(parts) {
+	case 4:
+		salt = "$" + parts[1] + "$" + parts[2] + "$"
+	case 5:
+		salt = "$" + parts[1] + "$" + parts[2] + "$" + parts[3] + "$"
+	default:
 		return errors.New("verify: malformed password")
 	}
-	salt := "$" + parts[1] + "$" + parts[2] + "$" + parts[3] + "$"
 
 	// crypt.NewFromHash may panic on unknown hash function.
 	defer func() {
