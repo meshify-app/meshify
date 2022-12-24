@@ -103,7 +103,7 @@ func updateUser(c *gin.Context) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	data.UpdatedBy = user.Name
+	data.UpdatedBy = user.Email
 
 	client, err := core.UpdateUser(id, &data)
 	if err != nil {
